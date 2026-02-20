@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cURL Examples - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>/* Same CSS */</style>
+</head>
+<body>
+    <header class="docs-header">...</header>
+    <div class="docs-layout">
+        <button class="sidebar-toggle">📚 Menu ▼</button>
+        <aside class="docs-sidebar">...</aside>
+        <main class="docs-content">
+            <div class="content-container">
+                <h1>cURL Examples</h1>
+                <p class="lead">Command-line examples for all PIGMENT API endpoints.</p>
+
+                <h2>Setup</h2>
+                <pre><code>export PIGMENT_API_KEY="pk_live_abc123..."</code></pre>
+
+                <h2>Start Evolution</h2>
+                <pre><code>curl -X POST https://api.pigment.dev/v1/evolve \
+  -H "Authorization: Bearer $PIGMENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target_url": "https://example.com/image.jpg",
+    "generations": 1000,
+    "polygons": 150
+  }'</code></pre>
+
+                <h2>Check Job Status</h2>
+                <pre><code>curl -X GET https://api.pigment.dev/v1/jobs/job_abc123 \
+  -H "Authorization: Bearer $PIGMENT_API_KEY"</code></pre>
+
+                <h2>List Works</h2>
+                <pre><code>curl -X GET "https://api.pigment.dev/v1/works?limit=10&sort=fitness" \
+  -H "Authorization: Bearer $PIGMENT_API_KEY"</code></pre>
+
+                <h2>Get Single Work</h2>
+                <pre><code>curl -X GET https://api.pigment.dev/v1/works/work_123 \
+  -H "Authorization: Bearer $PIGMENT_API_KEY"</code></pre>
+
+                <h2>Delete Work</h2>
+                <pre><code>curl -X DELETE https://api.pigment.dev/v1/works/work_123 \
+  -H "Authorization: Bearer $PIGMENT_API_KEY"</code></pre>
+
+                <h2>Generate with Prompt</h2>
+                <pre><code>curl -X POST https://api.pigment.dev/v1/prompt \
+  -H "Authorization: Bearer $PIGMENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "abstract geometric pattern with symmetry",
+    "iterations": 500
+  }'</code></pre>
+
+                <h2>Kinship Comparison</h2>
+                <pre><code>curl -X POST https://api.pigment.dev/v1/kinship/compare \
+  -H "Authorization: Bearer $PIGMENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "work_ids": ["work_123", "work_456", "work_789"]
+  }'</code></pre>
+
+                <h2>Get Lineage</h2>
+                <pre><code>curl -X GET "https://api.pigment.dev/v1/kinship/work_123/lineage?generations=3" \
+  -H "Authorization: Bearer $PIGMENT_API_KEY"</code></pre>
+
+                <h2>Gallery Listing</h2>
+                <pre><code>curl -X GET "https://api.pigment.dev/v1/gallery?sort=popular&limit=20" \
+  -H "Authorization: Bearer $PIGMENT_API_KEY"</code></pre>
+
+                <h2>Upload to Gallery</h2>
+                <pre><code>curl -X POST https://api.pigment.dev/v1/gallery \
+  -H "Authorization: Bearer $PIGMENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "work_id": "work_123",
+    "title": "My Masterpiece",
+    "tags": ["abstract", "featured"]
+  }'</code></pre>
+
+                <h2>Like Work</h2>
+                <pre><code>curl -X POST https://api.pigment.dev/v1/gallery/gallery_123/like \
+  -H "Authorization: Bearer $PIGMENT_API_KEY"</code></pre>
+
+                <div class="pagination">
+                    <a href="python.html" class="prev">← Python</a>
+                    <a href="../index.html" class="next">Docs Home →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="docs-footer">...</footer>
+</body>
+</html>
