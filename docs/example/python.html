@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Examples - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>/* Same CSS */</style>
+</head>
+<body>
+    <header class="docs-header">...</header>
+    <div class="docs-layout">
+        <button class="sidebar-toggle">📚 Menu ▼</button>
+        <aside class="docs-sidebar">...</aside>
+        <main class="docs-content">
+            <div class="content-container">
+                <h1>Python Examples</h1>
+                <p class="lead">Complete Python examples for all PIGMENT API endpoints.</p>
+
+                <h2>Installation</h2>
+                <pre><code>pip install pigment-api</code></pre>
+
+                <h2>Basic Setup</h2>
+                <pre><code>import os
+from pigment import PigmentClient
+
+client = PigmentClient(
+    api_key=os.environ.get('PIGMENT_API_KEY')
+)</code></pre>
+
+                <h2>Evolve Image</h2>
+                <pre><code>import time
+
+def evolve_image():
+    job = client.evolve(
+        target_url='https://example.com/image.jpg',
+        generations=1000
+    )
+
+    while True:
+        status = client.get_job_status(job['job_id'])
+        print(f"Progress: {status['progress']}%")
+        
+        if status['status'] != 'processing':
+            break
+        time.sleep(1)
+
+    print(f"Result: {status['result']['image_url']}")</code></pre>
+
+                <h2>Using Prompts</h2>
+                <pre><code>def generate_with_prompt():
+    result = client.prompt(
+        prompt='a serene landscape with mountains',
+        style='realistic',
+        iterations=500
+    )
+    return result</code></pre>
+
+                <h2>Kinship Analysis</h2>
+                <pre><code>def analyze_family_tree():
+    lineage = client.kinship.get_lineage(
+        work_id='work_123',
+        generations=3
+    )
+    
+    for ancestor in lineage['ancestors']:
+        print(f"Ancestor: {ancestor['id']} - "
+              f"Similarity: {ancestor['similarity']}")</code></pre>
+
+                <h2>Async Support</h2>
+                <pre><code>import asyncio
+from pigment import AsyncPigmentClient
+
+async def async_example():
+    client = AsyncPigmentClient(api_key=os.environ.get('PIGMENT_API_KEY'))
+    result = await client.evolve(target_url='https://example.com/image.jpg')
+    return result</code></pre>
+
+                <div class="pagination">
+                    <a href="javascript.html" class="prev">← JavaScript</a>
+                    <a href="curl.html" class="next">cURL Examples →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="docs-footer">...</footer>
+</body>
+</html>
