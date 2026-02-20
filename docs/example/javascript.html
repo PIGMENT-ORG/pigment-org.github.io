@@ -2,89 +2,332 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaScript Examples - PIGMENT API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>JavaScript Examples - PIGMENT v6 API</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../../css/docs.css">
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">[header]</header>
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">[sidebar]</aside>
         <main class="docs-content">
             <div class="content-container">
                 <h1>JavaScript Examples</h1>
-                <p class="lead">Complete JavaScript/Node.js examples for all PIGMENT API endpoints.</p>
+                <p class="lead">Complete JavaScript examples for browser and Node.js environments.</p>
 
-                <h2>Installation</h2>
-                <pre><code>npm install pigment-api</code></pre>
+                <h2>Official Client Library</h2>
+                <p>We provide an official client library to simplify integration:</p>
+                <div class="code-block">
+                    <pre><code>// Include in your HTML
+&lt;script src="https://pigment-org.github.io/js/api-client.js"&gt;&lt;/script&gt;
 
-                <h2>Basic Setup</h2>
-                <pre><code>import { PigmentClient } from 'pigment-api';
+// Or install via npm (coming soon)
+// npm install pigment-api</code></pre>
+                </div>
 
-const client = new PigmentClient({
-    apiKey: process.env.PIGMENT_API_KEY
-});</code></pre>
+                <h2>Browser Examples (Vanilla JS)</h2>
 
-                <h2>Evolve Image</h2>
-                <pre><code>async function evolveFromUrl() {
-    const job = await client.evolve({
-        target_url: 'https://example.com/image.jpg',
-        generations: 1000,
-        polygons: 100
+                <h3>1. Get API Key</h3>
+                <div class="code-block">
+                    <pre><code>async function getApiKey(email) {
+    const response = await fetch('https://pigment-api.onrender.com/v1/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
     });
+    
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.api_key;
+}
 
-    // Poll for results
-    let status;
-    do {
-        await new Promise(r => setTimeout(r, 1000));
-        status = await client.getJobStatus(job.job_id);
-        console.log(`Progress: ${status.progress}%`);
-    } while (status.status === 'processing');
+// Usage
+getApiKey('user@example.com')
+    .then(key => console.log('API Key:', key))
+    .catch(err => console.error('Error:', err));</code></pre>
+                </div>
 
-    console.log('Complete!', status.result.image_url);
-}</code></pre>
-
-                <h2>Using Prompts</h2>
-                <pre><code>async function generateWithPrompt() {
-    const result = await client.prompt({
-        prompt: 'a cyberpunk cityscape with neon lights',
-        style: 'geometric',
-        iterations: 500
+                <h3>2. Create Work</h3>
+                <div class="code-block">
+                    <pre><code>async function createWork(apiKey, title, genome, tags = []) {
+    const response = await fetch('https://pigment-api.onrender.com/v1/works', {
+        method: 'POST',
+        headers: {
+            'X-API-Key': apiKey,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            title,
+            content: genome,
+            tags
+        })
     });
-}</code></pre>
+    
+    return await response.json();
+}
 
-                <h2>Kinship Analysis</h2>
-                <pre><code>async function compareWorks() {
-    const result = await client.kinship.compare({
-        work_ids: ['work_123', 'work_456'],
-        include_features: true
+// Example genome
+const genome = `-- PIGMENT Genome v6.0.0
+-- @fitness 0.0
+
+canvas { width: 400 height: 400 }
+
+palette { color_0: #ff3366 }
+
+layer base {
+  zone poly_0 {
+    color: palette.color_0
+    opacity: 0.8
+    points: 120,140 180,120 160,200
+  }
+}`;</code></pre>
+                </div>
+
+                <h3>3. Evolve Work</h3>
+                <div class="code-block">
+                    <pre><code>async function evolveWork(apiKey, workId, steps = 500, mutationRate = 1.0) {
+    const response = await fetch('https://pigment-api.onrender.com/v1/evolve', {
+        method: 'POST',
+        headers: {
+            'X-API-Key': apiKey,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            work_id: workId,
+            steps,
+            mutation_rate: mutationRate
+        })
     });
+    
+    return await response.json();
 }</code></pre>
+                </div>
 
-                <h2>React Component</h2>
-                <pre><code>function EvolutionViewer({ targetImage }) {
-    const [progress, setProgress] = useState(0);
-    const [result, setResult] = useState(null);
-
-    useEffect(() => {
-        const ws = new WebSocket('wss://api.pigment.dev/v1/ws?token=' + apiKey);
-        ws.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            setProgress(data.progress);
-            if (data.result) setResult(data.result);
-        };
-    }, []);
+                <h3>4. Complete Workflow Example</h3>
+                <div class="code-block">
+                    <pre><code>async function runCompleteWorkflow() {
+    try {
+        // 1. Get API key
+        const apiKey = await getApiKey('demo@example.com');
+        console.log('API Key obtained');
+        
+        // 2. Create initial work
+        const work = await createWork(apiKey, 'JS Demo', genome, ['javascript']);
+        console.log('Work created:', work.id);
+        
+        // 3. Evolve it
+        const evolved = await evolveWork(apiKey, work.id, 500, 1.2);
+        console.log(`Evolved: ${evolved.fitness_before}% → ${evolved.fitness_after}%`);
+        console.log('Operator used:', evolved.operator);
+        
+        // 4. Get kinship
+        const kinshipResponse = await fetch('https://pigment-api.onrender.com/v1/kinship', {
+            method: 'POST',
+            headers: {
+                'X-API-Key': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ work_id: evolved.child_id })
+        });
+        const kinship = await kinshipResponse.json();
+        console.log('Parents:', kinship.parents?.length || 0);
+        
+        // 5. Apply prompt
+        const promptResponse = await fetch('https://pigment-api.onrender.com/v1/prompt', {
+            method: 'POST',
+            headers: {
+                'X-API-Key': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                work_id: evolved.child_id,
+                prompt: 'make it glitchy with neon colors'
+            })
+        });
+        const promptResult = await promptResponse.json();
+        console.log('AI operations:', promptResult.operations_applied);
+        
+        return promptResult.child_id;
+        
+    } catch (error) {
+        console.error('Workflow failed:', error);
+    }
 }</code></pre>
+                </div>
 
-                <div class="pagination">
-                    <a href="../endpoints/gallery.html" class="prev">← Gallery</a>
-                    <a href="python.html" class="next">Python Examples →</a>
+                <h2>Using the Official Client</h2>
+                <div class="code-block">
+                    <pre><code>// Initialize client
+const client = new PIGMENTClient('https://pigment-api.onrender.com');
+
+// Get API key
+await client.createUser('me@example.com');
+
+// Create work
+const work = await client.createWork('My Art', genome, ['demo']);
+
+// Evolve
+const evolved = await client.evolve(work.id, 1000);
+
+// Get kinship
+const kinship = await client.getKinship(evolved.child_id);
+
+// Apply prompt
+const promptResult = await client.applyPrompt(evolved.child_id, 'make it glitchy');</code></pre>
+                </div>
+
+                <h2>Node.js with Fetch</h2>
+                <div class="code-block">
+                    <pre><code>// Node.js 18+ has native fetch
+const API_URL = 'https://pigment-api.onrender.com';
+
+class PigmentClient {
+    constructor(apiKey) {
+        this.apiKey = apiKey;
+        this.baseUrl = API_URL;
+    }
+    
+    async request(endpoint, options = {}) {
+        const response = await fetch(`${this.baseUrl}${endpoint}`, {
+            ...options,
+            headers: {
+                'X-API-Key': this.apiKey,
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+        
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || `HTTP ${response.status}`);
+        }
+        
+        return response.json();
+    }
+    
+    async createWork(title, content, tags = []) {
+        return this.request('/v1/works', {
+            method: 'POST',
+            body: JSON.stringify({ title, content, tags })
+        });
+    }
+    
+    async evolve(workId, steps = 500, mutationRate = 1.0) {
+        return this.request('/v1/evolve', {
+            method: 'POST',
+            body: JSON.stringify({ work_id: workId, steps, mutation_rate: mutationRate })
+        });
+    }
+    
+    async getKinship(workId) {
+        return this.request('/v1/kinship', {
+            method: 'POST',
+            body: JSON.stringify({ work_id: workId })
+        });
+    }
+}
+
+// Usage
+const client = new PigmentClient('your-api-key');
+const work = await client.createWork('Node.js Example', genome);
+const evolved = await client.evolve(work.id);</code></pre>
+                </div>
+
+                <h2>WebSocket Real-time Updates</h2>
+                <div class="code-block">
+                    <pre><code>// Connect to WebSocket for real-time evolution updates
+const userId = 'user_' + Date.now().toString(36);
+const ws = new WebSocket(`wss://pigment-api.onrender.com/ws/${userId}`);
+
+ws.onopen = () => {
+    console.log('Connected to PIGMENT WebSocket');
+    
+    // Authenticate
+    ws.send(JSON.stringify({
+        type: 'auth',
+        api_key: 'your-api-key'
+    }));
+};
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    
+    switch(data.type) {
+        case 'evolution_tick':
+            console.log(`Progress: ${Math.round(data.progress * 100)}%`);
+            console.log(`Generation ${data.generation}: ${data.fitness}% fitness`);
+            console.log(`Operator: ${data.operator}`);
+            break;
+            
+        case 'evolution_done':
+            console.log('Evolution complete!');
+            console.log(`Final fitness: ${data.fitness_after}%`);
+            console.log(`Improvement: +${data.improvement}%`);
+            ws.close();
+            break;
+            
+        case 'fitness_milestone':
+            console.log(`🏆 Milestone: ${data.milestone}% fitness!`);
+            break;
+            
+        case 'error':
+            console.error('WebSocket error:', data.error);
+            break;
+    }
+};
+
+ws.onclose = () => {
+    console.log('Disconnected from WebSocket');
+};
+
+// Subscribe to a job
+ws.send(JSON.stringify({
+    type: 'subscribe_job',
+    job_id: 'job_abc123'
+}));</code></pre>
+                </div>
+
+                <h2>Error Handling with Retries</h2>
+                <div class="code-block">
+                    <pre><code>async function fetchWithRetry(url, options, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const response = await fetch(url, options);
+            
+            if (response.status === 429) {
+                // Rate limited - exponential backoff
+                const waitTime = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                console.log(`Rate limited. Retrying in ${waitTime/1000}s...`);
+                await new Promise(r => setTimeout(r, waitTime));
+                continue;
+            }
+            
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.message || `HTTP ${response.status}`);
+            }
+            
+            return await response.json();
+            
+        } catch (err) {
+            if (i === maxRetries - 1) throw err;
+            if (err.name === 'TypeError') {
+                // Network error, retry
+                await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+                continue;
+            }
+            throw err;
+        }
+    }
+}</code></pre>
                 </div>
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+    <footer class="docs-footer">[footer]</footer>
 </body>
 </html>
