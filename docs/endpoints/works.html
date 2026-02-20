@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>/v1/works - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>/* Same CSS */</style>
+</head>
+<body>
+    <header class="docs-header">...</header>
+    <div class="docs-layout">
+        <button class="sidebar-toggle">📚 Menu ▼</button>
+        <aside class="docs-sidebar">...</aside>
+        <main class="docs-content">
+            <div class="content-container">
+                <h1><code>/v1/works</code></h1>
+                <p class="lead">List, retrieve, and manage your generated artworks.</p>
+
+                <h2>List Works</h2>
+                <p><code>GET /v1/works</code></p>
+
+                <h3>Parameters</h3>
+                <table>
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>limit</td><td>integer</td><td>Max items (1-100, default 20)</td></tr>
+                    <tr><td>offset</td><td>integer</td><td>Pagination offset</td></tr>
+                    <tr><td>sort</td><td>string</td><td>Sort by: created_at, fitness</td></tr>
+                </table>
+
+                <h3>Response</h3>
+                <pre><code>{
+    "data": [
+        {
+            "id": "work_123",
+            "url": "https://storage.pigment.dev/work_123.png",
+            "fitness": 98.5,
+            "created_at": "2026-03-15T10:30:00Z",
+            "generations": 1000,
+            "polygons": 150,
+            "tags": ["abstract", "portrait"]
+        }
+    ],
+    "total": 42,
+    "limit": 20,
+    "offset": 0
+}</code></pre>
+
+                <h2>Get Single Work</h2>
+                <p><code>GET /v1/works/{id}</code></p>
+
+                <h3>Response</h3>
+                <pre><code>{
+    "id": "work_123",
+    "url": "https://storage.pigment.dev/work_123.png",
+    "fitness": 98.5,
+    "created_at": "2026-03-15T10:30:00Z",
+    "generations": 1000,
+    "polygons": 150,
+    "metadata": {
+        "target_url": "https://example.com/original.jpg",
+        "mutation_rate": 0.1,
+        "strategy": "refine.face"
+    },
+    "kinship": {
+        "parent": "work_122",
+        "children": ["work_124", "work_125"],
+        "similarity": 0.85
+    }
+}</code></pre>
+
+                <h2>Delete Work</h2>
+                <p><code>DELETE /v1/works/{id}</code></p>
+                <p>Returns <code>204 No Content</code> on success.</p>
+
+                <h2>Update Work</h2>
+                <p><code>PATCH /v1/works/{id}</code></p>
+
+                <h3>Request Body</h3>
+                <pre><code>{
+    "tags": ["abstract", "featured"],
+    "title": "My Masterpiece"
+}</code></pre>
+
+                <div class="pagination">
+                    <a href="../getting-started.html" class="prev">← Getting Started</a>
+                    <a href="evolve.html" class="next">/v1/evolve →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="docs-footer">...</footer>
+</body>
+</html>
