@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         :root {
             --ink: #0a0a0a;
             --paper: #f0ede6;
@@ -43,11 +43,11 @@
         .header-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .logo a {
@@ -65,9 +65,8 @@
 
         .header-nav {
             display: flex;
-            gap: clamp(1rem, 3vw, 2rem);
+            gap: 1.5rem;
             align-items: center;
-            flex-wrap: wrap;
         }
 
         .header-nav a {
@@ -76,7 +75,6 @@
             font-size: 0.9rem;
             transition: color 0.2s;
             white-space: nowrap;
-            padding: 0.5rem 0;
         }
 
         .header-nav a:hover,
@@ -93,13 +91,13 @@
             padding: 0.25rem 1rem;
             border-radius: 6px;
             cursor: pointer;
-            min-width: 50px;
+            min-width: 44px;
             min-height: 44px;
             line-height: 1;
         }
 
         .btn {
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1.2rem;
             border-radius: 6px;
             text-decoration: none;
             font-size: 0.9rem;
@@ -107,8 +105,8 @@
             white-space: nowrap;
             border: 1px solid transparent;
             display: inline-block;
-            min-height: 44px;
-            line-height: 1.8;
+            min-height: 40px;
+            line-height: 1.6;
         }
 
         .btn-primary {
@@ -145,7 +143,7 @@
             position: relative;
         }
 
-        /* Sidebar - Scrollable */
+        /* Sidebar - Desktop only */
         .docs-sidebar {
             width: 280px;
             flex-shrink: 0;
@@ -205,7 +203,6 @@
             display: block;
             padding: 0.4rem 0;
             transition: color 0.2s;
-            word-break: break-word;
             border-left: 2px solid transparent;
             padding-left: 0.5rem;
         }
@@ -216,11 +213,41 @@
             border-left-color: var(--accent);
         }
 
+        /* Mobile Sidebar Toggle */
+        .sidebar-toggle {
+            display: none;
+            width: 100%;
+            padding: 1rem;
+            background: #0d0d0d;
+            border: none;
+            border-bottom: 1px solid #1a1a1a;
+            color: var(--paper);
+            font-family: var(--mono);
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 60px;
+        }
+
+        .sidebar-toggle span {
+            color: var(--accent);
+        }
+
+        .sidebar-toggle .arrow {
+            transition: transform 0.3s;
+        }
+
+        .sidebar-toggle.active .arrow {
+            transform: rotate(180deg);
+        }
+
         /* Main Content */
         .docs-content {
             flex: 1;
             min-width: 0;
-            padding: 2.5rem 3rem;
+            padding: 2rem 2rem;
             overflow-x: auto;
         }
 
@@ -284,17 +311,16 @@
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 1rem;
             overflow-x: auto;
-            margin: 1.5rem 0;
-            position: relative;
+            margin: 1rem 0;
+            font-size: 0.85rem;
         }
 
         pre code {
             background: none;
             padding: 0;
             color: var(--paper);
-            font-size: 0.9rem;
             line-height: 1.5;
         }
 
@@ -391,6 +417,7 @@
             text-align: left;
             border-bottom: 1px solid #1a1a1a;
             font-size: 0.9rem;
+            min-width: 120px;
         }
 
         th {
@@ -416,7 +443,7 @@
             border: 1px solid #333;
             color: var(--dim);
             padding: 0.5rem 1rem;
-            border-radius: 4px 4px 0 0;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: all 0.2s;
@@ -432,7 +459,6 @@
 
         .tab-panel {
             display: none;
-            padding: 1.5rem 0;
         }
 
         .tab-panel.active {
@@ -445,6 +471,8 @@
             margin-top: 3rem;
             padding-top: 1.5rem;
             border-top: 1px solid #1a1a1a;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .pagination a {
@@ -476,7 +504,7 @@
         .docs-footer {
             background: #0d0d0d;
             border-top: 1px solid #1a1a1a;
-            padding: 2rem 1.5rem 1rem;
+            padding: 2rem 1rem 1rem;
             margin-top: auto;
         }
 
@@ -484,7 +512,7 @@
             max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 2rem;
         }
 
@@ -497,7 +525,6 @@
 
         .footer-section ul {
             list-style: none;
-            margin: 0;
         }
 
         .footer-section li {
@@ -524,29 +551,17 @@
             font-size: 0.8rem;
         }
 
-        /* Responsive */
+        /* Responsive Breakpoints */
         @media (max-width: 1024px) {
-            .docs-layout {
-                flex-direction: column;
-            }
-
-            .docs-sidebar {
-                width: 100%;
-                height: auto;
-                position: static;
-                border-right: none;
-                border-bottom: 1px solid #1a1a1a;
-                padding: 1rem;
-            }
-
             .docs-content {
-                padding: 2rem;
+                padding: 1.5rem;
             }
         }
 
         @media (max-width: 768px) {
+            /* Mobile header */
             .header-container {
-                padding: 0.75rem 1rem;
+                padding: 0.5rem 1rem;
             }
 
             .mobile-menu-btn {
@@ -586,15 +601,54 @@
                 display: none;
             }
 
-            .docs-content {
-                padding: 1.5rem;
+            /* Mobile layout - stack vertically */
+            .docs-layout {
+                flex-direction: column;
             }
 
+            /* Sidebar becomes collapsible */
+            .docs-sidebar {
+                display: none;
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid #1a1a1a;
+                padding: 1rem 0;
+            }
+
+            .docs-sidebar.show {
+                display: block;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+            }
+
+            .docs-content {
+                padding: 1.5rem 1rem;
+            }
+
+            /* Step layout */
             .step {
                 flex-direction: column;
                 gap: 0.5rem;
             }
 
+            .step-number {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            /* Tables scroll horizontally */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            /* Tabs stack */
             .tab-buttons {
                 flex-direction: column;
             }
@@ -603,8 +657,16 @@
                 width: 100%;
             }
 
+            /* Footer */
             .footer-container {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+
+            /* Pre blocks */
+            pre {
+                font-size: 0.75rem;
+                padding: 0.75rem;
             }
         }
 
@@ -618,19 +680,31 @@
                 font-size: 1.8rem;
             }
 
-            .docs-content {
+            .lead {
+                font-size: 1rem;
+            }
+
+            .pagination {
+                flex-direction: column;
+            }
+
+            .pagination a {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .info-box,
+            .warning-box {
                 padding: 1rem;
             }
 
-            pre {
-                padding: 1rem;
+            table {
                 font-size: 0.8rem;
             }
 
-            .step-number {
-                width: 32px;
-                height: 32px;
-                font-size: 1rem;
+            th, td {
+                padding: 0.5rem;
+                min-width: 100px;
             }
         }
 
@@ -638,9 +712,11 @@
         @media print {
             .docs-header,
             .docs-sidebar,
+            .sidebar-toggle,
             .docs-footer,
             .copy-btn,
-            .tab-buttons {
+            .tab-buttons,
+            .pagination {
                 display: none;
             }
 
@@ -656,6 +732,11 @@
             pre {
                 border: 1px solid #ccc;
                 background: #f5f5f5;
+            }
+
+            a {
+                color: black;
+                text-decoration: underline;
             }
         }
     </style>
@@ -681,7 +762,13 @@
     </header>
 
     <div class="docs-layout">
-        <aside class="docs-sidebar">
+        <!-- Mobile Sidebar Toggle -->
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <span>📚 Menu</span>
+            <span class="arrow">▼</span>
+        </button>
+
+        <aside class="docs-sidebar" id="sidebar">
             <div class="sidebar-section">
                 <h3 class="sidebar-title">Getting Started</h3>
                 <ul class="sidebar-nav">
@@ -739,7 +826,7 @@
                         <div class="step-content">
                             <h3>Get Your API Key</h3>
                             <p>First, you'll need an API key to authenticate your requests. Sign up for a free account and generate your first API key.</p>
-                            
+
                             <div class="code-header">
                                 <span>Generate API Key</span>
                             </div>
@@ -749,7 +836,7 @@
 # Copy your key (starts with pk_live_ or pk_test_)</code></pre>
 
                             <p>You'll get a key that looks like: <code>pk_live_abc123def456ghi789jkl0mno</code></p>
-                            
+
                             <div class="warning-box">
                                 <strong>⚠️ Important:</strong> Never share your API key or commit it to version control. Use environment variables instead.
                             </div>
@@ -847,8 +934,7 @@ async function evolveImage() {
             target_url: 'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d',
             generations: 1000,
             polygons: 100,
-            mutation_rate: 0.1,
-            webhook_url: 'https://your-server.com/webhook' // optional
+            mutation_rate: 0.1
         });
 
         console.log('Evolution started:', job.id);
@@ -908,7 +994,7 @@ def evolve_image():
             time.sleep(1)
             status = client.get_job_status(job.id)
             print(f'Progress: {status.progress}% | Fitness: {status.fitness}%')
-            
+
             if status.status != 'processing':
                 break
 
@@ -1109,7 +1195,7 @@ curl -X GET https://api.pigment.dev/v1/jobs/job_123456 \
     </footer>
 
     <script>
-        // Mobile menu
+        // Mobile menu for header
         const menuBtn = document.getElementById('menuBtn');
         const navLinks = document.getElementById('navLinks');
 
@@ -1135,17 +1221,47 @@ curl -X GET https://api.pigment.dev/v1/jobs/job_123456 \
             });
         }
 
+        // Mobile sidebar toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+                sidebarToggle.classList.toggle('active');
+            });
+
+            // Close sidebar when clicking a link on mobile
+            sidebar.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('show');
+                        sidebarToggle.classList.remove('active');
+                    }
+                });
+            });
+
+            // Close sidebar when clicking outside
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && 
+                    !e.target.closest('#sidebar') && 
+                    !e.target.closest('#sidebarToggle') &&
+                    sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                    sidebarToggle.classList.remove('active');
+                }
+            });
+        }
+
         // Tab switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tabId = btn.dataset.tab;
-                
-                // Update buttons in the same tab container
                 const container = btn.closest('.tab-container');
+                
                 container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                
-                // Update panels in the same container
+
                 container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
                 container.querySelector(`#tab-${tabId}`).classList.add('active');
             });
@@ -1153,9 +1269,9 @@ curl -X GET https://api.pigment.dev/v1/jobs/job_123456 \
 
         // Copy function
         window.copyCode = function(btn) {
-            const codeBlock = btn.closest('.code-header').nextElementSibling;
-            const code = codeBlock.textContent;
-            
+            const pre = btn.closest('.code-header').nextElementSibling;
+            const code = pre.textContent;
+
             navigator.clipboard.writeText(code).then(() => {
                 const originalText = btn.textContent;
                 btn.textContent = '✅ Copied!';
@@ -1165,37 +1281,30 @@ curl -X GET https://api.pigment.dev/v1/jobs/job_123456 \
             });
         };
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-
-        // Highlight current section in sidebar
-        const sections = document.querySelectorAll('h2');
+        // Active sidebar link based on scroll
+        const sections = document.querySelectorAll('h2[id]');
         const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
 
-        window.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop - 100;
-                if (window.scrollY >= sectionTop) {
-                    current = section.getAttribute('id');
-                }
-            });
+        if (sections.length > 0 && sidebarLinks.length > 0) {
+            window.addEventListener('scroll', () => {
+                let current = '';
+                const scrollPos = window.scrollY + 100;
 
-            sidebarLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${current}`) {
-                    link.classList.add('active');
-                }
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollPos >= sectionTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>
