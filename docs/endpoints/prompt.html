@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>AI Prompt Endpoint - PIGMENT API Docs</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/docs.css">
+    <style>
+        .prompt-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .prompt-card {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+        .prompt-text {
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            font-style: italic;
+        }
+        .prompt-result {
+            color: var(--dim);
+            font-size: 0.9rem;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 0.75rem;
+        }
+        .operator-tag {
+            display: inline-block;
+            background: #1a1a1a;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 0.25rem;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <header class="docs-header">
+        <!-- [Same header as other docs pages] -->
+        <div class="header-container">
+            <div class="logo">
+                <a href="../../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn" id="menuBtn">☰</button>
+            <nav class="header-nav" id="navLinks">
+                <a href="../../index.html">Home</a>
+                <a href="../index.html" class="active">Docs</a>
+                <a href="../../blog/index.html">Blog</a>
+                <a href="../../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="../getting-started.html" class="btn btn-primary">Get Started</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar">
+            <!-- [Same sidebar structure] -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../index.html">Introduction</a></li>
+                    <li><a href="../getting-started.html">Quick Start</a></li>
+                    <li><a href="../authentication.html">Authentication</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="works.html">/v1/works</a></li>
+                    <li><a href="evolve.html">/v1/evolve</a></li>
+                    <li><a href="kinship.html">/v1/kinship</a></li>
+                    <li><a href="prompt.html" class="active">/v1/prompt</a></li>
+                    <li><a href="gallery.html">/v1/gallery</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="docs-content">
+            <div class="content-container">
+                <div class="endpoint-header">
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-path">/v1/prompt</span>
+                </div>
+
+                <h1>AI Prompt Endpoint</h1>
+                <p class="lead">Guide the evolution process using natural language. Describe what you want to see, and our AI (Claude) translates your words into specific mutation operations.</p>
+
+                <div class="info-box">
+                    <strong>🤖 AI Integration:</strong> This endpoint uses Anthropic's Claude API when available, with a smart fallback to keyword-based matching. The system learns from every prompt to improve future generations.
+                </div>
+
+                <h2>Request</h2>
+                
+                <h3>Body Parameters</h3>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>work_id</code></td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>ID of the artwork to evolve</td>
+                        </tr>
+                        <tr>
+                            <td><code>prompt</code></td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>Natural language description of desired changes</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Example Request</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>cURL</span>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <pre><code>curl -X POST https://pigment-api.onrender.com/v1/prompt \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "work_id": "work_abc123",
+    "prompt": "make it glitchy with more contrast and neon colors"
+  }'</code></pre>
+                </div>
+
+                <h2>Response</h2>
+                
+                <h3>Response Fields</h3>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>parent_id</code></td>
+                            <td>string</td>
+                            <td>ID of the original artwork</td>
+                        </tr>
+                        <tr>
+                            <td><code>child_id</code></td>
+                            <td>string</td>
+                            <td>ID of the newly evolved artwork</td>
+                        </tr>
+                        <tr>
+                            <td><code>intent</code></td>
+                            <td>string</td>
+                            <td>AI's interpretation of your prompt</td>
+                        </tr>
+                        <tr>
+                            <td><code>operations_applied</code></td>
+                            <td>array</td>
+                            <td>List of mutation operations performed</td>
+                        </tr>
+                        <tr>
+                            <td><code>used_claude</code></td>
+                            <td>boolean</td>
+                            <td>Whether Claude API was used (vs local fallback)</td>
+                        </tr>
+                        <tr>
+                            <td><code>fitness_before</code></td>
+                            <td>float</td>
+                            <td>Fitness score before evolution</td>
+                        </tr>
+                        <tr>
+                            <td><code>fitness_after</code></td>
+                            <td>float</td>
+                            <td>Fitness score after evolution</td>
+                        </tr>
+                        <tr>
+                            <td><code>style</code></td>
+                            <td>string</td>
+                            <td>Detected style of the new artwork</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Example Response</h3>
+                <div class="code-block">
+                    <pre><code>{
+  "parent_id": "work_abc123",
+  "child_id": "work_def456",
+  "intent": "Apply digital glitch aesthetic with enhanced contrast and neon color palette",
+  "operations_applied": [
+    "glitch_colors",
+    "boost_contrast",
+    "saturate",
+    "chaos"
+  ],
+  "used_claude": true,
+  "fitness_before": 72.4,
+  "fitness_after": 68.9,
+  "improvement": -3.5,
+  "style": "glitch"
+}</code></pre>
+                </div>
+
+                <h2>Supported Operations</h2>
+                <p>The AI can trigger any of these mutation operations based on your prompt:</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0;">
+                    <span class="operator-tag">shift_palette</span>
+                    <span class="operator-tag">boost_contrast</span>
+                    <span class="operator-tag">darken</span>
+                    <span class="operator-tag">lighten</span>
+                    <span class="operator-tag">chaos</span>
+                    <span class="operator-tag">smooth</span>
+                    <span class="operator-tag">saturate</span>
+                    <span class="operator-tag">desaturate</span>
+                    <span class="operator-tag">scale_polygons</span>
+                    <span class="operator-tag">rotate_all</span>
+                    <span class="operator-tag">add_polygons</span>
+                    <span class="operator-tag">remove_polygons</span>
+                    <span class="operator-tag">set_opacity</span>
+                    <span class="operator-tag">glitch_colors</span>
+                    <span class="operator-tag">organic_spread</span>
+                    <span class="operator-tag">void_crush</span>
+                </div>
+
+                <h2>Example Prompts</h2>
+
+                <div class="prompt-examples">
+                    <div class="prompt-card">
+                        <div class="prompt-text">"make it glitchy, more contrast"</div>
+                        <div class="prompt-result">
+                            <strong>Operations:</strong> glitch_colors, chaos, boost_contrast
+                            <div style="margin-top: 0.5rem; color: var(--accent);">mut_rate: 3.0×</div>
+                        </div>
+                    </div>
+                    <div class="prompt-card">
+                        <div class="prompt-text">"give it an organic, nature feel"</div>
+                        <div class="prompt-result">
+                            <strong>Operations:</strong> organic_spread, smooth, saturate
+                            <div style="margin-top: 0.5rem; color: var(--accent);">mut_rate: 0.5×</div>
+                        </div>
+                    </div>
+                    <div class="prompt-card">
+                        <div class="prompt-text">"darker, more void-like"</div>
+                        <div class="prompt-result">
+                            <strong>Operations:</strong> void_crush, darken, remove_polygons
+                            <div style="margin-top: 0.5rem; color: var(--accent);">mut_rate: 0.6×</div>
+                        </div>
+                    </div>
+                    <div class="prompt-card">
+                        <div class="prompt-text">"add more detail and complexity"</div>
+                        <div class="prompt-result">
+                            <strong>Operations:</strong> add_polygons, boost_contrast
+                            <div style="margin-top: 0.5rem; color: var(--accent);">mut_rate: 1.5×</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>How It Works</h2>
+
+                <div style="background: #0d0d0d; padding: 1.5rem; border-radius: 8px; margin: 2rem 0;">
+                    <h3 style="margin-top: 0;">1. Prompt Analysis</h3>
+                    <p>Your prompt is sent to Claude API (or local keyword matcher) which analyzes intent and generates a structured mutation plan.</p>
+
+                    <h3>2. Mutation Plan</h3>
+                    <p>The AI returns a JSON plan like:</p>
+                    <pre><code>{
+  "intent": "Apply glitch aesthetic",
+  "operations": [
+    {"op": "glitch_colors", "intensity": 0.8},
+    {"op": "chaos", "intensity": 0.4},
+    {"op": "boost_contrast", "intensity": 0.6}
+  ],
+  "mutation_rate_multiplier": 3.0
+}</code></pre>
+
+                    <h3>3. Execution</h3>
+                    <p>The plan is applied to the artwork's genome, creating a new evolved version.</p>
+
+                    <h3>4. Learning</h3>
+                    <p>All prompts and results are logged to improve future AI responses.</p>
+                </div>
+
+                <h2>Local Fallback Keywords</h2>
+                <p>When Claude API is unavailable, the system uses keyword matching:</p>
+
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Keyword</th>
+                            <th>Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>glitch, corrupt, noise</td>
+                            <td>glitch_colors + chaos + boost_contrast (mut_rate 3.0×)</td>
+                        </tr>
+                        <tr>
+                            <td>organic, nature, smooth</td>
+                            <td>organic_spread + smooth + saturate (mut_rate 0.5×)</td>
+                        </tr>
+                        <tr>
+                            <td>void, dark, black</td>
+                            <td>void_crush + darken + remove_polygons (mut_rate 0.6×)</td>
+                        </tr>
+                        <tr>
+                            <td>bright, vivid, pop</td>
+                            <td>lighten + saturate + boost_contrast (mut_rate 1.2×)</td>
+                        </tr>
+                        <tr>
+                            <td>minimal, simple</td>
+                            <td>remove_polygons + desaturate + smooth (mut_rate 0.3×)</td>
+                        </tr>
+                        <tr>
+                            <td>neon, electric</td>
+                            <td>saturate + lighten + glitch_colors (mut_rate 1.8×)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Best Practices</h2>
+                <ul>
+                    <li><strong>Be specific:</strong> "make it glitchy" works, but "add magenta channel offset with pixel sorting" gives better results</li>
+                    <li><strong>Combine styles:</strong> "glitchy but organic" will try to balance both</li>
+                    <li><strong>Use contrast terms:</strong> "more contrast", "brighter", "darker" adjust luminance</li>
+                    <li><strong>Reference colors:</strong> "neon green", "warm orange", "cool blue" shift the palette</li>
+                </ul>
+
+                <h2>Error Responses</h2>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>400</td>
+                            <td>Missing work_id or prompt</td>
+                        </tr>
+                        <tr>
+                            <td>401</td>
+                            <td>Invalid API key</td>
+                        </tr>
+                        <tr>
+                            <td>404</td>
+                            <td>Work not found</td>
+                        </tr>
+                        <tr>
+                            <td>429</td>
+                            <td>Rate limit exceeded (60/min free tier)</td>
+                        </tr>
+                        <tr>
+                            <td>503</td>
+                            <td>Claude API unavailable (fallback used)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <a href="kinship.html" class="prev">← Kinship Endpoint</a>
+                    <a href="gallery.html" class="next">Gallery Endpoint →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="docs-footer">
+        <!-- [Same footer as other pages] -->
+    </footer>
+
+    <script src="../../js/docs.js"></script>
+</body>
+</html>
