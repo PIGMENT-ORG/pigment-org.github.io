@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Kinship Explained: Art Family Trees - PIGMENT Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/blog.css">
+    <style>
+        .kinship-viz {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .family-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .tree-node {
+            background: #1a1a1a;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            display: inline-block;
+        }
+        .tree-children {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #333;
+        }
+        .relationship-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 0.25rem;
+        }
+        .badge-parent { background: #ff3b2f; color: white; }
+        .badge-child { background: #0051ff; color: white; }
+        .badge-sibling { background: #bf5af2; color: white; }
+        .badge-cousin { background: #ff9f0a; color: black; }
+        .badge-similar { background: #2a2a2a; color: #ccc; }
+    </style>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo"><a href="../index.html">PIGMENT <span>blog</span></a></div>
+            <nav class="header-nav">
+                <a href="../index.html">Home</a>
+                <a href="../docs/index.html">Docs</a>
+                <a href="index.html" class="active">Blog</a>
+                <a href="../showcase/index.html">Showcase</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="docs-content" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+        <div class="blog-post">
+            <h1>Kinship Explained: Art Family Trees</h1>
+            <div class="blog-meta">
+                <span>By PIGMENT Team</span>
+                <span>March 10, 2026</span>
+                <span>10 min read</span>
+            </div>
+
+            <p class="lead">Just as you can trace your family tree, PIGMENT lets you trace the ancestry of your artworks. Parents, children, siblings, cousins — every evolved artwork has a lineage, and our kinship system reveals these connections.</p>
+
+            <h2>What is Kinship?</h2>
+            <p>In PIGMENT, every time you evolve an artwork, you create a <strong>parent-child relationship</strong>. The original work is the parent, and the evolved result is its child. Over many generations, these relationships form complex family trees.</p>
+
+            <p>But kinship goes beyond direct lineage. Two artworks might be:</p>
+            <ul>
+                <li><strong>Siblings</strong> — Share the same parent</li>
+                <li><strong>Cousins</strong> — Share grandparents or great-grandparents</li>
+                <li><strong>Similar</strong> — Visually related but not directly connected</li>
+            </ul>
+
+            <div class="kinship-viz">
+                <div class="family-tree">
+                    <div class="tree-node">Great-grandparent (gen 0)</div>
+                    <div style="font-size:1.2rem;">↓</div>
+                    <div class="tree-node">Grandparent (gen 23)</div>
+                    <div style="display:flex; gap:2rem; justify-content:center;">
+                        <div style="text-align:center;">
+                            <div class="tree-node">Parent (gen 42)</div>
+                            <div style="display:flex; gap:1rem; margin-top:1rem;">
+                                <div class="tree-node">Child 1</div>
+                                <div class="tree-node">Child 2</div>
+                            </div>
+                            <div style="color:#666; margin-top:1rem;">↓ siblings</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div class="tree-node">Aunt/Uncle (gen 41)</div>
+                            <div class="tree-node" style="margin-top:2rem;">Cousin</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="caption">A simplified family tree showing relationships</div>
+            </div>
+
+            <h2>The 16-Dimensional Feature Vector</h2>
+            <p>The foundation of kinship is the <strong>feature vector</strong> — a mathematical fingerprint of each artwork. When you create or evolve a work, PIGMENT extracts 16 perceptual features:</p>
+
+            <table style="width:100%; margin:1.5rem 0;">
+                <tr><td><strong>0-2:</strong> RGB means</td><td>Average color values</td></tr>
+                <tr><td><strong>3-5:</strong> RGB standard deviations</td><td>Color variance</td></tr>
+                <tr><td><strong>6:</strong> Luminance contrast</td><td>Brightness spread</td></tr>
+                <tr><td><strong>7:</strong> Color entropy</td><td>Color complexity</td></tr>
+                <tr><td><strong>8:</strong> Polygon count</td><td>Normalized (0-1)</td></tr>
+                <tr><td><strong>9:</strong> Average opacity</td><td>Transparency level</td></tr>
+                <tr><td><strong>10:</strong> Average points per polygon</td><td>Shape complexity</td></tr>
+                <tr><td><strong>11:</strong> Hue spread</td><td>Color diversity</td></tr>
+                <tr><td><strong>12:</strong> Glitch factor</td><td>Channel imbalance</td></tr>
+                <tr><td><strong>13:</strong> Organic factor</td><td>Green bias + smoothness</td></tr>
+                <tr><td><strong>14:</strong> Void factor</td><td>Darkness + low complexity</td></tr>
+                <tr><td><strong>15:</strong> Fitness proxy</td><td>Normalized fitness</td></tr>
+            </table>
+
+            <p>These features capture both <strong>visual appearance</strong> (colors, contrast) and <strong>structural properties</strong> (polygon counts, complexity).</p>
+
+            <h2>How Similarity is Calculated</h2>
+            <p>Kinship uses a weighted combination of three similarity measures:</p>
+
+            <div style="background:#0d0d0d; padding:2rem; border-radius:12px; margin:2rem 0;">
+                <div style="display:flex; gap:2rem; justify-content:center; flex-wrap:wrap;">
+                    <div style="text-align:center;">
+                        <div style="font-size:2.5rem; color:var(--accent);">40%</div>
+                        <div><strong>Visual</strong></div>
+                        <div style="color:#666;">RGB means, entropy, contrast</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:2.5rem; color:var(--accent);">30%</div>
+                        <div><strong>Generational</strong></div>
+                        <div style="color:#666;">Parent/child distance</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:2.5rem; color:var(--accent);">30%</div>
+                        <div><strong>Structural</strong></div>
+                        <div style="color:#666;">Polygon count, opacity</div>
+                    </div>
+                </div>
+            </div>
+
+            <p>The combined score determines the relationship:</p>
+            <ul>
+                <li><span class="relationship-badge badge-parent">Parent/Child</span> <strong>≥ 90%</strong> — Direct lineage (determined by parent_id)</li>
+                <li><span class="relationship-badge badge-sibling">Sibling</span> <strong>≥ 82%</strong> — Same parent</li>
+                <li><span class="relationship-badge badge-cousin">Cousin</span> <strong>65-81%</strong> — Share grandparents</li>
+                <li><span class="relationship-badge badge-similar">Similar</span> <strong>45-64%</strong> — Visually related</li>
+            </ul>
+
+            <h2>Ancestry Tracking</h2>
+            <p>The <code>/v1/ancestry/{id}</code> endpoint reveals an artwork's complete lineage:</p>
+
+            <div class="code-block">
+                <pre><code>GET /v1/ancestry/work_abc123
+
+{
+  "work_id": "work_abc123",
+  "title": "Abstract Study #1",
+  "generation": 42,
+  "fitness": 78.5,
+  "lineage": [
+    {
+      "id": "work_xyz789",
+      "title": "Base Image",
+      "fitness": 100.0,
+      "generation": 0
+    },
+    {
+      "id": "work_def456",
+      "title": "Base Image (gen 1)",
+      "fitness": 45.2,
+      "generation": 1
+    }
+  ],
+  "fitness_history": [
+    {"generation": 0, "fitness": 100.0, "operator": "init"},
+    {"generation": 1, "fitness": 45.2, "operator": "scale"},
+    {"generation": 42, "fitness": 78.5, "operator": "rotate"}
+  ]
+}</code></pre>
+            </div>
+
+            <p>This reveals not just who the ancestors are, but how fitness evolved over time and which operators were most effective at each stage.</p>
+
+            <h2>Finding Similar Works</h2>
+            <p>The <code>/v1/search/similar</code> endpoint lets you find relatives even without a direct parent link:</p>
+
+            <div class="code-block">
+                <pre><code>POST /v1/search/similar
+{
+  "work_id": "work_abc123",
+  "limit": 10
+}</code></pre>
+            </div>
+
+            <p>This uses FAISS-powered similarity search (in Layer 4) to find the nearest neighbors in feature space, returning results in milliseconds even with thousands of works.</p>
+
+            <h2>Visualizing Kinship</h2>
+            <p>We provide an official visualization library to make kinship trees interactive:</p>
+
+            <div class="code-block">
+                <pre><code>&lt;script src="https://pigment-org.github.io/js/kinship-viz.js"&gt;&lt;/script&gt;
+&lt;div id="family-tree" style="width:100%; height:400px;"&gt;&lt;/div&gt;
+
+const data = await fetch('https://pigment-api.onrender.com/v1/kinship', {
+    method: 'POST',
+    headers: { 'X-API-Key': 'your-key' },
+    body: JSON.stringify({ work_id: 'work_abc123' })
+});
+
+KinshipViz.render('family-tree', data);</code></pre>
+            </div>
+
+            <p>The visualization shows:</p>
+            <ul>
+                <li><strong>Node size</strong> — Importance/influence of each work</li>
+                <li><strong>Edge thickness</strong> — Similarity strength</li>
+                <li><strong>Colors</strong> — Different relationship types</li>
+                <li><strong>Tooltips</strong> — Hover for fitness, generation, similarity</li>
+            </ul>
+
+            <h2>Real Example</h2>
+            <p>Let's trace a real artwork's family:</p>
+
+            <div class="code-block">
+                <pre><code>{
+  "work": {
+    "id": "work_glitch_42",
+    "title": "Glitch Portrait (gen 42)",
+    "fitness": 89.3
+  },
+  "parents": [{
+    "id": "work_base_1",
+    "title": "Original Photo",
+    "similarity": 92.1,
+    "relationship": "parent"
+  }],
+  "siblings": [{
+    "id": "work_glitch_41",
+    "title": "Glitch Portrait (gen 41)",
+    "similarity": 87.6,
+    "relationship": "sibling"
+  }],
+  "children": [{
+    "id": "work_glitch_43",
+    "title": "Glitch Portrait (gen 43)",
+    "similarity": 94.3,
+    "relationship": "child"
+  }],
+  "cousins": [...],
+  "similar": [...]
+}</code></pre>
+            </div>
+
+            <p>This tells us:</p>
+            <ul>
+                <li>The artwork evolved from an original photo</li>
+                <li>It has a sibling from the previous generation</li>
+                <li>It spawned a child that's 94.3% similar</li>
+                <li>There are more distant relatives in the "cousins" and "similar" lists</li>
+            </ul>
+
+            <h2>Why Kinship Matters</h2>
+            <p>Kinship isn't just a curiosity — it's a powerful tool for:</p>
+            <ul>
+                <li><strong>Tracking influence</strong> — See which artworks inspired others</li>
+                <li><strong>Finding originals</strong> — Trace back to source images</li>
+                <li><strong>Discovering clusters</strong> — Find all works in a particular style</li>
+                <li><strong>Analyzing evolution</strong> — Study how fitness improves over generations</li>
+            </ul>
+
+            <p>The next time you evolve an artwork in PIGMENT, remember: you're not just creating a single image — you're starting a new branch in the vast family tree of algorithmic art.</p>
+
+            <hr style="border-color:#1a1a1a; margin:3rem 0;">
+
+            <p><strong>Further reading:</strong> <a href="genetic-algorithms.html">How Genetic Algorithms Create Art</a> | <a href="feature-vectors.html">16D Feature Vectors Explained</a></p>
+        </div>
+    </main>
+
+    <footer class="docs-footer">[footer]</footer>
+</body>
+</html>
