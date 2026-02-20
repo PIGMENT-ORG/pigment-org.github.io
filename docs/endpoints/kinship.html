@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Kinship Endpoint - PIGMENT API Docs</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/docs.css">
+    <style>
+        .viz-preview {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .viz-placeholder {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 3rem;
+            color: var(--dim);
+            font-family: var(--mono);
+        }
+        .relationship-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+        .badge-parent { background: #ff3b2f; color: white; }
+        .badge-child { background: #0051ff; color: white; }
+        .badge-sibling { background: #bf5af2; color: white; }
+        .badge-cousin { background: #ff9f0a; color: black; }
+        .badge-similar { background: #2a2a2a; color: var(--paper); }
+    </style>
+</head>
+<body>
+    <header class="docs-header">
+        <!-- [Same header as other docs pages] -->
+        <div class="header-container">
+            <div class="logo">
+                <a href="../../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn" id="menuBtn">☰</button>
+            <nav class="header-nav" id="navLinks">
+                <a href="../../index.html">Home</a>
+                <a href="../index.html" class="active">Docs</a>
+                <a href="../../blog/index.html">Blog</a>
+                <a href="../../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="../getting-started.html" class="btn btn-primary">Get Started</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar">
+            <!-- [Same sidebar structure] -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../index.html">Introduction</a></li>
+                    <li><a href="../getting-started.html">Quick Start</a></li>
+                    <li><a href="../authentication.html">Authentication</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="works.html">/v1/works</a></li>
+                    <li><a href="evolve.html">/v1/evolve</a></li>
+                    <li><a href="kinship.html" class="active">/v1/kinship</a></li>
+                    <li><a href="prompt.html">/v1/prompt</a></li>
+                    <li><a href="gallery.html">/v1/gallery</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="docs-content">
+            <div class="content-container">
+                <div class="endpoint-header">
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-path">/v1/kinship</span>
+                </div>
+
+                <h1>Kinship Endpoint</h1>
+                <p class="lead">Discover how your artworks are related. The kinship system builds family trees showing parents, children, siblings, and similar works based on feature similarity.</p>
+
+                <div class="info-box">
+                    <strong>🔍 How it works:</strong> Each artwork has a 16-dimensional feature vector. Kinship calculates similarity using a weighted combination of visual features, generational distance, and structural properties.
+                </div>
+
+                <h2>Request</h2>
+                
+                <h3>Body Parameters</h3>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>work_id</code></td>
+                            <td>string</td>
+                            <td>Yes</td>
+                            <td>ID of the artwork to find relatives for</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Example Request</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>cURL</span>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <pre><code>curl -X POST https://pigment-api.onrender.com/v1/kinship \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "work_id": "work_abc123"
+  }'</code></pre>
+                </div>
+
+                <h2>Response</h2>
+                
+                <h3>Response Fields</h3>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>work</code></td>
+                            <td>object</td>
+                            <td>The source artwork details</td>
+                        </tr>
+                        <tr>
+                            <td><code>parents</code></td>
+                            <td>array</td>
+                            <td>Direct ancestors (similarity ≥ 0.90)</td>
+                        </tr>
+                        <tr>
+                            <td><code>children</code></td>
+                            <td>array</td>
+                            <td>Direct descendants</td>
+                        </tr>
+                        <tr>
+                            <td><code>siblings</code></td>
+                            <td>array</td>
+                            <td>Works with same parent (similarity ≥ 0.82)</td>
+                        </tr>
+                        <tr>
+                            <td><code>cousins</code></td>
+                            <td>array</td>
+                            <td>Similar works (similarity 0.65 - 0.81)</td>
+                        </tr>
+                        <tr>
+                            <td><code>similar</code></td>
+                            <td>array</td>
+                            <td>Related works (similarity 0.45 - 0.64)</td>
+                        </tr>
+                        <tr>
+                            <td><code>total_relationships</code></td>
+                            <td>integer</td>
+                            <td>Total count of all relatives found</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Example Response</h3>
+                <div class="code-block">
+                    <pre><code>{
+  "work": {
+    "id": "work_abc123",
+    "title": "Abstract Study #1",
+    "style": "abstract",
+    "fitness": 78.5,
+    "generation": 42
+  },
+  "parents": [
+    {
+      "id": "work_xyz789",
+      "title": "Base Image",
+      "similarity": 94.2,
+      "relationship": "parent",
+      "generation": 0
+    }
+  ],
+  "children": [
+    {
+      "id": "work_def456",
+      "title": "Abstract Study #1 (gen 43)",
+      "similarity": 91.7,
+      "relationship": "child",
+      "generation": 43
+    }
+  ],
+  "siblings": [
+    {
+      "id": "work_ghi789",
+      "title": "Abstract Study #2",
+      "similarity": 86.3,
+      "relationship": "sibling",
+      "generation": 41
+    }
+  ],
+  "cousins": [
+    {
+      "id": "work_jkl012",
+      "title": "Color Study",
+      "similarity": 72.8,
+      "relationship": "cousin",
+      "generation": 38
+    }
+  ],
+  "similar": [
+    {
+      "id": "work_mno345",
+      "title": "Geometric Pattern",
+      "similarity": 54.1,
+      "relationship": "similar",
+      "generation": 27
+    }
+  ],
+  "total_relationships": 6
+}</code></pre>
+                </div>
+
+                <h2>Relationship Types</h2>
+                
+                <div class="feature-grid" style="margin: 2rem 0;">
+                    <div class="feature-card">
+                        <span class="relationship-badge badge-parent">Parent/Child</span>
+                        <p style="margin-top: 1rem;">Direct lineage relationship. Child works are evolved from parents.</p>
+                        <code>similarity ≥ 90%</code>
+                    </div>
+                    <div class="feature-card">
+                        <span class="relationship-badge badge-sibling">Sibling</span>
+                        <p style="margin-top: 1rem;">Share the same parent work.</p>
+                        <code>similarity ≥ 82%</code>
+                    </div>
+                    <div class="feature-card">
+                        <span class="relationship-badge badge-cousin">Cousin</span>
+                        <p style="margin-top: 1rem;">Share grandparents or great-grandparents.</p>
+                        <code>similarity 65-81%</code>
+                    </div>
+                    <div class="feature-card">
+                        <span class="relationship-badge badge-similar">Similar</span>
+                        <p style="margin-top: 1rem;">Visually similar but no direct lineage.</p>
+                        <code>similarity 45-64%</code>
+                    </div>
+                </div>
+
+                <h2>Similarity Calculation</h2>
+                <p>The combined similarity score is weighted from three components:</p>
+
+                <div style="background: #0d0d0d; padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0;">
+                    <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; color: var(--accent);">40%</div>
+                            <div style="color: var(--dim);">Visual Features</div>
+                            <small>RGB, entropy, texture</small>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; color: var(--accent);">30%</div>
+                            <div style="color: var(--dim);">Generational</div>
+                            <small>Parent/child distance</small>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; color: var(--accent);">30%</div>
+                            <div style="color: var(--dim);">Structural</div>
+                            <small>Polygon count, opacity</small>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>Visualization</h2>
+                <p>Use our JavaScript library to visualize kinship trees:</p>
+
+                <div class="code-block">
+                    <pre><code>import { KinshipViz } from 'https://pigment-org.github.io/js/kinship-viz.js';
+
+// Fetch kinship data
+const response = await fetch('https://pigment-api.onrender.com/v1/kinship', {
+  method: 'POST',
+  headers: { 'X-API-Key': 'your-key' },
+  body: JSON.stringify({ work_id: 'work_abc123' })
+});
+
+const data = await response.json();
+
+// Render interactive tree
+const viz = KinshipViz.create('viz-container', data);
+viz.render();</code></pre>
+                </div>
+
+                <div class="viz-preview">
+                    <div class="viz-placeholder">
+                        🔗 Interactive kinship tree visualization appears here
+                    </div>
+                </div>
+
+                <h2>Error Responses</h2>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>400</td>
+                            <td>Missing work_id parameter</td>
+                        </tr>
+                        <tr>
+                            <td>401</td>
+                            <td>Invalid or missing API key</td>
+                        </tr>
+                        <tr>
+                            <td>404</td>
+                            <td>Work not found</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Rate Limits</h2>
+                <ul>
+                    <li>Free tier: 60 requests per minute</li>
+                    <li>Pro tier: 600 requests per minute</li>
+                    <li>Enterprise: Custom limits</li>
+                </ul>
+
+                <div class="pagination">
+                    <a href="evolve.html" class="prev">← Evolve Endpoint</a>
+                    <a href="prompt.html" class="next">Prompt Endpoint →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="docs-footer">
+        <!-- [Same footer as other pages] -->
+    </footer>
+
+    <script src="../../js/docs.js"></script>
+</body>
+</html>
