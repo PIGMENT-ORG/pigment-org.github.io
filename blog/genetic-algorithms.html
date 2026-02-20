@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>How Genetic Algorithms Create Art - PIGMENT Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/blog.css">
+    <style>
+        .code-block {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+        .code-block code {
+            color: var(--accent);
+            font-family: var(--mono);
+            font-size: 0.9rem;
+        }
+        .figure {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .figure img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .caption {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo"><a href="../index.html">PIGMENT <span>blog</span></a></div>
+            <nav class="header-nav">
+                <a href="../index.html">Home</a>
+                <a href="../docs/index.html">Docs</a>
+                <a href="index.html" class="active">Blog</a>
+                <a href="../showcase/index.html">Showcase</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="docs-content" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+        <div class="blog-post">
+            <h1>How Genetic Algorithms Create Art</h1>
+            <div class="blog-meta">
+                <span>By PIGMENT Team</span>
+                <span>March 15, 2026</span>
+                <span>12 min read</span>
+            </div>
+
+            <div class="figure">
+                <div style="font-size: 5rem;">🧬 → 🎨</div>
+                <div class="caption">Evolution in action: random polygons → structured art</div>
+            </div>
+
+            <p class="lead">Genetic algorithms mimic natural selection to "evolve" solutions to problems. In PIGMENT, we use them to evolve artwork — starting from random polygons and progressively refining them toward a target image or aesthetic goal.</p>
+
+            <h2>The Core Concepts</h2>
+            <p>Every genetic algorithm has five fundamental components:</p>
+            <ul>
+                <li><strong>Population</strong> — A set of candidate solutions (in our case, a collection of polygons)</li>
+                <li><strong>Genome</strong> — The "DNA" of each solution (polygon positions, colors, opacities)</li>
+                <li><strong>Fitness function</strong> — Measures how good each solution is (similarity to target image)</li>
+                <li><strong>Selection</strong> — Choosing the best solutions to reproduce</li>
+                <li><strong>Mutation</strong> — Random changes to create new variations</li>
+            </ul>
+
+            <h2>How PIGMENT Represents Art</h2>
+            <p>In PIGMENT, every artwork is stored as a <code>.pg</code> (PIGMENT Genome) file. Think of it as the DNA of your art:</p>
+
+            <div class="code-block">
+                <pre><code>-- PIGMENT Genome v6.0.0
+-- @fitness 78.5
+-- @generation 1542
+
+canvas { width: 400 height: 400 }
+
+palette {
+  c0: #ff3366
+  c1: #33ff99
+  c2: #3366ff
+}
+
+layer evolved {
+  zone poly_0 {
+    color: palette.c0
+    opacity: 0.8
+    points: 120,140 180,120 160,200
+  }
+  zone poly_1 {
+    color: palette.c1
+    opacity: 0.5
+    points: 220,180 280,220 240,280
+  }
+}</code></pre>
+            </div>
+
+            <p>Each polygon has:</p>
+            <ul>
+                <li><strong>Points</strong> — Coordinates that define its shape</li>
+                <li><strong>Color</strong> — RGB values from the palette</li>
+                <li><strong>Opacity</strong> — Transparency level (0-255)</li>
+            </ul>
+
+            <h2>The Evolution Process</h2>
+
+            <h3>1. Initialization</h3>
+            <p>When you load an image, PIGMENT creates a population of random polygons. In your frontend code:</p>
+
+            <div class="code-block">
+                <pre><code>function randPoly() {
+  const w = state.targetW, h = state.targetH;
+  const size = 10 + Math.random() * Math.min(w, h) * 0.35;
+  const cx = Math.random() * w, cy = Math.random() * h;
+  const sides = 3 + Math.floor(Math.random() * 3);
+  const pts = [];
+  
+  for (let i = 0; i < sides; i++) {
+    const a = (i / sides) * Math.PI * 2 + Math.random() * 0.8;
+    const r = size * (0.4 + Math.random() * 0.9);
+    pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
+  }
+  
+  return {
+    pts,
+    r: Math.random() * 255,
+    g: Math.random() * 255,
+    b: Math.random() * 255,
+    a: 20 + Math.random() * 160
+  };
+}</code></pre>
+            </div>
+
+            <p>At this stage, the artwork looks like random colored blobs — but that's exactly what we want. Evolution needs diversity to explore the solution space.</p>
+
+            <h3>2. Fitness Calculation</h3>
+            <p>The fitness function measures how close the current polygons are to the target image:</p>
+
+            <div class="code-block">
+                <pre><code>function calcFitness(polys) {
+  // Render polygons to canvas
+  renderPolygons(ctx, polys);
+  const evolved = ctx.getImageData(0, 0, w, h).data;
+  
+  // Compare pixel by pixel with target
+  let diff = 0;
+  for (let i = 0; i < evolved.length; i += 16) {
+    const dr = evolved[i] - target[i];
+    const dg = evolved[i+1] - target[i+1];
+    const db = evolved[i+2] - target[i+2];
+    diff += dr*dr + dg*dg + db*db;
+  }
+  
+  // Convert to percentage (100% = perfect match)
+  const maxDiff = 3 * 255 * 255 * (evolved.length / 16);
+  return 100 * (1 - diff / maxDiff);
+}</code></pre>
+            </div>
+
+            <p>This is the "survival of the fittest" mechanism — polygons that make the image look more like the target are considered better.</p>
+
+            <h3>3. Mutation Operators</h3>
+            <p>PIGMENT v6 includes 7 mutation operators, each affecting the genome differently:</p>
+
+            <table style="width:100%; border-collapse: collapse; margin:1.5rem 0;">
+                <tr style="border-bottom:1px solid #333;">
+                    <th style="text-align:left; padding:0.75rem;">Operator</th>
+                    <th style="text-align:left; padding:0.75rem;">Description</th>
+                    <th style="text-align:left; padding:0.75rem;">Effect</th>
+                </tr>
+                <tr style="border-bottom:1px solid #333;">
+                    <td style="padding:0.75rem;"><code>scale</code></td>
+                    <td>Resize polygon</td>
+                    <td>Changes shape size while preserving proportions</td>
+                </tr>
+                <tr style="border-bottom:1px solid #333;">
+                    <td style="padding:0.75rem;"><code>translate</code></td>
+                    <td>Move polygon</td>
+                    <td>Shifts position in x/y direction</td>
+                </tr>
+                <tr style="border-bottom:1px solid #333;">
+                    <td style="padding:0.75rem;"><code>color</code></td>
+                    <td>Shift RGB values</td>
+                    <td>Changes color slightly</td>
+                </tr>
+                <tr style="border-bottom:1px solid #333;">
+                    <td style="padding:0.75rem;"><code>opacity</code></td>
+                    <td>Change transparency</td>
+                    <td>Adjusts how much background shows through</td>
+                </tr>
+                <tr style="border-bottom:1px solid #333;">
+                    <td style="padding:0.75rem;"><code>rotate</code></td>
+                    <td>Rotate around center</td>
+                    <td>Spins the polygon</td>
+                </tr>
+                <tr style="border-bottom:1px solid #333;">
+                    <td style="padding:0.75rem;"><code>addpoint</code></td>
+                    <td>Add vertex</td>
+                    <td>Increases complexity (max 8 points)</td>
+                </tr>
+                <tr>
+                    <td style="padding:0.75rem;"><code>intelligent</code></td>
+                    <td>Use best operator</td>
+                    <td>Selects operator with highest success rate</td>
+                </tr>
+            </table>
+
+            <h3>4. Adaptive Probabilities</h3>
+            <p>One of PIGMENT's most powerful features is its adaptive operator selection. Each operator tracks its success rate:</p>
+
+            <div class="code-block">
+                <pre><code>const OPS = [
+  { name: 'Scale', key: 'scale', attempts: 0, successes: 0 },
+  { name: 'Translate', key: 'translate', attempts: 0, successes: 0 },
+  // ...
+];</code></pre>
+            </div>
+
+            <p>When an operator improves fitness, its probability increases slightly. When it fails, probability decreases. Over time, the system learns which operators work best for the current image and phase.</p>
+
+            <h3>5. Multi-Phase Strategy</h3>
+            <p>PIGMENT uses different strategies depending on fitness level:</p>
+
+            <div class="code-block">
+                <pre><code>const weights = {
+  explore: { scale:0.35, translate:0.25, color:0.20, opacity:0.10, rotate:0.07, intelligent:0.03 },
+  refine:  { scale:0.30, translate:0.15, color:0.20, opacity:0.20, rotate:0.10, intelligent:0.05 },
+  polish:  { scale:0.25, translate:0.15, color:0.20, opacity:0.20, rotate:0.12, intelligent:0.08 }
+};</code></pre>
+            </div>
+
+            <p>
+                <strong>Explore phase (0-30% fitness):</strong> Large mutations to discover structure<br>
+                <strong>Refine phase (30-60%):</strong> Moderate adjustments to improve<br>
+                <strong>Polish phase (60-100%):</strong> Fine-tuning for final accuracy
+            </p>
+
+            <h2>Stagnation Detection</h2>
+            <p>Sometimes evolution gets stuck in local optima — good but not great solutions. PIGMENT detects stagnation (no improvement for 400+ generations) and activates special "breaker" strategies:</p>
+
+            <ul>
+                <li><strong>Shake:</strong> Large random movements to escape local minima</li>
+                <li><strong>Recolor:</strong> Mass color randomization to find new color basins</li>
+                <li><strong>Reshape:</strong> Aggressive polygon reshaping</li>
+            </ul>
+
+            <h2>The 16D Feature Vector</h2>
+            <p>Beyond pixel-by-pixel comparison, PIGMENT extracts a 16-dimensional feature vector from every genome:</p>
+
+            <div class="code-block">
+                <pre><code>[
+  r_mean, g_mean, b_mean,      # Average colors
+  r_std, g_std, b_std,          # Color variance
+  lum_contrast,                 # Brightness spread
+  color_entropy,                # Color complexity
+  poly_count,                   # Normalized polygon count
+  avg_opacity,                  # Average transparency
+  avg_points,                   # Average points per polygon
+  hue_spread,                   # Color diversity
+  glitch_factor,                # Channel imbalance
+  organic_factor,               # Green bias
+  void_factor,                  # Darkness
+  fitness_proxy                 # Normalized fitness
+]</code></pre>
+            </div>
+
+            <p>This vector enables the kinship system and similarity search, allowing you to find related artworks even if they evolved from different starting points.</p>
+
+            <h2>Real-World Example</h2>
+            <p>Here's what happens in a typical evolution session:</p>
+
+            <div class="code-block">
+                <pre><code>Generation 0: Fitness 12.4% - Random colored blobs
+Generation 100: Fitness 34.7% - Basic shapes emerging
+Generation 500: Fitness 67.2% - Structure becoming clear
+Generation 1000: Fitness 84.9% - Fine details appearing
+Generation 2000: Fitness 92.3% - Near-perfect match</code></pre>
+            </div>
+
+            <p>Each generation applies hundreds of mutations, with successful ones being kept and unsuccessful ones discarded. The system gets smarter over time, learning which operators work best for each context.</p>
+
+            <h2>Try It Yourself</h2>
+            <p>The best way to understand genetic algorithms is to watch them in action:</p>
+            <ol>
+                <li>Open the <a href="../pigment-engine.html">PIGMENT demo</a></li>
+                <li>Drop any image onto the canvas</li>
+                <li>Press PLAY and watch evolution unfold</li>
+                <li>Observe how the strategy changes as fitness improves</li>
+            </ol>
+
+            <div class="figure">
+                <div style="background:#1a1a1a; padding:2rem; border-radius:8px;">
+                    <div style="display:flex; gap:1rem; justify-content:center;">
+                        <div>0%</div>
+                        <div style="flex:1; height:20px; background:#333; border-radius:10px;">
+                            <div style="width:78%; height:100%; background:var(--accent); border-radius:10px;"></div>
+                        </div>
+                        <div>78%</div>
+                    </div>
+                </div>
+                <div class="caption">Live fitness progress in the PIGMENT UI</div>
+            </div>
+
+            <p>The next time you see an image evolving, you'll understand the sophisticated dance of selection, mutation, and adaptation happening behind the scenes. That's the power of genetic algorithms — and that's PIGMENT.</p>
+
+            <hr style="border-color:#1a1a1a; margin:3rem 0;">
+
+            <p><strong>Further reading:</strong> <a href="kinship-explained.html">Kinship Explained: Art Family Trees</a> | <a href="ai-prompts.html">How AI Prompts Guide Evolution</a></p>
+        </div>
+    </main>
+
+    <footer class="docs-footer">[footer]</footer>
+</body>
+</html>
