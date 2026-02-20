@@ -3,672 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Blog - PIGMENT</title>
+    <title>PIGMENT Blog - AI Art Evolution</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --ink: #0a0a0a;
-            --paper: #f0ede6;
-            --dim: #b8b4ac;
-            --accent: #c8ff00;
-            --mono: 'DM Mono', monospace;
-            --display: 'Unbounded', sans-serif;
-        }
-
-        body {
-            background: var(--ink);
-            color: var(--paper);
-            font-family: var(--mono);
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header - Sticky */
-        .blog-header {
-            background: rgba(10,10,10,0.98);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #1a1a1a;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0.75rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo a {
-            font-family: var(--display);
-            font-weight: 900;
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        .logo span {
-            color: var(--dim);
-        }
-
-        .header-nav {
-            display: flex;
-            gap: clamp(1rem, 3vw, 2rem);
-            align-items: center;
-        }
-
-        .header-nav a {
-            color: var(--dim);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        .header-nav a:hover,
-        .header-nav a.active {
-            color: var(--accent);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: 1px solid #333;
-            color: var(--paper);
-            font-size: 1.8rem;
-            padding: 0.25rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            min-width: 50px;
-            min-height: 44px;
-        }
-
-        .btn {
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-            min-height: 44px;
-            display: inline-block;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--paper);
-            border-color: #333;
-        }
-
-        .btn-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        /* Main Content */
-        .blog-main {
-            flex: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            padding: 2rem 1.5rem;
-        }
-
-        .blog-title {
-            font-family: var(--display);
-            font-size: clamp(2rem, 6vw, 3rem);
-            font-weight: 900;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .blog-subtitle {
-            text-align: center;
-            color: var(--dim);
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            margin-bottom: 3rem;
-        }
-
-        /* Featured Post */
-        .featured-post {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 3rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            padding: 2rem;
-        }
-
-        .featured-image {
-            background: #1a1a1a;
-            border-radius: 8px;
-            overflow: hidden;
-            aspect-ratio: 16/9;
-        }
-
-        .featured-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .featured-content h2 {
-            font-family: var(--display);
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-        }
-
-        .featured-content h2 a {
-            color: var(--paper);
-            text-decoration: none;
-        }
-
-        .featured-content h2 a:hover {
-            color: var(--accent);
-        }
-
-        .featured-meta {
-            color: var(--dim);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .featured-excerpt {
-            color: #ccc;
-            margin-bottom: 1.5rem;
-        }
-
-        .read-more {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .read-more:hover {
-            text-decoration: underline;
-        }
-
-        /* Blog Grid */
         .blog-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            margin: 2rem 0;
+            margin: 3rem 0;
         }
-
         .blog-card {
             background: #0d0d0d;
             border: 1px solid #1a1a1a;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            transition: transform 0.2s, border-color 0.2s;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            transition: transform 0.2s;
         }
-
         .blog-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-5px);
             border-color: var(--accent);
         }
-
-        .card-image {
+        .blog-card-image {
             width: 100%;
-            aspect-ratio: 16/9;
+            height: 180px;
             background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
         }
-
-        .card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .card-content {
+        .blog-card-content {
             padding: 1.5rem;
-            flex: 1;
         }
-
-        .card-category {
-            color: var(--accent);
+        .blog-card-date {
+            color: #666;
             font-size: 0.8rem;
-            text-transform: uppercase;
             margin-bottom: 0.5rem;
-            display: block;
         }
-
-        .card-title {
+        .blog-card-title {
             font-family: var(--display);
             font-size: 1.3rem;
             margin-bottom: 0.75rem;
-            line-height: 1.3;
         }
-
-        .card-title a {
-            color: var(--paper);
-            text-decoration: none;
-        }
-
-        .card-title a:hover {
-            color: var(--accent);
-        }
-
-        .card-meta {
-            color: var(--dim);
-            font-size: 0.8rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .card-excerpt {
+        .blog-card-excerpt {
             color: #999;
             font-size: 0.9rem;
-            line-height: 1.6;
+            margin-bottom: 1rem;
         }
-
-        /* Categories */
-        .categories {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 2rem 0;
-        }
-
-        .category-tag {
-            background: #1a1a1a;
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            color: var(--dim);
+        .blog-card-link {
+            color: var(--accent);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            border: 1px solid #2a2a2a;
+            font-weight: 600;
         }
-
-        .category-tag:hover,
-        .category-tag.active {
-            background: var(--accent);
-            color: var(--ink);
-            border-color: var(--accent);
-        }
-
-        /* Newsletter */
-        .newsletter {
+        .featured-post {
             background: #0d0d0d;
             border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 3rem 2rem;
-            text-align: center;
-            margin: 3rem 0;
-        }
-
-        .newsletter h2 {
-            font-family: var(--display);
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .newsletter p {
-            color: var(--dim);
-            margin-bottom: 2rem;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .newsletter-form {
-            display: flex;
-            gap: 1rem;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .newsletter-input {
-            flex: 1;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            padding: 1rem;
-            border-radius: 6px;
-            color: var(--paper);
-            font-family: var(--mono);
-            font-size: 1rem;
-            min-height: 48px;
-        }
-
-        .newsletter-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .newsletter-btn {
-            background: var(--accent);
-            color: var(--ink);
-            border: none;
-            padding: 0 2rem;
-            border-radius: 6px;
-            font-family: var(--mono);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-height: 48px;
-            white-space: nowrap;
-        }
-
-        .newsletter-btn:hover,
-        .newsletter-btn:active {
-            background: #d4ff26;
-            transform: translateY(-2px);
-        }
-
-        /* Footer */
-        .blog-footer {
-            background: #0d0d0d;
-            border-top: 1px solid #1a1a1a;
-            padding: 2rem 1.5rem 1rem;
-            margin-top: auto;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 2rem;
         }
-
-        .footer-section h4 {
-            font-family: var(--display);
-            color: var(--paper);
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a {
-            color: var(--dim);
-            text-decoration: none;
-            font-size: 0.85rem;
-        }
-
-        .footer-section a:hover {
-            color: var(--accent);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #1a1a1a;
-            color: #333;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .header-container {
-                padding: 0.75rem 1rem;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .header-nav {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: #0a0a0a;
-                flex-direction: column;
-                padding: 1rem;
-                border-bottom: 1px solid #1a1a1a;
-            }
-
-            .header-nav.show {
-                display: flex;
-            }
-
-            .header-nav a {
-                width: 100%;
-                text-align: center;
-                padding: 0.75rem;
-            }
-
-            .header-actions {
-                display: none;
-            }
-
             .featured-post {
                 grid-template-columns: 1fr;
-                padding: 1.5rem;
-            }
-
-            .blog-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .newsletter-form {
-                flex-direction: column;
-            }
-
-            .footer-container {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .blog-main {
-                padding: 1rem;
-            }
-
-            .featured-post {
-                padding: 1rem;
-            }
-
-            .card-content {
-                padding: 1rem;
-            }
-
-            .newsletter {
-                padding: 2rem 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <header class="blog-header">
+    <header class="docs-header">
         <div class="header-container">
-            <div class="logo">
-                <a href="../index.html">PIGMENT <span>blog</span></a>
-            </div>
-            <button class="mobile-menu-btn" id="menuBtn">☰</button>
-            <nav class="header-nav" id="navLinks">
+            <div class="logo"><a href="../index.html">PIGMENT <span>blog</span></a></div>
+            <nav class="header-nav">
                 <a href="../index.html">Home</a>
                 <a href="../docs/index.html">Docs</a>
                 <a href="index.html" class="active">Blog</a>
                 <a href="../showcase/index.html">Showcase</a>
             </nav>
-            <div class="header-actions">
-                <a href="../docs/getting-started.html" class="btn btn-outline">Get Started</a>
-            </div>
         </div>
     </header>
 
-    <main class="blog-main">
-        <h1 class="blog-title">PIGMENT Blog</h1>
-        <p class="blog-subtitle">Thoughts on evolutionary art, genetic algorithms, and creative coding</p>
-
-        <div class="categories">
-            <a href="#" class="category-tag active">All</a>
-            <a href="#" class="category-tag">Technical</a>
-            <a href="#" class="category-tag">Tutorials</a>
-            <a href="#" class="category-tag">Research</a>
-            <a href="#" class="category-tag">Updates</a>
-        </div>
+    <main class="docs-content" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+        <h1>PIGMENT Blog</h1>
+        <p class="lead">Deep dives into genetic algorithms, kinship systems, and AI-powered art evolution.</p>
 
         <div class="featured-post">
-            <div class="featured-image">
-                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='338' viewBox='0 0 600 338'%3E%3Crect width='600' height='338' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%23c8ff00' font-family='monospace' font-size='24'%3EGenetic Algorithms%3C/text%3E%3C/svg%3E" alt="Genetic Algorithms">
-            </div>
-            <div class="featured-content">
-                <span class="card-category">Tutorial</span>
-                <h2><a href="genetic-algorithms.html">How Genetic Algorithms Create Art</a></h2>
-                <div class="featured-meta">By PIGMENT Team · March 15, 2026 · 12 min read</div>
-                <div class="featured-excerpt">Explore the fascinating world of genetic algorithms and how they can be used to generate unique artwork. Learn about mutation, crossover, and selection in the context of creative coding.</div>
-                <a href="genetic-algorithms.html" class="read-more">Read full article →</a>
+            <div class="featured-image" style="background: #1a1a1a; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 5rem;">🧬</div>
+            <div>
+                <h2>How Genetic Algorithms Create Art</h2>
+                <p style="color: #999;">An in-depth exploration of how evolution through mutation and selection can generate stunning visual artwork.</p>
+                <p><strong>Reading time:</strong> 12 minutes</p>
+                <a href="genetic-algorithms.html" class="btn btn-primary">Read More →</a>
             </div>
         </div>
 
         <div class="blog-grid">
             <div class="blog-card">
-                <div class="card-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='169' viewBox='0 0 300 169'%3E%3Crect width='300' height='169' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%23c8ff00' font-family='monospace' font-size='16'%3EKinship%3C/text%3E%3C/svg%3E" alt="Kinship">
-                </div>
-                <div class="card-content">
-                    <span class="card-category">Technical</span>
-                    <h3 class="card-title"><a href="kinship-explained.html">Kinship Explained: Art Family Trees</a></h3>
-                    <div class="card-meta">March 10, 2026 · 8 min read</div>
-                    <div class="card-excerpt">Understanding how artworks relate to each other through our kinship system. Track artistic influence across generations.</div>
+                <div class="blog-card-image">🔗</div>
+                <div class="blog-card-content">
+                    <div class="blog-card-date">March 15, 2026</div>
+                    <div class="blog-card-title">Kinship Explained: Art Family Trees</div>
+                    <div class="blog-card-excerpt">How FAISS vector search finds parents, siblings, and cousins in your art collection using 16-dimensional features.</div>
+                    <a href="kinship-explained.html" class="blog-card-link">Read more →</a>
                 </div>
             </div>
-
             <div class="blog-card">
-                <div class="card-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='169' viewBox='0 0 300 169'%3E%3Crect width='300' height='169' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%23c8ff00' font-family='monospace' font-size='16'%3EAI Prompts%3C/text%3E%3C/svg%3E" alt="AI Prompts">
-                </div>
-                <div class="card-content">
-                    <span class="card-category">Research</span>
-                    <h3 class="card-title"><a href="ai-prompts.html">AI-Powered Evolution: Claude Integration</a></h3>
-                    <div class="card-meta">March 5, 2026 · 10 min read</div>
-                    <div class="card-excerpt">How we integrated Claude to understand natural language prompts and guide the evolution process intelligently.</div>
+                <div class="blog-card-image">🤖</div>
+                <div class="blog-card-content">
+                    <div class="blog-card-date">March 10, 2026</div>
+                    <div class="blog-card-title">AI Prompts Meet Genetic Algorithms</div>
+                    <div class="blog-card-excerpt">How Claude API translates "make it glitchy" into structured mutation plans for evolving artwork.</div>
+                    <a href="ai-prompts.html" class="blog-card-link">Read more →</a>
                 </div>
             </div>
-
             <div class="blog-card">
-                <div class="card-image">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='169' viewBox='0 0 300 169'%3E%3Crect width='300' height='169' fill='%232a2a2a'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' fill='%23c8ff00' font-family='monospace' font-size='16'%3EFeature Vectors%3C/text%3E%3C/svg%3E" alt="Feature Vectors">
-                </div>
-                <div class="card-content">
-                    <span class="card-category">Technical</span>
-                    <h3 class="card-title"><a href="feature-vectors.html">16D Feature Vectors: How We Measure Art</a></h3>
-                    <div class="card-meta">Feb 28, 2026 · 15 min read</div>
-                    <div class="card-excerpt">Deep dive into our 16-dimensional feature space and how it enables precise similarity matching between artworks.</div>
+                <div class="blog-card-image">📊</div>
+                <div class="blog-card-content">
+                    <div class="blog-card-date">March 5, 2026</div>
+                    <div class="blog-card-title">16 Dimensions of Art</div>
+                    <div class="blog-card-excerpt">Breaking down the perceptual features: RGB means, entropy, hue spread, glitch factor, and more.</div>
+                    <a href="feature-vectors.html" class="blog-card-link">Read more →</a>
                 </div>
             </div>
-        </div>
-
-        <div class="newsletter">
-            <h2>Stay Updated</h2>
-            <p>Get the latest articles, tutorials, and updates from the PIGMENT team.</p>
-            <form class="newsletter-form" onsubmit="event.preventDefault(); toast('Thanks for subscribing!');">
-                <input type="email" placeholder="Enter your email" class="newsletter-input" required>
-                <button type="submit" class="newsletter-btn">Subscribe</button>
-            </form>
         </div>
     </main>
 
-    <footer class="blog-footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h4>PIGMENT</h4>
-                <ul>
-                    <li><a href="../index.html">Home</a></li>
-                    <li><a href="../docs/index.html">Documentation</a></li>
-                    <li><a href="index.html">Blog</a></li>
-                    <li><a href="../showcase/index.html">Showcase</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Topics</h4>
-                <ul>
-                    <li><a href="genetic-algorithms.html">Genetic Algorithms</a></li>
-                    <li><a href="kinship-explained.html">Kinship</a></li>
-                    <li><a href="ai-prompts.html">AI Prompts</a></li>
-                    <li><a href="feature-vectors.html">Feature Vectors</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Connect</h4>
-                <ul>
-                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
-                    <li><a href="https://twitter.com/pigment">Twitter</a></li>
-                    <li><a href="mailto:blog@pigment.dev">Email</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 PIGMENT. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        // Mobile menu
-        const menuBtn = document.getElementById('menuBtn');
-        const navLinks = document.getElementById('navLinks');
-
-        if (menuBtn && navLinks) {
-            menuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                navLinks.classList.toggle('show');
-                menuBtn.textContent = navLinks.classList.contains('show') ? '✕' : '☰';
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.blog-header')) {
-                    navLinks.classList.remove('show');
-                    menuBtn.textContent = '☰';
-                }
-            });
-
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) {
-                    navLinks.classList.remove('show');
-                    menuBtn.textContent = '☰';
-                }
-            });
-        }
-
-        function toast(msg) {
-            const el = document.createElement('div');
-            el.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: var(--accent);
-                color: var(--ink);
-                padding: 12px 24px;
-                border-radius: 40px;
-                font-size: 14px;
-                z-index: 2000;
-                transition: opacity 0.2s;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            `;
-            el.textContent = msg;
-            document.body.appendChild(el);
-            
-            setTimeout(() => {
-                el.style.opacity = '0';
-                setTimeout(() => el.remove(), 200);
-            }, 2000);
-        }
-    </script>
+    <footer class="docs-footer">[footer]</footer>
 </body>
 </html>
