@@ -2,57 +2,247 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rate Limits - PIGMENT API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Rate Limits - PIGMENT v6 API Docs</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../css/docs.css">
+    <style>
+        .plan-card {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .plan-name {
+            font-family: var(--display);
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .plan-limit {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        .plan-concurrent {
+            color: var(--dim);
+            font-size: 0.9rem;
+        }
+        .note-box {
+            background: #1a1a1a;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+    </style>
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+            <nav class="header-nav">
+                <a href="../index.html">Home</a>
+                <a href="index.html" class="active">Docs</a>
+                <a href="../blog/index.html">Blog</a>
+                <a href="../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="getting-started.html" class="btn btn-primary">Quick Start</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html">Introduction</a></li>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html" class="active">Rate Limits</a></li>
+                    <li><a href="errors.html">Error Handling</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="endpoints/works.html">/v1/works</a></li>
+                    <li><a href="endpoints/evolve.html">/v1/evolve</a></li>
+                    <li><a href="endpoints/kinship.html">/v1/kinship</a></li>
+                    <li><a href="endpoints/prompt.html">/v1/prompt</a></li>
+                    <li><a href="endpoints/gallery.html">/v1/gallery</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Examples</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="examples/javascript.html">JavaScript</a></li>
+                    <li><a href="examples/python.html">Python</a></li>
+                    <li><a href="examples/curl.html">cURL</a></li>
+                </ul>
+            </div>
+        </aside>
+
         <main class="docs-content">
             <div class="content-container">
                 <h1>Rate Limits</h1>
-                <p class="lead">Understand our rate limiting policy to build reliable applications.</p>
+                <p class="lead">Understand our rate limiting policy to build reliable applications. Rate limits help ensure fair usage and API stability for all users.</p>
 
-                <h2>Rate Limit Tiers</h2>
-                <table>
-                    <tr><th>Plan</th><th>Requests/minute</th><th>Concurrent jobs</th></tr>
-                    <tr><td>Free</td><td>60</td><td>2</td></tr>
-                    <tr><td>Pro</td><td>600</td><td>10</td></tr>
-                    <tr><td>Enterprise</td><td>Custom</td><td>Unlimited</td></tr>
-                </table>
-
-                <h2>Headers</h2>
-                <p>Each response includes rate limit headers:</p>
-                <pre><code>X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 58
-X-RateLimit-Reset: 1640995200</code></pre>
-
-                <h2>Handling Rate Limits</h2>
-                <div class="warning-box">
-                    <strong>Implement exponential backoff</strong> when you receive a 429 response.
+                <div class="note-box">
+                    <strong>ℹ️ Note:</strong> Rate limits are currently generous on the free tier. These limits may be adjusted as the platform grows. Always implement proper error handling in your applications.
                 </div>
 
-                <h3>Example: Exponential Backoff</h3>
-                <pre><code>async function makeRequestWithRetry() {
-    const maxRetries = 5;
+                <h2>Current Rate Limits</h2>
+                <p>Based on your API key type and plan, different rate limits apply:</p>
+
+                <div class="plan-card">
+                    <div class="plan-name">🎨 Free Plan</div>
+                    <div class="plan-limit">60 requests/minute</div>
+                    <div class="plan-concurrent">2 concurrent evolution jobs (when using Layer 3/4)</div>
+                    <p style="margin-top: 1rem; color: var(--dim);">Default for all new API keys from <code>/v1/users</code></p>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-name">🚀 Enterprise Plan</div>
+                    <div class="plan-limit">Custom limits</div>
+                    <div class="plan-concurrent">Unlimited concurrent jobs</div>
+                    <p style="margin-top: 1rem; color: var(--dim);">Contact us for enterprise access</p>
+                </div>
+
+                <h2>Rate Limit Headers</h2>
+                <p>Every API response includes headers that show your current rate limit status:</p>
+
+                <div class="code-block">
+                    <pre><code>X-RateLimit-Limit: 60          // Your total allowed requests per minute
+X-RateLimit-Remaining: 58      // Requests left in current window
+X-RateLimit-Reset: 1640995200  // Unix timestamp when limits reset</code></pre>
+                </div>
+
+                <h3>Example Response with Headers</h3>
+                <div class="code-block">
+                    <pre><code>HTTP/1.1 200 OK
+Content-Type: application/json
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 57
+X-RateLimit-Reset: 1708531200
+
+{
+  "id": "work_abc123",
+  "title": "My Artwork"
+}</code></pre>
+                </div>
+
+                <h2>Handling Rate Limits</h2>
+                <p>When you exceed your rate limit, the API returns a <code>429 Too Many Requests</code> response. Implement exponential backoff to handle this gracefully.</p>
+
+                <h3>Exponential Backoff Example</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>JavaScript</span>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <pre><code>async function makeRequestWithRetry(requestFn, maxRetries = 5) {
     for (let i = 0; i < maxRetries; i++) {
         try {
-            return await api.request();
+            return await requestFn();
         } catch (error) {
+            // Check if it's a rate limit error (429)
             if (error.status !== 429) throw error;
-            const waitTime = Math.pow(2, i) * 1000;
-            await new Promise(r => setTimeout(r, waitTime));
+            
+            // Calculate wait time: 2^i seconds with jitter
+            const waitTime = Math.pow(2, i) * 1000 + Math.random() * 1000;
+            console.log(`Rate limited. Retrying in ${waitTime/1000}s...`);
+            
+            await new Promise(resolve => setTimeout(resolve, waitTime));
         }
     }
-}</code></pre>
+    throw new Error('Max retries exceeded');
+}
+
+// Usage
+const result = await makeRequestWithRetry(() => 
+    fetch('https://pigment-api.onrender.com/v1/works', {
+        headers: { 'X-API-Key': 'your-key' }
+    })
+);</code></pre>
+                </div>
+
+                <h3>Python Example</h3>
+                <div class="code-block">
+                    <pre><code>import time
+import random
+
+def make_request_with_retry(request_func, max_retries=5):
+    for i in range(max_retries):
+        try:
+            return request_func()
+        except Exception as e:
+            if getattr(e, 'status', None) != 429:
+                raise e
+            
+            wait_time = (2 ** i) + random.random()
+            print(f"Rate limited. Retrying in {wait_time:.1f}s...")
+            time.sleep(wait_time)
+    
+    raise Exception("Max retries exceeded")</code></pre>
+                </div>
 
                 <h2>Concurrent Jobs</h2>
-                <p>You can run multiple evolution jobs simultaneously based on your plan. Check status with:</p>
-                <pre><code>GET /v1/jobs</code></pre>
+                <p>Depending on your plan, you can run multiple evolution jobs simultaneously:</p>
+
+                <ul>
+                    <li><strong>Free Plan:</strong> Up to 2 concurrent jobs</li>
+                    <li><strong>Enterprise:</strong> Custom limits</li>
+                </ul>
+
+                <p>Check your active jobs:</p>
+                <div class="code-block">
+                    <pre><code># For Layer 3/4 (FastAPI version)
+curl -X GET https://pigment-api.onrender.com/v1/jobs \
+  -H "X-API-Key: your-key"</code></pre>
+                </div>
+
+                <div class="note-box">
+                    <strong>📌 Note:</strong> If you're using the Layer 2 version (`server.py`), jobs are processed synchronously. The `/v1/jobs` endpoint is only available in the Layer 3/4 FastAPI deployment.
+                </div>
+
+                <h2>Best Practices</h2>
+                <ul>
+                    <li><strong>Cache responses</strong> when possible to reduce API calls</li>
+                    <li><strong>Implement exponential backoff</strong> with jitter</li>
+                    <li><strong>Monitor your usage</strong> via response headers</li>
+                    <li><strong>Queue requests</strong> instead of sending bursts</li>
+                    <li><strong>Use WebSocket</strong> for real-time updates instead of polling</li>
+                </ul>
+
+                <h2>What Happens When You're Rate Limited?</h2>
+                <p>The API returns:</p>
+                <div class="code-block">
+                    <pre><code>HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+Retry-After: 30
+
+{
+  "error": "Rate limit exceeded",
+  "message": "You have exceeded your rate limit of 60 requests per minute. Please wait 30 seconds before retrying.",
+  "retry_after": 30
+}</code></pre>
+                </div>
+
+                <h2>Need Higher Limits?</h2>
+                <p>If you need higher rate limits for your application:</p>
+                <ul>
+                    <li>Contact us at <strong>enterprise@pigment.dev</strong></li>
+                    <li>Provide your API key and use case</li>
+                    <li>We'll work with you on custom limits</li>
+                </ul>
 
                 <div class="pagination">
                     <a href="authentication.html" class="prev">← Authentication</a>
@@ -61,6 +251,41 @@ X-RateLimit-Reset: 1640995200</code></pre>
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+
+    <footer class="docs-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="index.html">Documentation</a></li>
+                    <li><a href="../blog/index.html">Blog</a></li>
+                    <li><a href="../showcase/index.html">Showcase</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                    <li><a href="errors.html">Error Handling</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+                    <li><a href="../blog/kinship-explained.html">Kinship System</a></li>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved. · v6.0.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/docs.js"></script>
 </body>
 </html>
