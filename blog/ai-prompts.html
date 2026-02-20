@@ -90,3 +90,169 @@
 
             <div class="mutation-flow">
                 <div class="flow-step">"make it glitchy"</div>
+                <div>→</div>
+                <div class="flow-step">AI Analysis</div>
+                <div>→</div>
+                <div class="flow-step">Mutation Plan</div>
+                <div>→</div>
+                <div class="flow-step">Evolution</div>
+            </div>
+
+            <h2>How Claude Transforms Prompts</h2>
+            <p>When you send a prompt to the <code>/v1/prompt</code> endpoint, the system (if configured with an <code>ANTHROPIC_API_KEY</code>) sends your request to Claude along with the current genome context:</p>
+
+            <div class="code-block">
+                <pre><code>{
+  "polygon_count": 150,
+  "mean_rgb": [128, 92, 156],
+  "fitness": 72.4,
+  "style": "custom",
+  "generation": 1542,
+  "prompt": "make it glitchy with neon accents"
+}</code></pre>
+            </div>
+
+            <p>Claude returns a structured mutation plan:</p>
+
+            <div class="code-block">
+                <pre><code>{
+  "intent": "Apply digital glitch aesthetic with neon highlights",
+  "operations": [
+    {"op": "glitch_colors", "intensity": 0.8},
+    {"op": "chaos", "intensity": 0.4, "params": {"fraction": 0.2}},
+    {"op": "saturate", "intensity": 0.9, "params": {"amount": 0.7}},
+    {"op": "boost_contrast", "intensity": 0.6}
+  ],
+  "mutation_rate_multiplier": 2.5
+}</code></pre>
+            </div>
+
+            <p>This plan is then executed on the artwork, applying the specified mutations with the given intensities.</p>
+
+            <h2>The Mutation Operations</h2>
+            <p>Claude can trigger any of 16 mutation operations, each with customizable parameters:</p>
+
+            <table style="width:100%; margin:1.5rem 0;">
+                <tr><td><code>shift_palette</code></td><td>Rotate colors in HSL space</td><td>"warmer", "cooler"</td></tr>
+                <tr><td><code>boost_contrast</code></td><td>Increase luminance spread</td><td>"more contrast"</td></tr>
+                <tr><td><code>darken</code></td><td>Reduce brightness</td><td>"darker", "moody"</td></tr>
+                <tr><td><code>lighten</code></td><td>Increase brightness</td><td>"brighter"</td></tr>
+                <tr><td><code>chaos</code></td><td>Randomize colors</td><td>"chaotic", "random"</td></tr>
+                <tr><td><code>smooth</code></td><td>Reduce variance</td><td>"smoother", "blend"</td></tr>
+                <tr><td><code>saturate</code></td><td>Increase intensity</td><td>"vibrant", "neon"</td></tr>
+                <tr><td><code>desaturate</code></td><td>Reduce intensity</td><td>"muted", "faded"</td></tr>
+                <tr><td><code>glitch_colors</code></td><td>Channel splitting</td><td>"glitchy", "error"</td></tr>
+                <tr><td><code>organic_spread</code></td><td>Green bias + smooth</td><td>"organic", "natural"</td></tr>
+                <tr><td><code>void_crush</code></td><td>Dark + desaturated</td><td>"void", "dark"</td></tr>
+            </table>
+
+            <h2>Local Fallback System</h2>
+            <p>If Claude is unavailable (no API key or network issues), PIGMENT uses intelligent keyword matching:</p>
+
+            <div class="prompt-example">
+                <div class="prompt-text">"make it glitchy"</div>
+                <div><span class="claude-badge">Claude</span> <span class="fallback-badge">Fallback</span></div>
+                <p><strong>Result:</strong> glitch_colors + chaos + boost_contrast (mutation rate 3.0×)</p>
+            </div>
+
+            <div class="prompt-example">
+                <div class="prompt-text">"give it an organic, nature feel"</div>
+                <div><span class="claude-badge">Claude</span> <span class="fallback-badge">Fallback</span></div>
+                <p><strong>Result:</strong> organic_spread + smooth + saturate (mutation rate 0.5×)</p>
+            </div>
+
+            <div class="prompt-example">
+                <div class="prompt-text">"darker, more void-like"</div>
+                <div><span class="claude-badge">Claude</span> <span class="fallback-badge">Fallback</span></div>
+                <p><strong>Result:</strong> void_crush + darken + remove_polygons (mutation rate 0.6×)</p>
+            </div>
+
+            <div class="prompt-example">
+                <div class="prompt-text">"add more detail and complexity"</div>
+                <div><span class="claude-badge">Claude</span> <span class="fallback-badge">Fallback</span></div>
+                <p><strong>Result:</strong> add_polygons + boost_contrast (mutation rate 1.5×)</p>
+            </div>
+
+            <h2>Keyword Mapping</h2>
+            <p>The fallback system uses carefully designed keyword maps:</p>
+
+            <table style="width:100%;">
+                <tr><th>Keywords</th><th>Effect</th></tr>
+                <tr><td>glitch, corrupt, noise, error</td><td>glitch_colors + chaos + boost_contrast</td></tr>
+                <tr><td>organic, nature, smooth, growth</td><td>organic_spread + smooth + saturate</td></tr>
+                <tr><td>void, dark, black, empty</td><td>void_crush + darken + remove_polygons</td></tr>
+                <tr><td>bright, vivid, pop, neon</td><td>lighten + saturate + boost_contrast</td></tr>
+                <tr><td>minimal, simple, clean</td><td>remove_polygons + desaturate + smooth</td></tr>
+                <tr><td>complex, detailed, intricate</td><td>add_polygons + boost_contrast</td></tr>
+            </table>
+
+            <h2>Complete Example</h2>
+            <p>Here's a real prompt sequence:</p>
+
+            <div class="code-block">
+                <pre><code>// Initial work
+const work = await createWork("Base Portrait");
+
+// Apply glitch effect
+const glitch = await applyPrompt(work.id, "make it glitchy");
+// → glitch_colors, chaos, boost_contrast
+// Fitness: 72.4% → 68.9% (sometimes glitch reduces fitness!)
+
+// Then add contrast
+const contrast = await applyPrompt(glitch.child_id, "more contrast, make it pop");
+// → boost_contrast, saturate
+// Fitness: 68.9% → 74.2%
+
+// Finally, smooth it out
+const smooth = await applyPrompt(contrast.child_id, "smooth the harsh edges");
+// → smooth, organic_spread
+// Fitness: 74.2% → 76.8%</code></pre>
+            </div>
+
+            <h2>Learning from Prompts</h2>
+            <p>Every prompt is logged in the <code>prompt_logs</code> table:</p>
+
+            <div class="code-block">
+                <pre><code>SELECT prompt, intent, operations_applied 
+FROM prompt_logs 
+WHERE used_claude = true 
+ORDER BY created_at DESC 
+LIMIT 5;</code></pre>
+            </div>
+
+            <p>This data can be used to:</p>
+            <ul>
+                <li>Improve keyword matching over time</li>
+                <li>Train custom models for prompt interpretation</li>
+                <li>Understand what users want most often</li>
+            </ul>
+
+            <h2>Best Practices</h2>
+            <ul>
+                <li><strong>Be specific:</strong> "add magenta channel offset" works better than "make it glitchy"</li>
+                <li><strong>Combine styles:</strong> "glitchy but organic" will try to balance both</li>
+                <li><strong>Use contrast terms:</strong> "more contrast", "brighter", "darker" adjust luminance</li>
+                <li><strong>Reference colors:</strong> "neon green", "warm orange" shift the palette</li>
+                <li><strong>Iterate:</strong> Apply prompts incrementally for finer control</li>
+            </ul>
+
+            <h2>Try It Yourself</h2>
+            <ol>
+                <li>Open the <a href="../pigment-engine.html">PIGMENT demo</a></li>
+                <li>Load an image and let it evolve for a while</li>
+                <li>Type "make it glitchy" in the AI Evolve prompt box</li>
+                <li>Watch as the system applies glitch mutations</li>
+                <li>Check the response to see if Claude was used (✨ Claude) or fallback (🤖 local)</li>
+            </ol>
+
+            <p>The future of art evolution isn't just about algorithms — it's about conversation. With PIGMENT's AI prompt system, you're not just running code; you're collaborating with an intelligent system that understands what you want.</p>
+
+            <hr style="border-color:#1a1a1a; margin:3rem 0;">
+
+            <p><strong>Further reading:</strong> <a href="genetic-algorithms.html">How Genetic Algorithms Create Art</a> | <a href="kinship-explained.html">Kinship: Art Family Trees</a></p>
+        </div>
+    </main>
+
+    <footer class="docs-footer">[footer]</footer>
+</body>
+</html>
