@@ -2,82 +2,411 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error Handling - PIGMENT API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Error Handling - PIGMENT v6 API Docs</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../css/docs.css">
+    <style>
+        .error-example {
+            background: #1a0f0f;
+            border-left: 4px solid #ff3b2f;
+            padding: 1rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+        .code-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .code-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .code-table tr:last-child td {
+            border-bottom: none;
+        }
+        .badge-4xx { color: #ff9f0a; }
+        .badge-5xx { color: #ff3b2f; }
+    </style>
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+            <nav class="header-nav">
+                <a href="../index.html">Home</a>
+                <a href="index.html" class="active">Docs</a>
+                <a href="../blog/index.html">Blog</a>
+                <a href="../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="getting-started.html" class="btn btn-primary">Quick Start</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html">Introduction</a></li>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                    <li><a href="errors.html" class="active">Error Handling</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="endpoints/works.html">/v1/works</a></li>
+                    <li><a href="endpoints/evolve.html">/v1/evolve</a></li>
+                    <li><a href="endpoints/kinship.html">/v1/kinship</a></li>
+                    <li><a href="endpoints/prompt.html">/v1/prompt</a></li>
+                    <li><a href="endpoints/gallery.html">/v1/gallery</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Examples</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="examples/javascript.html">JavaScript</a></li>
+                    <li><a href="examples/python.html">Python</a></li>
+                    <li><a href="examples/curl.html">cURL</a></li>
+                </ul>
+            </div>
+        </aside>
+
         <main class="docs-content">
             <div class="content-container">
                 <h1>Error Handling</h1>
-                <p class="lead">All errors return consistent JSON responses with helpful messages.</p>
+                <p class="lead">All errors return consistent JSON responses with helpful messages to help you debug and handle issues gracefully.</p>
+
+                <div class="error-example">
+                    <strong>⚠️ Remember:</strong> Always implement proper error handling in your applications. Network issues, rate limits, and invalid parameters are normal parts of API integration.
+                </div>
 
                 <h2>Error Response Format</h2>
-                <pre><code>{
-    "error": {
-        "code": "invalid_parameters",
-        "message": "The request parameters are invalid",
-        "details": {
-            "field": "target_url",
-            "reason": "URL must be publicly accessible"
-        },
-        "request_id": "req_abc123"
-    }
+                <p>When an error occurs, the API returns a JSON object with detailed information:</p>
+
+                <div class="code-block">
+                    <pre><code>{
+  "error": {
+    "code": "invalid_parameters",
+    "message": "The request parameters are invalid",
+    "details": {
+      "field": "work_id",
+      "reason": "Work ID must be a valid UUID"
+    },
+    "request_id": "req_2a7f8c3e1b9d4f6"
+  }
 }</code></pre>
+                </div>
+
+                <h3>Error Fields</h3>
+                <table class="code-table">
+                    <tr>
+                        <td><code>error.code</code></td>
+                        <td>A machine-readable error code for programmatic handling</td>
+                    </tr>
+                    <tr>
+                        <td><code>error.message</code></td>
+                        <td>Human-readable description of what went wrong</td>
+                    </tr>
+                    <tr>
+                        <td><code>error.details</code></td>
+                        <td>Additional context (field name, specific reason, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><code>error.request_id</code></td>
+                        <td>Unique identifier for debugging (include in support requests)</td>
+                    </tr>
+                </table>
 
                 <h2>HTTP Status Codes</h2>
-                <table>
-                    <tr><th>Code</th><th>Description</th></tr>
-                    <tr><td>400</td><td>Bad Request - Invalid parameters</td></tr>
-                    <tr><td>401</td><td>Unauthorized - Missing or invalid API key</td></tr>
-                    <tr><td>403</td><td>Forbidden - Insufficient permissions</td></tr>
-                    <tr><td>404</td><td>Not Found - Resource doesn't exist</td></tr>
-                    <tr><td>409</td><td>Conflict - Resource already exists</td></tr>
-                    <tr><td>422</td><td>Unprocessable Entity - Validation failed</td></tr>
-                    <tr><td>429</td><td>Too Many Requests - Rate limit exceeded</td></tr>
-                    <tr><td>500</td><td>Internal Server Error - Try again later</td></tr>
+                <p>PIGMENT v6 uses standard HTTP status codes to indicate the success or failure of requests:</p>
+
+                <table class="code-table">
+                    <tr>
+                        <td><span class="badge-4xx">400</span></td>
+                        <td><strong>Bad Request</strong></td>
+                        <td>Invalid parameters or malformed request</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-4xx">401</span></td>
+                        <td><strong>Unauthorized</strong></td>
+                        <td>Missing or invalid API key (check <code>X-API-Key</code> header)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-4xx">403</span></td>
+                        <td><strong>Forbidden</strong></td>
+                        <td>API key valid but lacks permission (e.g., accessing another user's work)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-4xx">404</span></td>
+                        <td><strong>Not Found</strong></td>
+                        <td>Resource doesn't exist (check work_id, user_id, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-4xx">409</span></td>
+                        <td><strong>Conflict</strong></td>
+                        <td>Resource already exists (e.g., duplicate email in <code>/v1/users</code>)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-4xx">422</span></td>
+                        <td><strong>Unprocessable Entity</strong></td>
+                        <td>Validation failed (e.g., email format invalid)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-4xx">429</span></td>
+                        <td><strong>Too Many Requests</strong></td>
+                        <td>Rate limit exceeded (see <a href="rate-limits.html">Rate Limits</a>)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-5xx">500</span></td>
+                        <td><strong>Internal Server Error</strong></td>
+                        <td>Something went wrong on our end — try again later</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-5xx">503</span></td>
+                        <td><strong>Service Unavailable</strong></td>
+                        <td>API temporarily offline (maintenance or overload)</td>
+                    </tr>
                 </table>
 
                 <h2>Common Error Codes</h2>
-                <table>
-                    <tr><th>Code</th><th>Description</th></tr>
-                    <tr><td>invalid_parameters</td><td>One or more parameters are invalid</td></tr>
-                    <tr><td>image_not_found</td><td>Target image URL is not accessible</td></tr>
-                    <tr><td>evolution_failed</td><td>Evolution process failed</td></tr>
-                    <tr><td>job_not_found</td><td>Job ID doesn't exist</td></tr>
-                    <tr><td>quota_exceeded</td><td>Monthly quota exceeded</td></tr>
+
+                <h3>Authentication Errors</h3>
+                <table class="code-table">
+                    <tr>
+                        <td><code>missing_api_key</code></td>
+                        <td>No <code>X-API-Key</code> header provided</td>
+                    </tr>
+                    <tr>
+                        <td><code>invalid_api_key</code></td>
+                        <td>API key format is invalid or key not found</td>
+                    </tr>
+                    <tr>
+                        <td><code>expired_token</code></td>
+                        <td>JWT token has expired (if using Bearer auth)</td>
+                    </tr>
+                </table>
+
+                <h3>Works Errors</h3>
+                <table class="code-table">
+                    <tr>
+                        <td><code>work_not_found</code></td>
+                        <td>The specified <code>work_id</code> doesn't exist</td>
+                    </tr>
+                    <tr>
+                        <td><code>invalid_genome</code></td>
+                        <td>The .pg genome content is malformed</td>
+                    </tr>
+                    <tr>
+                        <td><code>feature_extraction_failed</code></td>
+                        <td>Could not extract 16D features from genome</td>
+                    </tr>
+                </table>
+
+                <h3>Evolution Errors</h3>
+                <table class="code-table">
+                    <tr>
+                        <td><code>evolution_failed</code></td>
+                        <td>Genetic algorithm process failed (rare)</td>
+                    </tr>
+                    <tr>
+                        <td><code>invalid_steps</code></td>
+                        <td><code>steps</code> parameter must be between 1-2000</td>
+                    </tr>
+                    <tr>
+                        <td><code>invalid_mutation_rate</code></td>
+                        <td><code>mutation_rate</code> must be between 0.1-5.0</td>
+                    </tr>
+                </table>
+
+                <h3>Kinship Errors</h3>
+                <table class="code-table">
+                    <tr>
+                        <td><code>insufficient_data</code></td>
+                        <td>Need at least 2 works to compute kinship</td>
+                    </tr>
+                    <tr>
+                        <td><code>feature_mismatch</code></td>
+                        <td>Feature vectors have incorrect dimensions</td>
+                    </tr>
+                </table>
+
+                <h3>Prompt Errors</h3>
+                <table class="code-table">
+                    <tr>
+                        <td><code>prompt_too_long</code></td>
+                        <td>Prompt exceeds 500 characters</td>
+                    </tr>
+                    <tr>
+                        <td><code>claude_unavailable</code></td>
+                        <td>Claude API temporarily unavailable (fallback used)</td>
+                    </tr>
                 </table>
 
                 <h2>Error Handling Examples</h2>
+
                 <div class="tab-container">
                     <div class="tab-buttons">
                         <button class="tab-btn active" data-tab="js">JavaScript</button>
-                        <button class="tab-btn" data-tab="python">Python</button>
+                        <button class="tab-btn" data-tab="py">Python</button>
+                        <button class="tab-btn" data-tab="curl">cURL</button>
                     </div>
+
                     <div class="tab-panel active" id="tab-js">
-                        <pre><code>try {
-    await client.evolve({...});
-} catch (error) {
-    if (error.code === 'invalid_parameters') {
-        console.error('Invalid params:', error.details);
-    } else if (error.status === 429) {
-        // Rate limited - implement backoff
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span>JavaScript Error Handling</span>
+                                <button class="copy-btn">📋 Copy</button>
+                            </div>
+                            <pre><code>async function safeApiCall() {
+    try {
+        const response = await fetch('https://pigment-api.onrender.com/v1/works', {
+            headers: { 'X-API-Key': 'your-key' }
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            
+            // Handle specific error codes
+            switch (errorData.error?.code) {
+                case 'invalid_api_key':
+                    console.error('API key invalid — regenerate from /v1/users');
+                    break;
+                    
+                case 'work_not_found':
+                    console.error('Work ID not found — check your ID');
+                    break;
+                    
+                case 'rate_limit_exceeded':
+                    const retryAfter = response.headers.get('Retry-After');
+                    console.log(`Rate limited. Wait ${retryAfter}s`);
+                    // Implement exponential backoff
+                    await new Promise(r => setTimeout(r, retryAfter * 1000));
+                    return safeApiCall(); // Retry
+                    
+                default:
+                    console.error(`API Error: ${errorData.error?.message}`);
+            }
+            return null;
+        }
+        
+        return await response.json();
+        
+    } catch (networkError) {
+        console.error('Network error — check your connection');
+        return null;
     }
 }</code></pre>
+                        </div>
                     </div>
-                    <div class="tab-panel" id="tab-python">
-                        <pre><code>try:
-    client.evolve(...)
-except PigmentError as e:
-    if e.code == 'invalid_parameters':
-        print(f"Invalid {e.details['field']}: {e.details['reason']}")</code></pre>
+
+                    <div class="tab-panel" id="tab-py">
+                        <div class="code-block">
+                            <pre><code>import requests
+import time
+
+def safe_api_call():
+    try:
+        response = requests.get(
+            'https://pigment-api.onrender.com/v1/works',
+            headers={'X-API-Key': 'your-key'}
+        )
+        
+        if response.status_code != 200:
+            error_data = response.json()
+            error_code = error_data.get('error', {}).get('code')
+            
+            if error_code == 'invalid_api_key':
+                print('API key invalid — regenerate from /v1/users')
+                
+            elif error_code == 'work_not_found':
+                print('Work ID not found — check your ID')
+                
+            elif response.status_code == 429:
+                retry_after = int(response.headers.get('Retry-After', 30))
+                print(f'Rate limited. Waiting {retry_after}s')
+                time.sleep(retry_after)
+                return safe_api_call()  # Retry
+                
+            else:
+                print(f"API Error: {error_data.get('error', {}).get('message')}")
+            return None
+            
+        return response.json()
+        
+    except requests.exceptions.ConnectionError:
+        print('Network error — check your connection')
+        return None</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="tab-panel" id="tab-curl">
+                        <div class="code-block">
+                            <pre><code># Check response headers and body
+curl -i -X GET https://pigment-api.onrender.com/v1/works \
+  -H "X-API-Key: your-key"
+
+# Example error response
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{
+  "error": {
+    "code": "invalid_api_key",
+    "message": "The provided API key is invalid",
+    "request_id": "req_abc123"
+  }
+}</code></pre>
+                        </div>
                     </div>
                 </div>
+
+                <h2>Handling Network Errors</h2>
+                <p>Network issues can occur. Always implement retry logic with exponential backoff:</p>
+
+                <div class="code-block">
+                    <pre><code>async function fetchWithRetry(url, options, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await fetch(url, options);
+        } catch (err) {
+            if (i === maxRetries - 1) throw err;
+            
+            // Exponential backoff: 1s, 2s, 4s...
+            const waitTime = Math.pow(2, i) * 1000;
+            console.log(`Retry ${i + 1}/${maxRetries} in ${waitTime}ms`);
+            await new Promise(r => setTimeout(r, waitTime));
+        }
+    }
+}</code></pre>
+                </div>
+
+                <h2>Debugging Tips</h2>
+                <ul>
+                    <li><strong>Check the <code>request_id</code></strong> — include this when contacting support</li>
+                    <li><strong>Verify your API key</strong> — ensure it's in the <code>X-API-Key</code> header</li>
+                    <li><strong>Validate work_ids</strong> — they should be UUID format</li>
+                    <li><strong>Monitor rate limits</strong> — check <code>X-RateLimit-Remaining</code> headers</li>
+                    <li><strong>Test with curl first</strong> — isolate client-side issues</li>
+                </ul>
+
+                <h2>Need More Help?</h2>
+                <p>If you're encountering errors you can't resolve:</p>
+                <ul>
+                    <li>Check the <a href="rate-limits.html">Rate Limits</a> page</li>
+                    <li>Review the specific <a href="endpoints/works.html">endpoint documentation</a></li>
+                    <li>Open an issue on <a href="https://github.com/pigment-org">GitHub</a></li>
+                    <li>Email <strong>support@pigment.dev</strong> with your <code>request_id</code></li>
+                </ul>
 
                 <div class="pagination">
                     <a href="rate-limits.html" class="prev">← Rate Limits</a>
@@ -86,6 +415,41 @@ except PigmentError as e:
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+
+    <footer class="docs-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="index.html">Documentation</a></li>
+                    <li><a href="../blog/index.html">Blog</a></li>
+                    <li><a href="../showcase/index.html">Showcase</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                    <li><a href="errors.html">Error Handling</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+                    <li><a href="../blog/kinship-explained.html">Kinship System</a></li>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved. · v6.0.0</p>
+        </div>
+    </footer>
+
+    <script src="../js/docs.js"></script>
 </body>
 </html>
