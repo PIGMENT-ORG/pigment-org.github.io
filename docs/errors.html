@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Handling - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>/* Same CSS */</style>
+</head>
+<body>
+    <header class="docs-header">...</header>
+    <div class="docs-layout">
+        <button class="sidebar-toggle">📚 Menu ▼</button>
+        <aside class="docs-sidebar">...</aside>
+        <main class="docs-content">
+            <div class="content-container">
+                <h1>Error Handling</h1>
+                <p class="lead">All errors return consistent JSON responses with helpful messages.</p>
+
+                <h2>Error Response Format</h2>
+                <pre><code>{
+    "error": {
+        "code": "invalid_parameters",
+        "message": "The request parameters are invalid",
+        "details": {
+            "field": "target_url",
+            "reason": "URL must be publicly accessible"
+        },
+        "request_id": "req_abc123"
+    }
+}</code></pre>
+
+                <h2>HTTP Status Codes</h2>
+                <table>
+                    <tr><th>Code</th><th>Description</th></tr>
+                    <tr><td>400</td><td>Bad Request - Invalid parameters</td></tr>
+                    <tr><td>401</td><td>Unauthorized - Missing or invalid API key</td></tr>
+                    <tr><td>403</td><td>Forbidden - Insufficient permissions</td></tr>
+                    <tr><td>404</td><td>Not Found - Resource doesn't exist</td></tr>
+                    <tr><td>409</td><td>Conflict - Resource already exists</td></tr>
+                    <tr><td>422</td><td>Unprocessable Entity - Validation failed</td></tr>
+                    <tr><td>429</td><td>Too Many Requests - Rate limit exceeded</td></tr>
+                    <tr><td>500</td><td>Internal Server Error - Try again later</td></tr>
+                </table>
+
+                <h2>Common Error Codes</h2>
+                <table>
+                    <tr><th>Code</th><th>Description</th></tr>
+                    <tr><td>invalid_parameters</td><td>One or more parameters are invalid</td></tr>
+                    <tr><td>image_not_found</td><td>Target image URL is not accessible</td></tr>
+                    <tr><td>evolution_failed</td><td>Evolution process failed</td></tr>
+                    <tr><td>job_not_found</td><td>Job ID doesn't exist</td></tr>
+                    <tr><td>quota_exceeded</td><td>Monthly quota exceeded</td></tr>
+                </table>
+
+                <h2>Error Handling Examples</h2>
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="js">JavaScript</button>
+                        <button class="tab-btn" data-tab="python">Python</button>
+                    </div>
+                    <div class="tab-panel active" id="tab-js">
+                        <pre><code>try {
+    await client.evolve({...});
+} catch (error) {
+    if (error.code === 'invalid_parameters') {
+        console.error('Invalid params:', error.details);
+    } else if (error.status === 429) {
+        // Rate limited - implement backoff
+    }
+}</code></pre>
+                    </div>
+                    <div class="tab-panel" id="tab-python">
+                        <pre><code>try:
+    client.evolve(...)
+except PigmentError as e:
+    if e.code == 'invalid_parameters':
+        print(f"Invalid {e.details['field']}: {e.details['reason']}")</code></pre>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <a href="rate-limits.html" class="prev">← Rate Limits</a>
+                    <a href="faq.html" class="next">FAQ →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="docs-footer">...</footer>
+</body>
+</html>
