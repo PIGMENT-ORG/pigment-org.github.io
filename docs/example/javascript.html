@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Examples - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/docs.css">
+</head>
+<body>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+            <nav class="header-nav">
+                <a href="../../index.html">Home</a>
+                <a href="../index.html" class="active">Docs</a>
+                <a href="../../blog/index.html">Blog</a>
+                <a href="../../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="../getting-started.html" class="btn btn-primary">Get Started</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar">
+            <!-- Same sidebar as auth.html -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Examples</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="javascript.html" class="active">JavaScript</a></li>
+                    <li><a href="python.html">Python</a></li>
+                    <li><a href="curl.html">cURL</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="docs-content">
+            <div class="content-container">
+                <h1>JavaScript Examples</h1>
+                <p class="lead">Complete JavaScript/Node.js examples for all PIGMENT API endpoints.</p>
+
+                <h2>Installation</h2>
+                <div class="code-block">
+                    <pre><code>npm install pigment-api</code></pre>
+                </div>
+
+                <h2>Basic Setup</h2>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span>Initialize client</span>
+                        <button class="copy-btn">📋 Copy</button>
+                    </div>
+                    <pre><code>import { PigmentClient } from 'pigment-api';
+
+const client = new PigmentClient({
+    apiKey: process.env.PIGMENT_API_KEY,
+    environment: 'production' // or 'development'
+});</code></pre>
+                </div>
+
+                <h2>Evolve an Image</h2>
+                <div class="code-block">
+                    <pre><code>// Evolve an image from URL
+async function evolveFromUrl() {
+    try {
+        const result = await client.evolve({
+            target_url: 'https://example.com/image.jpg',
+            generations: 1000,
+            polygons: 100,
+            mutation_rate: 0.1,
+            callback_url: 'https://your-server.com/webhook'
+        });
+        
+        console.log('Evolution started:', result.job_id);
+        console.log('Estimated time:', result.estimated_seconds, 'seconds');
+        
+        // Poll for results
+        const status = await client.getJobStatus(result.job_id);
+        console.log('Status:', status);
+        
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+}
+
+// Evolve from local file
+async function evolveFromFile() {
+    const fs = require('fs');
+    const fileBuffer = fs.readFileSync('./my-image.jpg');
+    
+    const result = await client.evolve({
+        target_image: fileBuffer.toString('base64'),
+        generations: 5000
+    });
+}</code></pre>
+                </div>
+
+                <h2>Using Prompts</h2>
+                <div class="code-block">
+                    <pre><code>// Generate with text prompt
+async function generateWithPrompt() {
+    const result = await client.prompt({
+        prompt: 'a cyberpunk cityscape with neon lights',
+        style: 'abstract',
+        iterations: 500,
+        seed: 42
+    });
+    
+    console.log('Generated image URL:', result.image_url);
+    console.log('Fitness score:', result.fitness);
+}
+
+// Style transfer
+async function styleTransfer() {
+    const result = await client.prompt({
+        content_image: contentBase64,
+        style_image: styleBase64,
+        strength: 0.7
+    });
+}</code></pre>
+                </div>
+
+                <h2>Kinship Analysis</h2>
+                <div class="code-block">
+                    <pre><code>// Compare artworks
+async function compareArtworks() {
+    const result = await client.kinship({
+        works: [
+            'work_id_1',
+            'work_id_2',
+            'work_id_3'
+        ],
+        include_features: true,
+        min_similarity: 0.5
+    });
+    
+    console.log('Similarity matrix:', result.matrix);
+    console.log('Family tree:', result.tree);
+    
+    // Visualize with included tool
+    const viz = new KinshipViz('#container', result.tree);
+}
+
+// Find ancestors
+async function findAncestors(workId) {
+    const family = await client.kinship.lineage({
+        work_id: workId,
+        generations: 5
+    });
+    
+    console.log('Ancestors:', family.ancestors);
+    console.log('Descendants:', family.descendants);
+}</code></pre>
+                </div>
+
+                <h2>Gallery Management</h2>
+                <div class="code-block">
+                    <pre><code>// List gallery
+async function listGallery() {
+    const works = await client.gallery.list({
+        limit: 50,
+        offset: 0,
+        sort: 'fitness:desc',
+        tags: ['abstract', 'portrait']
+    });
+    
+    works.forEach(work => {
+        console.log(`${work.id}: ${work.fitness}% - ${work.created_at}`);
+    });
+}
+
+// Upload to gallery
+async function uploadToGallery() {
+    const result = await client.gallery.upload({
+        image: imageBase64,
+        title: 'My Masterpiece',
+        tags: ['digital', 'evolutionary'],
+        public: true
+    });
+    
+    console.log('Gallery URL:', result.url);
+}
+
+// Batch operations
+async function batchUpload() {
+    const files = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
+    
+    const results = await Promise.all(
+        files.map(file => client.gallery.upload({
+            image: fs.readFileSync(file).toString('base64'),
+            title: file
+        }))
+    );
+    
+    console.log(`Uploaded ${results.length} files`);
+}</code></pre>
+                </div>
+
+                <h2>Real-time Updates</h2>
+                <div class="code-block">
+                    <pre><code>// WebSocket connection
+import { WebSocket } from 'ws';
+
+const ws = new WebSocket('wss://api.pigment.dev/v1/ws', {
+    headers: {
+        'Authorization': `Bearer ${apiKey}`
+    }
+});
+
+ws.on('open', () => {
+    console.log('Connected to PIGMENT');
+    
+    // Subscribe to job updates
+    ws.send(JSON.stringify({
+        type: 'subscribe',
+        job_id: 'job_123456'
+    }));
+});
+
+ws.on('message', (data) => {
+    const update = JSON.parse(data);
+    
+    switch(update.type) {
+        case 'progress':
+            console.log(`Progress: ${update.percent}%`);
+            console.log(`Current fitness: ${update.fitness}`);
+            break;
+            
+        case 'complete':
+            console.log('Evolution complete!');
+            console.log('Result:', update.result);
+            ws.close();
+            break;
+            
+        case 'error':
+            console.error('Error:', update.message);
+            break;
+    }
+});
+
+ws.on('close', () => {
+    console.log('Disconnected');
+});</code></pre>
+                </div>
+
+                <h2>React Component Example</h2>
+                <div class="code-block">
+                    <pre><code>import React, { useState, useEffect } from 'react';
+import { usePigment } from 'pigment-api/react';
+
+function EvolutionViewer({ targetImage }) {
+    const { evolve, job, progress } = usePigment();
+    const [currentImage, setCurrentImage] = useState(null);
+    
+    useEffect(() => {
+        if (targetImage) {
+            evolve({
+                target_image: targetImage,
+                generations: 1000
+            });
+        }
+    }, [targetImage]);
+    
+    useEffect(() => {
+        if (job?.status === 'complete') {
+            setCurrentImage(job.result.image);
+        }
+    }, [job]);
+    
+    return (
+        <div className="evolution-viewer">
+            <div className="side-by-side">
+                <div className="target">
+                    <h3>Target</h3>
+                    <img src={targetImage} alt="Target" />
+                </div>
+                <div className="evolved">
+                    <h3>Evolved</h3>
+                    {currentImage ? (
+                        <img src={currentImage} alt="Evolved" />
+                    ) : (
+                        <div className="progress">
+                            <div className="bar" style={{width: `${progress}%`}} />
+                            <span>{progress}%</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+            <div className="stats">
+                <div>Generation: {job?.generation || 0}</div>
+                <div>Fitness: {job?.fitness?.toFixed(2)}%</div>
+                <div>Best: {job?.best_fitness?.toFixed(2)}%</div>
+            </div>
+        </div>
+    );
+}</code></pre>
+                </div>
+
+                <h2>Error Handling</h2>
+                <div class="code-block">
+                    <pre><code>import { PigmentError } from 'pigment-api';
+
+async function safeEvolve() {
+    try {
+        const result = await client.evolve(params);
+        return result;
+        
+    } catch (error) {
+        if (error instanceof PigmentError) {
+            switch(error.code) {
+                case 'AUTH_ERROR':
+                    console.error('Invalid API key');
+                    break;
+                case 'RATE_LIMIT':
+                    console.error('Rate limited. Retry in', error.retryAfter, 'seconds');
+                    await sleep(error.retryAfter * 1000);
+                    return safeEvolve();
+                case 'INVALID_PARAMS':
+                    console.error('Invalid parameters:', error.details);
+                    break;
+                default:
+                    console.error('API error:', error.message);
+            }
+        } else {
+            console.error('Network error:', error);
+        }
+    }
+}</code></pre>
+                </div>
+
+                <h2>Next Steps</h2>
+                <ul>
+                    <li><a href="python.html">View Python examples →</a></li>
+                    <li><a href="../endpoints/evolve.html">Evolve endpoint docs →</a></li>
+                    <li><a href="https://github.com/pigment-org/js-client">Download JS client →</a></li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <footer class="docs-footer">
+        <!-- Same footer as auth.html -->
+    </footer>
+
+    <script src="../../js/api-client.js"></script>
+    <script>
+        // Copy functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.closest('.code-block').querySelector('code').textContent;
+                navigator.clipboard.writeText(code);
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = '📋 Copy', 2000);
+            });
+        });
+    </script>
+</body>
+</html>
