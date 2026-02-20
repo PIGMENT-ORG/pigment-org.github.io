@@ -1,153 +1,689 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PIGMENT v6 API Documentation</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/docs.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Documentation - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --ink: #0a0a0a;
+            --paper: #f0ede6;
+            --dim: #b8b4ac;
+            --accent: #c8ff00;
+            --mono: 'DM Mono', monospace;
+            --display: 'Unbounded', sans-serif;
+        }
+
+        body {
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--mono);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header - Sticky */
+        .docs-header {
+            background: rgba(10,10,10,0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .logo a {
+            font-family: var(--display);
+            font-weight: 900;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            color: var(--accent);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .logo span {
+            color: var(--dim);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: clamp(1rem, 3vw, 2rem);
+            align-items: center;
+        }
+
+        .header-nav a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            white-space: nowrap;
+            padding: 0.5rem 0;
+        }
+
+        .header-nav a:hover,
+        .header-nav a.active {
+            color: var(--accent);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: 1px solid #333;
+            color: var(--paper);
+            font-size: 1.8rem;
+            padding: 0.25rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            min-width: 50px;
+            min-height: 44px;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border: 1px solid transparent;
+            display: inline-block;
+            min-height: 44px;
+            line-height: 1.8;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--ink);
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover,
+        .btn-primary:active {
+            background: #d4ff26;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--paper);
+            border-color: #333;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Main Layout */
+        .docs-layout {
+            display: flex;
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Sidebar */
+        .docs-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: #0d0d0d;
+            border-right: 1px solid #1a1a1a;
+            height: calc(100vh - 73px);
+            position: sticky;
+            top: 73px;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-section {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-title {
+            font-family: var(--display);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.4rem 0;
+            transition: color 0.2s;
+            word-break: break-word;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        .docs-content {
+            flex: 1;
+            min-width: 0;
+            padding: 2.5rem 3rem;
+            overflow-x: auto;
+        }
+
+        .content-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: var(--display);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-family: var(--display);
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin: 2.5rem 0 1rem;
+            color: var(--accent);
+        }
+
+        h3 {
+            font-family: var(--display);
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            margin: 2rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: #ccc;
+            font-size: 1rem;
+        }
+
+        .lead {
+            font-size: 1.2rem;
+            color: var(--paper);
+            margin-bottom: 2rem;
+        }
+
+        ul, ol {
+            margin: 1.5rem 0 1.5rem 1.5rem;
+            color: #ccc;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: #1a1a1a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-family: var(--mono);
+        }
+
+        pre {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--paper);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.2s, border-color 0.2s;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--dim);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        .info-box {
+            background: #1a1a1a;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #1a1a1a;
+            font-size: 0.9rem;
+        }
+
+        th {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .pagination a {
+            color: var(--dim);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #1a1a1a;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .pagination a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Footer */
+        .docs-footer {
+            background: #0d0d0d;
+            border-top: 1px solid #1a1a1a;
+            padding: 2rem 1.5rem 1rem;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h4 {
+            font-family: var(--display);
+            color: var(--paper);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            margin: 0;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1a1a1a;
+            color: #333;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .docs-layout {
+                flex-direction: column;
+            }
+
+            .docs-sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid #1a1a1a;
+                padding: 1rem;
+            }
+
+            .docs-content {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0.75rem 1rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #0a0a0a;
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid #1a1a1a;
+                gap: 0.5rem;
+            }
+
+            .header-nav.show {
+                display: flex;
+            }
+
+            .header-nav a {
+                width: 100%;
+                text-align: center;
+                padding: 0.75rem;
+            }
+
+            .header-actions {
+                display: none;
+            }
+
+            .docs-content {
+                padding: 1.5rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .docs-content {
+                padding: 1rem;
+            }
+        }
+
+        @media (min-width: 1600px) {
+            .docs-content {
+                padding: 3rem 4rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Header -->
-  <header style="background: #0a0a0a; border-bottom: 1px solid #2a2a2a; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
-    <div style="font-family: 'Unbounded', sans-serif; font-weight: 900; color: #c8ff00;">PIGMENT <span style="color: #666; font-weight: 300;">v6</span></div>
-    <nav style="display: flex; gap: 24px;">
-      <a href="/" style="color: #f0ede6; text-decoration: none;">Home</a>
-      <a href="/docs" style="color: #c8ff00; text-decoration: none;">Docs</a>
-      <a href="/blog" style="color: #f0ede6; text-decoration: none;">Blog</a>
-      <a href="/showcase" style="color: #f0ede6; text-decoration: none;">Showcase</a>
-      <a href="/pigment-engine.html" style="color: #f0ede6; text-decoration: none;">Launch App →</a>
-    </nav>
-  </header>
-
-  <!-- Docs Layout -->
-  <div class="docs-layout">
-    <!-- Sidebar -->
-    <div class="docs-sidebar">
-      <h3>Getting Started</h3>
-      <ul>
-        <li><a href="/docs/getting-started.html" class="active">Quick Start</a></li>
-        <li><a href="/docs/authentication.html">Authentication</a></li>
-      </ul>
-
-      <h3>Endpoints</h3>
-      <ul>
-        <li><a href="/docs/endpoints/works.html">/v1/works</a></li>
-        <li><a href="/docs/endpoints/evolve.html">/v1/evolve</a></li>
-        <li><a href="/docs/endpoints/kinship.html">/v1/kinship</a></li>
-        <li><a href="/docs/endpoints/prompt.html">/v1/prompt</a></li>
-        <li><a href="/docs/endpoints/gallery.html">/v1/gallery</a></li>
-      </ul>
-
-      <h3>Examples</h3>
-      <ul>
-        <li><a href="/docs/examples/javascript.html">JavaScript</a></li>
-        <li><a href="/docs/examples/python.html">Python</a></li>
-        <li><a href="/docs/examples/curl.html">cURL</a></li>
-      </ul>
-
-      <h3>Resources</h3>
-      <ul>
-        <li><a href="https://github.com/PIGMENT-ORG/PIGMENT-V6">GitHub</a></li>
-        <li><a href="https://pigment-api.onrender.com/docs">OpenAPI</a></li>
-      </ul>
-    </div>
-
-    <!-- Content -->
-    <div class="docs-content">
-      <h1>PIGMENT v6 API <span class="accent">Documentation</span></h1>
-      <p style="font-size: 18px; color: var(--dim);">Build AI-powered art applications with genetic algorithms.</p>
-
-      <div style="background: #1a1a1a; padding: 24px; border-radius: 12px; margin: 32px 0;">
-        <h3>Base URL</h3>
-        <pre style="margin: 16px 0 0;">https://pigment-api.onrender.com</pre>
-      </div>
-
-      <h2>Overview</h2>
-      <p>PIGMENT is a genetic algorithm platform that evolves images through mutations. Every artwork is represented as a genome — a collection of colored polygons with opacity and position data.</p>
-
-      <p>The API provides endpoints for:</p>
-      <ul style="margin: 16px 0 16px 24px;">
-        <li>Creating and managing artworks</li>
-        <li>Evolving works through genetic algorithms</li>
-        <li>Tracking kinship relationships between works</li>
-        <li>Applying AI prompts via Claude</li>
-        <li>Searching similar works by feature vectors</li>
-      </ul>
-
-      <h2>Feature Vectors</h2>
-      <p>Each artwork has a 16-dimensional perceptual feature vector:</p>
-      <pre>[
-  r_mean, g_mean, b_mean,      # 0-2: Average RGB
-  r_std, g_std, b_std,          # 3-5: RGB standard deviations
-  lum_contrast,                 # 6: Luminance spread
-  color_entropy,                # 7: Color complexity
-  poly_count,                   # 8: Normalized polygon count
-  avg_opacity,                  # 9: Average opacity
-  avg_points,                   # 10: Average points per polygon
-  hue_spread,                   # 11: Color diversity
-  glitch_factor,                # 12: Channel imbalance
-  organic_factor,               # 13: Green bias + smoothness
-  void_factor,                  # 14: Darkness + low complexity
-  fitness_proxy                  # 15: Normalized fitness
-]</pre>
-
-      <h2>Quick Example</h2>
-      <div class="code-example">
-        <div class="tab-bar">
-          <span class="tab active">JavaScript</span>
-          <span class="tab">Python</span>
-          <span class="tab">cURL</span>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn" id="menuBtn">☰</button>
+            <nav class="header-nav" id="navLinks">
+                <a href="../index.html">Home</a>
+                <a href="index.html" class="active">Docs</a>
+                <a href="../blog/index.html">Blog</a>
+                <a href="../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="getting-started.html" class="btn btn-primary">Get Started</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
         </div>
-        <pre><code>// Create a user (get API key)
-const user = await fetch('https://pigment-api.onrender.com/v1/users', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email: 'me@example.com' })
-}).then(r => r.json());
+    </header>
 
-// Your API key is in user.api_key
+    <div class="docs-layout">
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html" class="active">Introduction</a></li>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                </ul>
+            </div>
 
-// Create an artwork
-const work = await fetch('https://pigment-api.onrender.com/v1/works', {
-  method: 'POST',
-  headers: { 
-    'Content-Type': 'application/json',
-    'X-API-Key': user.api_key
-  },
-  body: JSON.stringify({
-    title: 'My First Art',
-    content: '-- PIGMENT Genome...',
-    tags: ['demo']
-  })
-}).then(r => r.json());
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="endpoints/works.html">/v1/works</a></li>
+                    <li><a href="endpoints/evolve.html">/v1/evolve</a></li>
+                    <li><a href="endpoints/kinship.html">/v1/kinship</a></li>
+                    <li><a href="endpoints/prompt.html">/v1/prompt</a></li>
+                    <li><a href="endpoints/gallery.html">/v1/gallery</a></li>
+                </ul>
+            </div>
 
-// Evolve it
-const evolved = await fetch('https://pigment-api.onrender.com/v1/evolve', {
-  method: 'POST',
-  headers: { 'X-API-Key': user.api_key },
-  body: JSON.stringify({ work_id: work.id, steps: 500 })
-}).then(r => r.json());</code></pre>
-      </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Examples</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="examples/javascript.html">JavaScript</a></li>
+                    <li><a href="examples/python.html">Python</a></li>
+                    <li><a href="examples/curl.html">cURL</a></li>
+                </ul>
+            </div>
 
-      <h2>Next Steps</h2>
-      <div class="grid grid-2" style="margin-top: 24px;">
-        <a href="/docs/getting-started.html" class="card" style="text-decoration: none;">
-          <h3 style="margin-top: 0;">🚀 Quick Start</h3>
-          <p style="color: var(--dim);">Get your API key and make your first request in 5 minutes.</p>
-        </a>
-        <a href="/docs/endpoints/works.html" class="card" style="text-decoration: none;">
-          <h3 style="margin-top: 0;">📁 Works API</h3>
-          <p style="color: var(--dim);">Create, read, update, and delete artworks.</p>
-        </a>
-      </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Resources</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../blog/index.html">Blog</a></li>
+                    <li><a href="../showcase/index.html">Showcase</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="docs-content">
+            <div class="content-container">
+                <h1>Introduction to PIGMENT</h1>
+                <p class="lead">PIGMENT is a powerful API that uses genetic algorithms to generate unique artwork. Watch images evolve through generations of mutation and selection.</p>
+
+                <div class="info-box">
+                    <strong>✨ New in v6:</strong> AI-powered evolution, kinship tracking, and real-time WebSocket support.
+                </div>
+
+                <h2>How it works</h2>
+                <p>PIGMENT represents images as collections of colored polygons. Through genetic algorithms, these polygons evolve to match target images or create entirely new artwork based on prompts.</p>
+
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>🧬 Evolution</h3>
+                        <p>Start with random polygons and evolve toward your target image. Fine-tune mutation rates, polygon counts, and more.</p>
+                        <a href="getting-started.html" class="card-link">Learn more →</a>
+                    </div>
+                    <div class="card">
+                        <h3>🔗 Kinship</h3>
+                        <p>Track relationships between artworks. See how they influence each other and build family trees of artistic evolution.</p>
+                        <a href="endpoints/kinship.html" class="card-link">Learn more →</a>
+                    </div>
+                    <div class="card">
+                        <h3>🤖 AI Prompts</h3>
+                        <p>Describe what you want to see, and our AI will guide the evolution process. "Make it glitchy" or "Add more contrast".</p>
+                        <a href="endpoints/prompt.html" class="card-link">Learn more →</a>
+                    </div>
+                </div>
+
+                <h2>Quick Start</h2>
+                <p>Get started in minutes with our JavaScript client:</p>
+
+                <pre><code>import { PigmentClient } from 'pigment-api';
+
+const client = new PigmentClient({
+    apiKey: 'your-api-key'
+});
+
+const result = await client.evolve({
+    target_url: 'https://example.com/image.jpg',
+    generations: 1000
+});
+
+console.log(`Fitness: ${result.fitness}%`);</code></pre>
+
+                <div class="pagination">
+                    <a href="#" class="prev disabled">← Previous</a>
+                    <a href="getting-started.html" class="next">Getting Started →</a>
+                </div>
+            </div>
+        </main>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer style="border-top: 1px solid #2a2a2a; padding: 48px 24px; text-align: center;">
-    <p>PIGMENT v6 API Documentation</p>
-  </footer>
+    <footer class="docs-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="index.html">Documentation</a></li>
+                    <li><a href="../blog/index.html">Blog</a></li>
+                    <li><a href="../showcase/index.html">Showcase</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <ul>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                    <li><a href="https://twitter.com/pigment">Twitter</a></li>
+                    <li><a href="mailto:support@pigment.dev">Email</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu
+        const menuBtn = document.getElementById('menuBtn');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuBtn && navLinks) {
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navLinks.classList.toggle('show');
+                menuBtn.textContent = navLinks.classList.contains('show') ? '✕' : '☰';
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.docs-header')) {
+                    navLinks.classList.remove('show');
+                    menuBtn.textContent = '☰';
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    navLinks.classList.remove('show');
+                    menuBtn.textContent = '☰';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
