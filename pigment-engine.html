@@ -6,558 +6,233 @@
   <title>PIGMENT v6 — AI-Powered Living Art</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
-    /* === PIGMENT v6 - COMPLETE STYLES === */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --ink: #0a0a0a;
-      --paper: #f0ede6;
-      --dim: #b8b4ac;
-      --accent: #c8ff00;
-      --red: #ff3b2f;
-      --blue: #0051ff;
-      --purple: #8a6ae0;
-      --mono: 'DM Mono', monospace;
-      --display: 'Unbounded', sans-serif;
+      --ink: #0a0a0a; --paper: #f0ede6; --dim: #b8b4ac;
+      --accent: #c8ff00; --red: #ff3b2f; --blue: #0051ff;
+      --mono: 'DM Mono', monospace; --display: 'Unbounded', sans-serif;
     }
+    body { background:var(--ink); color:var(--paper); font-family:var(--mono); height:100vh; overflow:hidden; display:grid; grid-template-rows:52px 1fr 36px; grid-template-columns:1fr 300px; }
 
-    body {
-      background: var(--ink);
-      color: var(--paper);
-      font-family: var(--mono);
-      height: 100vh;
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: 52px 1fr 36px;
-      grid-template-columns: 1fr 320px;
-    }
+    /* ── MODAL ── */
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(10px); padding:16px; }
+    .modal.visible { display:flex; }
+    .modal-content { background:#0d0d0d; border:2px solid var(--accent); border-radius:20px; max-width:860px; width:100%; max-height:90vh; overflow-y:auto; position:relative; padding:28px 22px; box-shadow:0 0 50px rgba(200,255,0,0.25); }
+    .modal-close { position:sticky; top:8px; float:right; font-size:26px; cursor:pointer; color:var(--dim); background:#0d0d0d; width:38px; height:38px; display:flex; align-items:center; justify-content:center; border-radius:50%; z-index:10; }
+    .modal-close:hover { color:var(--accent); }
+    .viewer-dropzone { border:3px dashed var(--accent); padding:50px 20px; text-align:center; margin:16px 0; cursor:pointer; background:rgba(200,255,0,0.04); border-radius:14px; }
+    .viewer-dropzone.active { background:rgba(200,255,0,0.12); }
+    .viewer-canvas { border:2px solid var(--accent); max-width:100%; background:white; border-radius:10px; margin:16px 0; }
+    .viewer-info { background:#1a1a1a; border:1px solid #333; border-radius:10px; padding:16px; margin:12px 0; }
+    .viewer-info-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #2a2a2a; font-size:12px; }
+    .viewer-info-row:last-child { border-bottom:none; }
+    .viewer-info-label { color:var(--dim); }
+    .viewer-info-value { color:var(--accent); font-weight:bold; }
+    .viewer-genome-text { background:#000; border:1px solid var(--accent); padding:16px; max-height:300px; overflow-y:auto; font-size:11px; border-radius:8px; margin:12px 0; display:none; white-space:pre-wrap; }
+    .viewer-controls { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:16px 0; }
+    .viewer-btn { background:transparent; border:1px solid var(--accent); color:var(--accent); padding:10px 16px; border-radius:8px; cursor:pointer; font-family:var(--mono); font-size:12px; }
+    .viewer-btn:hover { background:var(--accent); color:var(--ink); }
 
-    /* === MODAL STYLES === */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.95);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(10px);
-      padding: 16px;
-    }
-    .modal.visible { display: flex; }
-    .modal-content {
-      background: #0d0d0d;
-      border: 2px solid var(--accent);
-      border-radius: 20px;
-      max-width: 900px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-      padding: 30px 24px;
-      box-shadow: 0 0 50px rgba(200,255,0,0.3);
-    }
-    .modal-close {
-      position: sticky;
-      top: 10px;
-      float: right;
-      font-size: 28px;
-      cursor: pointer;
-      color: var(--dim);
-      transition: color 0.2s;
-      background: #0d0d0d;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      z-index: 10;
-    }
-    .modal-close:hover { color: var(--accent); background: #1a1a1a; }
+    /* ── HEADER ── */
+    header { grid-column:1/-1; display:flex; align-items:center; padding:0 16px; border-bottom:1px solid #1e1e1e; gap:14px; overflow-x:auto; white-space:nowrap; }
+    header::-webkit-scrollbar { display:none; }
+    .wordmark { font-family:var(--display); font-weight:900; font-size:15px; letter-spacing:.08em; color:var(--accent); flex-shrink:0; }
+    .wordmark span { color:var(--dim); font-weight:300; }
+    .pill { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:100px; padding:4px 10px; font-size:10px; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; flex-shrink:0; }
+    .pill.live { border-color:var(--accent); color:var(--accent); }
+    .pill.live::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:5px; animation:pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+    .hdr-right { margin-left:auto; display:flex; gap:10px; align-items:center; flex-shrink:0; }
+    .stat-chip { font-size:11px; color:var(--dim); display:flex; align-items:center; gap:5px; }
+    .stat-chip .val { font-family:var(--display); font-size:12px; font-weight:700; color:var(--paper); min-width:44px; text-align:right; }
+    .stat-chip .val.hot { color:var(--accent); }
 
-    /* === GENOME VIEWER === */
-    .viewer-dropzone {
-      border: 3px dashed var(--accent);
-      padding: 60px 20px;
-      text-align: center;
-      margin: 20px 0;
-      cursor: pointer;
-      background: rgba(200,255,0,0.05);
-      border-radius: 16px;
-      clear: both;
-    }
-    .viewer-dropzone.active { background: rgba(200,255,0,0.15); border-color: var(--paper); }
-    .viewer-canvas { border: 2px solid var(--accent); max-width: 100%; background: white; border-radius: 12px; margin: 20px 0; }
-    .viewer-info { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 20px; margin: 20px 0; }
-    .viewer-info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333; }
-    .viewer-info-label { color: var(--dim); }
-    .viewer-info-value { color: var(--accent); font-weight: bold; }
-    .viewer-genome-text {
-      background: #000; border: 1px solid var(--accent); padding: 20px; max-height: 400px;
-      overflow-y: auto; font-size: 12px; border-radius: 8px; margin: 20px 0; display: none; white-space: pre-wrap;
-    }
-    .viewer-controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 20px 0; }
-    .viewer-btn {
-      background: transparent; border: 1px solid var(--accent); color: var(--accent);
-      padding: 12px 20px; border-radius: 8px; cursor: pointer; font-family: var(--mono); font-size: 13px;
-    }
-    .viewer-btn:hover { background: var(--accent); color: var(--ink); }
+    /* ── CANVAS AREA ── */
+    .canvas-area { position:relative; display:flex; align-items:center; justify-content:center; background:#050505; overflow:hidden; min-height:0; padding:16px; }
+    .canvas-wrap { display:flex; gap:6px; max-width:100%; max-height:100%; flex-wrap:wrap; justify-content:center; align-items:flex-start; }
+    .canvas-slot { position:relative; flex:0 1 auto; }
+    canvas { display:block; image-rendering:pixelated; max-width:100%; height:auto; border-radius:4px; }
+    .canvas-label { position:absolute; bottom:6px; font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:#666; font-family:var(--display); font-weight:700; background:rgba(0,0,0,.7); padding:3px 6px; border-radius:4px; }
+    .label-target { left:6px; }
+    .label-evolved { right:6px; }
+    .diff-canvas { position:absolute; top:0; left:0; opacity:0; mix-blend-mode:difference; pointer-events:none; transition:opacity .3s; }
+    .diff-canvas.visible { opacity:.6; }
 
-    /* === HEADER === */
-    header {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      border-bottom: 1px solid #1e1e1e;
-      gap: 16px;
-      overflow-x: auto;
-      white-space: nowrap;
-      -webkit-overflow-scrolling: touch;
+    /* ── LIVE HUD OVERLAY (on canvas area) ── */
+    #live-hud {
+      position:absolute; top:12px; left:12px;
+      background:rgba(5,5,5,.88);
+      border:1px solid #1e1e1e;
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:10px;
+      font-family:var(--mono);
+      color:var(--dim);
+      pointer-events:none;
+      backdrop-filter:blur(6px);
+      z-index:5;
+      min-width:200px;
+      display:none;
+      transition:opacity .3s;
     }
-    header::-webkit-scrollbar { display: none; }
-    .wordmark {
-      font-family: var(--display);
-      font-weight: 900;
-      font-size: 15px;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      flex-shrink: 0;
-    }
-    .wordmark span { color: var(--dim); font-weight: 300; }
-    .pill {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 100px;
-      padding: 4px 10px;
-      font-size: 10px;
-      color: var(--dim);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      flex-shrink: 0;
-    }
-    .pill.live { border-color: var(--accent); color: var(--accent); }
-    .pill.live::before {
-      content: '';
-      display: inline-block;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      margin-right: 5px;
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .hdr-right { margin-left: auto; display: flex; gap: 12px; align-items: center; flex-shrink: 0; }
-    .stat-chip {
-      font-size: 11px;
-      color: var(--dim);
-      display: flex; 
-      align-items: center; 
-      gap: 5px;
-    }
-    .stat-chip .val {
-      font-family: var(--display);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--paper);
-      min-width: 48px;
-      text-align: right;
-    }
-    .stat-chip .val.hot { color: var(--accent); }
+    #live-hud.visible { display:block; }
+    .hud-title { font-family:var(--display); font-size:8px; letter-spacing:.18em; text-transform:uppercase; color:#444; margin-bottom:8px; }
+    .hud-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; gap:12px; }
+    .hud-label { color:#555; font-size:9px; }
+    .hud-val { color:var(--accent); font-family:var(--display); font-size:11px; font-weight:700; }
+    .hud-val.dim { color:var(--dim); font-size:10px; }
+    .hud-divider { border:none; border-top:1px solid #1a1a1a; margin:7px 0; }
+    /* strategy badge inside HUD */
+    .hud-strategy { margin-top:8px; background:#111; border-radius:6px; padding:7px 9px; border-left:2px solid var(--accent); }
+    .hud-strat-name { color:var(--accent); font-size:10px; font-weight:700; line-height:1.3; margin-bottom:2px; }
+    .hud-strat-desc { color:#555; font-size:9px; line-height:1.4; }
+    /* heatmap */
+    .hud-heatmap { margin-top:8px; }
+    .hud-heatmap-title { font-size:9px; color:#444; margin-bottom:4px; letter-spacing:.1em; text-transform:uppercase; }
+    .heatmap-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:2px; width:80px; }
+    .heatmap-cell { width:14px; height:14px; border-radius:2px; }
+    /* op mini bars */
+    .hud-ops { margin-top:8px; display:flex; flex-direction:column; gap:3px; }
+    .hud-op-row { display:flex; align-items:center; gap:5px; }
+    .hud-op-name { width:46px; font-size:8px; color:#444; text-transform:uppercase; letter-spacing:.08em; }
+    .hud-op-bar { flex:1; height:3px; background:#1a1a1a; border-radius:2px; overflow:hidden; }
+    .hud-op-fill { height:100%; border-radius:2px; transition:width .6s ease; }
+    .hud-op-pct { width:24px; font-size:8px; color:#555; text-align:right; font-family:var(--display); font-weight:700; }
 
-    /* === CANVAS AREA === */
-    .canvas-area {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #050505;
-      overflow: hidden;
-      min-height: 0;
-      padding: 16px;
-    }
-    .canvas-wrap {
-      position: relative;
-      display: flex;
-      gap: 4px;
-      max-width: 100%;
-      max-height: 100%;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-    }
-    .canvas-wrap > div { position: relative; max-width: 100%; flex: 0 1 auto; }
-    canvas { display: block; image-rendering: pixelated; max-width: 100%; height: auto; border-radius: 4px; }
-    .canvas-label {
-      position: absolute;
-      bottom: 6px;
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #666;
-      font-family: var(--display);
-      font-weight: 700;
-      background: rgba(0,0,0,0.7);
-      padding: 3px 6px;
-      border-radius: 4px;
-      backdrop-filter: blur(2px);
-    }
-    .label-target { left: 6px; }
-    .label-evolved { right: 6px; }
-    .diff-canvas { position: absolute; top:0; left:0; opacity:0; mix-blend-mode:difference; pointer-events:none; transition:opacity 0.3s; }
-    .diff-canvas.visible { opacity: 0.6; }
+    /* ── DROP OVERLAY ── */
+    .drop-overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; background:#050505; z-index:10; transition:opacity .3s; padding:24px; text-align:center; }
+    .drop-overlay.hidden { opacity:0; pointer-events:none; }
+    .drop-icon { font-size:64px; opacity:.4; animation:float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+    .drop-text { font-family:var(--display); font-size:18px; font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--dim); }
+    .drop-sub { font-size:13px; color:#555; }
+    .drop-btn { background:transparent; border:1px solid #2a2a2a; color:var(--paper); padding:12px 32px; font-family:var(--mono); font-size:14px; cursor:pointer; border-radius:8px; transition:all .15s; }
+    .drop-btn:hover { border-color:var(--accent); color:var(--accent); }
 
-    /* === DROP OVERLAY === */
-    .drop-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      background: #050505;
-      z-index: 10;
-      transition: opacity 0.3s;
-      padding: 24px;
-      text-align: center;
-    }
-    .drop-overlay.hidden { opacity: 0; pointer-events: none; }
-    .drop-icon { font-size: 64px; opacity: 0.4; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-    .drop-text { font-family: var(--display); font-size: 18px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dim); }
-    .drop-sub { font-size: 13px; color: #555; }
-    .drop-btn {
-      background: transparent;
-      border: 1px solid #2a2a2a;
-      color: var(--paper);
-      padding: 12px 32px;
-      font-family: var(--mono);
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.15s;
-    }
-    .drop-btn:hover { border-color: var(--accent); color: var(--accent); }
+    /* ── FITNESS RAIL ── */
+    .fitness-rail { position:absolute; bottom:0; left:0; right:0; height:3px; background:#111; }
+    .fitness-fill { height:100%; background:var(--accent); width:0%; transition:width .4s ease; }
 
-    /* === FITNESS RAIL === */
-    .fitness-rail { position: absolute; bottom:0; left:0; right:0; height:3px; background:#111; }
-    .fitness-fill { height:100%; background:var(--accent); width:0%; transition: width 0.4s ease; }
+    /* ── SIDEBAR ── */
+    .sidebar { background:#0d0d0d; border-left:1px solid #1a1a1a; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+    .sidebar-inner { flex:1; overflow-y:auto; padding-bottom:24px; }
+    .sidebar-inner::-webkit-scrollbar { width:3px; }
+    .sidebar-inner::-webkit-scrollbar-thumb { background:#333; border-radius:2px; }
+    .sidebar-section { padding:14px 16px; border-bottom:1px solid #1a1a1a; }
+    .sidebar-section:last-child { border-bottom:none; }
+    .section-label { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); font-family:var(--display); font-weight:700; margin-bottom:10px; }
 
-    /* === SIDEBAR === */
-    .sidebar {
-      background: #0d0d0d;
-      border-left: 1px solid #1a1a1a;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .sidebar-section { padding: 16px; border-bottom: 1px solid #1a1a1a; flex-shrink: 0; }
-    .sidebar-section:last-child { border-bottom: none; flex: 1; overflow-y: auto; padding-bottom: 24px; }
-    .section-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); font-family: var(--display); font-weight: 700; margin-bottom: 12px; }
+    /* ── CONTROLS HEADER ── */
+    .controls-header { background:#0d0d0d; z-index:5; padding:12px 16px 10px; cursor:pointer; border-bottom:1px solid #1a1a1a; -webkit-tap-highlight-color:transparent; flex-shrink:0; }
+    .controls-header .section-label { margin-bottom:0; display:flex; align-items:center; justify-content:space-between; pointer-events:none; }
+    .controls-header .section-label::after { content:'▼'; font-size:8px; color:var(--accent); margin-left:8px; transition:transform .2s; }
+    .sidebar.open .controls-header .section-label::after { transform:rotate(180deg); }
+    .sidebar-backdrop { position:fixed; inset:0; background:transparent; z-index:19; display:none; }
+    .sidebar-backdrop.visible { display:block; }
 
-    /* === STICKY CONTROLS HEADER === */
-    .controls-header {
-      position: sticky;
-      top: 0;
-      background: #0d0d0d;
-      z-index: 5;
-      padding: 12px 16px 0 16px;
-      cursor: pointer;
-      border-bottom: 1px solid #1a1a1a;
-      transition: background 0.1s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .controls-header:active { background: #1a1a1a; }
-    .controls-header .section-label {
-      margin-bottom: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      pointer-events: none;
-    }
-    .controls-header .section-label::after {
-      content: '▼';
-      font-size: 8px;
-      color: var(--accent);
-      margin-left: 8px;
-      transition: transform 0.2s;
-    }
-    .sidebar.visible .controls-header .section-label::after { transform: rotate(180deg); }
+    /* ── BUTTONS ── */
+    .btn-row { display:flex; gap:7px; margin-bottom:9px; flex-wrap:wrap; }
+    .btn { flex:1 1 auto; min-width:60px; padding:9px 6px; font-family:var(--mono); font-size:11px; border-radius:6px; cursor:pointer; border:1px solid; transition:all .15s; letter-spacing:.05em; background:transparent; }
+    .btn-primary { background:var(--accent); color:var(--ink); border-color:var(--accent); font-weight:600; }
+    .btn-primary:disabled { opacity:.3; cursor:not-allowed; }
+    .btn-ghost { color:var(--dim); border-color:#222; }
+    .btn-ghost:hover { border-color:#444; color:var(--paper); }
+    .btn-danger { color:var(--red); border-color:#2a1515; }
 
-    /* === SIDEBAR BACKDROP === */
-    .sidebar-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: transparent;
-      z-index: 19;
-      display: none;
-    }
-    .sidebar-backdrop.visible { display: block; }
+    /* ── DOWNLOAD MENU ── */
+    .download-container { position:relative; flex:1; }
+    .download-btn { width:100%; padding:9px 6px; font-family:var(--mono); font-size:11px; border-radius:6px; cursor:pointer; border:1px solid #222; background:transparent; color:var(--dim); display:flex; align-items:center; justify-content:center; gap:4px; }
+    .download-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .download-menu { position:fixed; background:#1a1a1a; border:1px solid var(--accent); border-radius:8px; display:none; z-index:9999; min-width:180px; box-shadow:0 -8px 24px rgba(0,0,0,.8); }
+    .download-menu.show { display:block; }
+    .download-menu-item { padding:11px 14px; font-size:12px; color:var(--dim); cursor:pointer; border-bottom:1px solid #2a2a2a; font-family:var(--mono); }
+    .download-menu-item:last-child { border-bottom:none; }
+    .download-menu-item:hover { background:#2a2a2a; color:var(--accent); }
 
-    /* === BUTTONS === */
-    .btn-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-    .btn {
-      flex: 1 1 auto;
-      min-width: 65px;
-      padding: 10px 6px;
-      font-family: var(--mono);
-      font-size: 11px;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid;
-      transition: all 0.15s;
-      letter-spacing: 0.05em;
-      background: transparent;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn-primary { background: var(--accent); color: var(--ink); border-color: var(--accent); font-weight: 600; }
-    .btn-primary:active { background: #d4ff26; }
-    .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
-    .btn-ghost { color: var(--dim); border-color: #222; }
-    .btn-ghost:active { border-color: #444; color: var(--paper); }
-    .btn-danger { color: var(--red); border-color: #2a1515; }
-    .btn-danger:active { border-color: var(--red); }
+    /* ── CONTROLS ── */
+    #advanced-controls { margin-top:10px; }
+    .control-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; gap:8px; }
+    .control-label { font-size:10px; color:var(--dim); white-space:nowrap; min-width:52px; }
+    .control-val { font-family:var(--display); font-size:11px; font-weight:700; color:var(--paper); min-width:36px; text-align:right; }
+    input[type="range"] { flex:1; -webkit-appearance:none; height:3px; background:#222; border-radius:2px; outline:none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:15px; height:15px; border-radius:50%; background:var(--accent); cursor:pointer; }
+    select { background:#111; color:var(--paper); border:1px solid #222; padding:5px 7px; border-radius:6px; font-size:11px; width:100%; cursor:pointer; }
 
-    /* === DOWNLOAD MENU === */
-    .download-container { position: relative; flex: 1; }
-    .download-btn {
-      width: 100%;
-      padding: 10px 6px;
-      font-family: var(--mono);
-      font-size: 11px;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 1px solid #222;
-      background: transparent;
-      color: var(--dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-    .download-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .download-menu {
-      position: absolute;
-      bottom: 100%;
-      left: 0;
-      right: 0;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 6px;
-      margin-bottom: 4px;
-      display: none;
-      z-index: 10;
-    }
-    .download-menu.show { display: block; }
-    .download-menu-item {
-      padding: 10px 12px;
-      font-size: 11px;
-      color: var(--dim);
-      cursor: pointer;
-      border-bottom: 1px solid #2a2a2a;
-    }
-    .download-menu-item:last-child { border-bottom: none; }
-    .download-menu-item:hover { background: #2a2a2a; color: var(--accent); }
+    /* ── PROMPT ── */
+    .prompt-row { display:flex; gap:7px; }
+    .prompt-input { flex:1; background:#111; border:1px solid #222; border-radius:6px; padding:9px 11px; font-family:var(--mono); font-size:12px; color:var(--paper); outline:none; }
+    .prompt-input:focus { border-color:var(--accent); }
 
-    /* === CONTROLS === */
-    #advanced-controls { margin-top: 12px; }
-    .control-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
-    .control-label { font-size: 10px; color: var(--dim); white-space: nowrap; min-width: 55px; }
-    .control-val { font-family: var(--display); font-size: 11px; font-weight: 700; color: var(--paper); min-width: 38px; text-align: right; }
-    input[type="range"] {
-      flex: 1;
-      -webkit-appearance: none;
-      height: 3px;
-      background: #222;
-      border-radius: 2px;
-      outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-      transition: transform 0.1s;
-    }
-    input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
-    select {
-      background: #111;
-      color: var(--paper);
-      border: 1px solid #222;
-      padding: 6px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      width: 100%;
-      cursor: pointer;
-    }
+    /* ── GENOME EDITOR ── */
+    .genome-editor { width:100%; background:#111; border:1px solid #222; border-radius:6px; padding:8px; font-family:var(--mono); font-size:10px; color:var(--paper); outline:none; resize:vertical; min-height:90px; margin:6px 0; }
+    .genome-editor:focus { border-color:var(--accent); }
 
-    /* === OPERATOR STATS === */
-    .op-grid { display: flex; flex-direction: column; gap: 8px; }
-    .op-row { display: flex; align-items: center; gap: 8px; }
-    .op-name { font-size: 9px; color: var(--dim); width: 52px; text-transform: uppercase; letter-spacing: 0.1em; }
-    .op-bar-bg { flex: 1; height: 4px; background: #1a1a1a; border-radius: 2px; overflow: hidden; }
-    .op-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
-    .op-pct { font-size: 9px; color: #555; width: 28px; text-align: right; font-family: var(--display); font-weight: 700; }
+    /* ── HISTORY GRID ── */
+    .history-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(68px,1fr)); gap:6px; }
+    .history-thumb { aspect-ratio:1; border-radius:6px; overflow:hidden; cursor:pointer; border:2px solid #1a1a1a; position:relative; transition:border-color .15s; }
+    .history-thumb:hover { border-color:var(--accent); }
+    .history-thumb canvas { width:100%; height:100%; object-fit:cover; }
+    .history-thumb .gen-label { position:absolute; bottom:2px; left:3px; font-size:7px; color:white; background:rgba(0,0,0,.5); padding:1px 3px; border-radius:2px; }
+    .history-thumb .fit-label { position:absolute; top:2px; right:3px; font-size:7px; color:var(--accent); background:rgba(0,0,0,.5); padding:1px 3px; border-radius:2px; }
 
-    /* === AI INSIGHTS === */
-    .ai-stats { background: #111; padding: 14px; border-radius: 8px; border: 1px solid #222; }
-    .ai-stat-row { display: flex; justify-content: space-between; font-size: 11px; margin: 6px 0; }
-    .ai-stat-label { color: var(--dim); }
-    .ai-stat-value { color: var(--accent); font-weight: 700; font-family: var(--display); }
+    /* ── FOOTER ── */
+    footer { grid-column:1/-1; display:flex; align-items:center; padding:0 16px; border-top:1px solid #1a1a1a; gap:14px; background:#080808; overflow-x:auto; white-space:nowrap; }
+    footer::-webkit-scrollbar { display:none; }
+    .kbd { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:4px; padding:2px 5px; font-size:10px; color:var(--dim); }
+    .kbd-desc { font-size:10px; color:#444; margin-right:6px; }
+    .ftr-right { margin-left:auto; font-size:10px; color:#2a2a2a; font-family:var(--display); font-weight:700; }
 
-    /* === ERROR FOCUS === */
-    .error-summary { background: #111; padding: 14px; border-radius: 8px; border: 1px solid #222; }
-    .error-row { display: flex; justify-content: space-between; margin: 6px 0; font-size: 11px; }
-    .error-badge { background: #1a1a1a; padding: 3px 8px; border-radius: 12px; color: var(--accent); font-size: 10px; }
-
-    /* === STRATEGY === */
-    .strategy-box { background: #111; padding: 14px; border-radius: 8px; border: 1px solid #222; margin: 10px 0; }
-    .strategy-name { font-size: 15px; font-weight: bold; color: var(--accent); margin-bottom: 4px; }
-    .strategy-desc { font-size: 10px; color: var(--dim); }
-
-    /* === PROMPT INPUT === */
-    .prompt-row { display: flex; gap: 8px; }
-    .prompt-input {
-      flex: 1;
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--paper);
-      outline: none;
-    }
-    .prompt-input:focus { border-color: var(--accent); }
-
-    /* === GENOME EDITOR === */
-    .genome-editor {
-      width: 100%;
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 6px;
-      padding: 8px;
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--paper);
-      outline: none;
-      resize: vertical;
-      min-height: 100px;
-      margin: 8px 0;
-    }
-    .genome-editor:focus { border-color: var(--accent); }
-
-    /* === HISTORY GRID === */
-    .history-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-      gap: 8px;
-    }
-    .history-thumb {
-      aspect-ratio: 1;
-      border-radius: 6px;
-      overflow: hidden;
-      cursor: pointer;
-      border: 2px solid #1a1a1a;
-      position: relative;
-      transition: border-color 0.15s;
-    }
-    .history-thumb:hover { border-color: var(--accent); }
-    .history-thumb canvas { width:100%; height:100%; object-fit: cover; }
-    .history-thumb .gen-label {
-      position: absolute; bottom:3px; left:4px;
-      font-size:8px; color:white; background:rgba(0,0,0,0.5); padding:1px 4px; border-radius:3px;
-    }
-    .history-thumb .fit-label {
-      position: absolute; top:3px; right:4px;
-      font-size:8px; color:var(--accent); background:rgba(0,0,0,0.5); padding:1px 4px; border-radius:3px;
-    }
-
-    /* === FOOTER === */
-    footer {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      border-top: 1px solid #1a1a1a;
-      gap: 16px;
-      background: #080808;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-    footer::-webkit-scrollbar { display: none; }
-    .kbd { background: #1a1a1a; border:1px solid #2a2a2a; border-radius:4px; padding:2px 6px; font-size:10px; color:var(--dim); }
-    .kbd-desc { font-size:10px; color:#444; margin-right:8px; }
-    .ftr-right { margin-left: auto; font-size:10px; color:#2a2a2a; font-family:var(--display); font-weight:700; }
-
-    /* === TOAST === */
-    #toast {
-      position: fixed; bottom:60px; left:50%; transform:translateX(-50%) translateY(20px);
-      background: var(--ink); border:1px solid var(--accent); color:var(--accent);
-      padding:12px 24px; font-size:13px; border-radius:40px; opacity:0; transition:opacity 0.2s, transform 0.2s;
-      pointer-events:none; white-space:nowrap; font-family:var(--display); font-weight:700; z-index:2000;
-    }
+    /* ── TOAST ── */
+    #toast { position:fixed; bottom:56px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); border:1px solid var(--accent); color:var(--accent); padding:10px 22px; font-size:13px; border-radius:40px; opacity:0; transition:opacity .2s,transform .2s; pointer-events:none; white-space:nowrap; font-family:var(--display); font-weight:700; z-index:2000; }
     #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    /* === SCROLLBAR === */
+    /* ── SCROLLBAR ── */
     ::-webkit-scrollbar { width:4px; height:4px; }
     ::-webkit-scrollbar-track { background:#111; }
-    ::-webkit-scrollbar-thumb { background:#444; border-radius:4px; }
+    ::-webkit-scrollbar-thumb { background:#333; border-radius:4px; }
 
-    /* === MOBILE RESPONSIVE === */
-    @media (max-width: 768px) {
+    /* ── HUD TOGGLE BTN ── */
+    #btn-hud { font-size:11px; }
+    #btn-hud.active { color:var(--accent); border-color:var(--accent); }
+
+    /* ── API STATUS ── */
+    #api-status-dot { font-size:9px; color:#555; float:right; margin-top:1px; }
+
+    /* ── STAGNATION ALERT ── */
+    .stag-alert { background:#1a0f00; border:1px solid #ff9f0a; border-radius:6px; padding:8px 10px; font-size:10px; color:#ff9f0a; margin-top:8px; display:none; }
+    .stag-alert.show { display:block; }
+
+    /* ── MOBILE ── */
+    @media (max-width:768px) {
       body { grid-template-rows:48px 1fr 40px; grid-template-columns:1fr; }
-      .sidebar {
-        position: fixed; bottom:40px; left:0; right:0; max-height:80vh;
-        border-left:none; border-top:2px solid var(--accent);
-        transform:translateY(100%); transition:transform 0.3s cubic-bezier(0.4,0.0,0.2,1);
-        z-index:100; overflow-y:auto; background:#0d0d0d; border-radius:24px 24px 0 0;
-        will-change:transform; touch-action:pan-y;
-      }
-      .sidebar.visible { transform:translateY(0); }
-      .sidebar::before {
-        content:''; position:absolute; top:-40px; left:50%; transform:translateX(-50%);
-        width:50px; height:5px; background:var(--accent); border-radius:20px; opacity:0.8;
-      }
-      .sidebar .drag-area {
-        position:absolute; top:-50px; left:0; right:0; height:50px; cursor:grab; touch-action:none; background:transparent; z-index:5;
-      }
+      .sidebar { position:fixed; bottom:40px; left:0; right:0; max-height:80vh; border-left:none; border-top:2px solid var(--accent); transform:translateY(100%); transition:transform .3s cubic-bezier(.4,0,.2,1); z-index:100; background:#0d0d0d; border-radius:24px 24px 0 0; will-change:transform; }
+      .sidebar.open { transform:translateY(0); }
+      .sidebar::before { content:''; position:absolute; top:-32px; left:50%; transform:translateX(-50%); width:44px; height:4px; background:var(--accent); border-radius:20px; opacity:.7; }
       .canvas-area { padding:8px; }
-      .canvas-wrap { gap:2px; }
-      .hdr-right .stat-chip:not(:first-child):not(:nth-child(2)) { display:none; }
+      #live-hud { font-size:9px; min-width:160px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ==================== GENOME VIEWER MODAL ==================== -->
+<!-- ── GENOME VIEWER MODAL ── -->
 <div class="modal" id="viewer-modal">
   <div class="modal-content">
     <span class="modal-close" id="modal-close">✕</span>
-    <h2 style="color:var(--accent); margin-bottom:24px;">🧬 PIGMENT v6 Genome Viewer</h2>
+    <h2 style="color:var(--accent);margin-bottom:20px;">🧬 Genome Viewer</h2>
     <div class="viewer-dropzone" id="viewer-dropzone">
-      <div style="font-size:56px;">📂</div>
-      <div style="font-size:18px;">Drop .pg file here</div>
-      <div style="font-size:13px; color:var(--dim);">or click to browse</div>
+      <div style="font-size:48px;">📂</div>
+      <div style="font-size:16px;margin:6px 0;">Drop .pg file here</div>
+      <div style="font-size:12px;color:var(--dim);">or click to browse</div>
       <input type="file" id="viewer-file" accept=".pg" style="display:none">
     </div>
     <div id="viewer-info" style="display:none;">
       <div class="viewer-info">
-        <div class="viewer-info-row"><span class="viewer-info-label">Filename:</span><span class="viewer-info-value" id="viewer-filename">--</span></div>
-        <div class="viewer-info-row"><span class="viewer-info-label">Dimensions:</span><span class="viewer-info-value" id="viewer-dimensions">--</span></div>
-        <div class="viewer-info-row"><span class="viewer-info-label">Fitness:</span><span class="viewer-info-value" id="viewer-fitness">--</span></div>
-        <div class="viewer-info-row"><span class="viewer-info-label">Generations:</span><span class="viewer-info-value" id="viewer-generations">--</span></div>
-        <div class="viewer-info-row"><span class="viewer-info-label">Polygons:</span><span class="viewer-info-value" id="viewer-polygons">--</span></div>
+        <div class="viewer-info-row"><span class="viewer-info-label">File</span><span class="viewer-info-value" id="viewer-filename">--</span></div>
+        <div class="viewer-info-row"><span class="viewer-info-label">Dimensions</span><span class="viewer-info-value" id="viewer-dimensions">--</span></div>
+        <div class="viewer-info-row"><span class="viewer-info-label">Fitness</span><span class="viewer-info-value" id="viewer-fitness">--</span></div>
+        <div class="viewer-info-row"><span class="viewer-info-label">Generations</span><span class="viewer-info-value" id="viewer-generations">--</span></div>
+        <div class="viewer-info-row"><span class="viewer-info-label">Polygons</span><span class="viewer-info-value" id="viewer-polygons">--</span></div>
       </div>
       <canvas id="viewer-canvas" class="viewer-canvas"></canvas>
       <div class="viewer-controls">
@@ -572,7 +247,7 @@
   </div>
 </div>
 
-<!-- ==================== HEADER ==================== -->
+<!-- ── HEADER ── -->
 <header>
   <div class="wordmark">PIGMENT <span>v6 AI</span></div>
   <div class="pill live" id="status-pill">IDLE</div>
@@ -585,7 +260,7 @@
   </div>
 </header>
 
-<!-- ==================== CANVAS AREA ==================== -->
+<!-- ── CANVAS AREA ── -->
 <div class="canvas-area" id="canvas-area">
   <div class="drop-overlay" id="drop-overlay">
     <div class="drop-icon">⬡</div>
@@ -594,1609 +269,1036 @@
     <button class="drop-btn" id="browse-btn">Browse files</button>
     <input type="file" id="file-input" accept="image/*" style="display:none">
   </div>
+
+  <!-- canvas pair -->
   <div class="canvas-wrap" id="canvas-wrap" style="display:none">
-    <div style="position:relative"><canvas id="cv-target"></canvas><div class="canvas-label label-target">TARGET</div></div>
-    <div style="position:relative"><canvas id="cv-evolved"></canvas><canvas id="cv-diff" class="diff-canvas"></canvas><div class="canvas-label label-evolved">EVOLVED</div></div>
+    <div class="canvas-slot"><canvas id="cv-target"></canvas><div class="canvas-label label-target">TARGET</div></div>
+    <div class="canvas-slot"><canvas id="cv-evolved"></canvas><canvas id="cv-diff" class="diff-canvas"></canvas><div class="canvas-label label-evolved">EVOLVED</div></div>
   </div>
+
+  <!-- LIVE HUD OVERLAY -->
+  <div id="live-hud">
+    <div class="hud-title">◈ Live Stats</div>
+
+    <div class="hud-row"><span class="hud-label">Generation</span><span class="hud-val" id="hud-gen">0</span></div>
+    <div class="hud-row"><span class="hud-label">Fitness</span><span class="hud-val" id="hud-fit">0.00%</span></div>
+    <div class="hud-row"><span class="hud-label">Best ever</span><span class="hud-val dim" id="hud-best">0.00%</span></div>
+    <div class="hud-row"><span class="hud-label">Δ Fit/s</span><span class="hud-val dim" id="hud-dfit">—</span></div>
+    <div class="hud-row"><span class="hud-label">Mut/s</span><span class="hud-val dim" id="hud-mps">0</span></div>
+    <div class="hud-row"><span class="hud-label">Mut rate</span><span class="hud-val dim" id="hud-mut">1.0×</span></div>
+    <div class="hud-row"><span class="hud-label">Session hits</span><span class="hud-val dim" id="hud-success">0%</span></div>
+    <div class="hud-row"><span class="hud-label">Server</span><span class="hud-val dim" id="hud-server">offline</span></div>
+
+    <hr class="hud-divider">
+
+    <!-- Strategy badge -->
+    <div class="hud-strategy">
+      <div class="hud-strat-name" id="hud-strat-name">—</div>
+      <div class="hud-strat-desc" id="hud-strat-desc">Load an image to begin</div>
+    </div>
+
+    <!-- Stagnation warning -->
+    <div class="stag-alert" id="stag-alert">⚡ Stagnation — switching strategy</div>
+
+    <hr class="hud-divider">
+
+    <!-- Heatmap -->
+    <div class="hud-heatmap">
+      <div class="hud-heatmap-title">Error heatmap</div>
+      <div class="heatmap-grid" id="hud-heatmap-grid"></div>
+    </div>
+
+    <hr class="hud-divider">
+
+    <!-- Op bars -->
+    <div class="hud-ops" id="hud-ops"></div>
+  </div>
+
   <div class="fitness-rail"><div class="fitness-fill" id="fitness-fill"></div></div>
 </div>
 
-<!-- ==================== SIDEBAR BACKDROP ==================== -->
+<!-- ── SIDEBAR BACKDROP ── -->
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
-<!-- ==================== SIDEBAR ==================== -->
+<!-- ── SIDEBAR ── -->
 <div class="sidebar" id="sidebar">
-  <div class="drag-area" id="sidebar-drag"></div>
   <div class="controls-header" id="controls-header"><div class="section-label">Controls</div></div>
+  <div class="sidebar-inner">
 
-  <!-- === BUTTONS ROW === -->
-  <div class="sidebar-section">
-    <div class="btn-row">
-      <button class="btn btn-primary" id="btn-play" disabled>▶ PLAY</button>
-      <button class="btn btn-ghost" id="btn-reset" disabled>↺</button>
-      <button class="btn btn-ghost" id="btn-diff">◈ DIFF</button>
-    </div>
-    <div class="btn-row">
-      <div class="download-container">
-        <button class="download-btn" id="btn-download">⬇ Download ▼</button>
-        <div class="download-menu" id="download-menu">
-          <div class="download-menu-item" data-export="png-target">📷 Target PNG</div>
-          <div class="download-menu-item" data-export="png-evolved">🎨 Evolved PNG</div>
-          <div class="download-menu-item" data-export="png-diff">🔍 Diff PNG</div>
-        </div>
+    <!-- PLAYBACK -->
+    <div class="sidebar-section">
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-play" disabled>▶ PLAY</button>
+        <button class="btn btn-ghost" id="btn-reset" disabled>↺ Reset</button>
+        <button class="btn btn-ghost" id="btn-diff">◈ Diff</button>
       </div>
-      <button class="btn btn-ghost" id="btn-snapshot">📷 SNAP</button>
-      <button class="btn btn-danger" id="btn-clear">✕</button>
+      <div class="btn-row">
+        <div class="download-container">
+          <button class="download-btn" id="btn-download">⬇ Download ▼</button>
+          <div class="download-menu" id="download-menu">
+            <div class="download-menu-item" data-export="png-target">📷 Target PNG</div>
+            <div class="download-menu-item" data-export="png-evolved">🎨 Evolved PNG</div>
+            <div class="download-menu-item" data-export="png-diff">🔍 Diff PNG</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" id="btn-snapshot">📷 Snap</button>
+        <button class="btn btn-ghost btn-danger" id="btn-clear">✕</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btn-hud">◈ HUD</button>
+        <button class="btn btn-ghost" id="btn-ai-suggest">🤖 Suggest</button>
+      </div>
+      <div id="suggestion-result" style="font-size:10px;color:var(--accent);margin-top:6px;display:none;line-height:1.5"></div>
     </div>
-  </div>
 
-  <!-- === PARAMETERS === -->
-  <div class="sidebar-section">
-    <div class="section-label">⚙️ PARAMETERS</div>
-    <div class="control-row">
-      <span class="control-label">Resolution</span>
-      <select id="resolution-mode">
-        <option value="auto" selected>Auto (AI chooses)</option>
-        <option value="full">Full always</option>
-        <option value="advanced">🔧 Advanced Mode</option>
-      </select>
+    <!-- PARAMETERS -->
+    <div class="sidebar-section">
+      <div class="section-label">⚙️ Parameters</div>
+      <div class="control-row">
+        <span class="control-label">Resolution</span>
+        <select id="resolution-mode">
+          <option value="auto" selected>Auto (AI)</option>
+          <option value="full">Full always</option>
+          <option value="advanced">🔧 Advanced</option>
+        </select>
+      </div>
+      <div id="advanced-controls" style="display:none;">
+        <div class="control-row"><span class="control-label">Polygons</span><input type="range" id="sl-poly" min="10" max="300" value="50"><span class="control-val" id="vl-poly">50</span></div>
+        <div class="control-row"><span class="control-label">Speed</span><input type="range" id="sl-speed" min="1" max="100" value="20"><span class="control-val" id="vl-speed">20</span></div>
+        <div class="control-row"><span class="control-label">Mut Rate</span><input type="range" id="sl-mut" min="1" max="50" value="10" step="1"><span class="control-val" id="vl-mut">1.0×</span></div>
+        <div class="control-row"><span class="control-label">Min Alpha</span><input type="range" id="sl-alpha" min="5" max="120" value="20"><span class="control-val" id="vl-alpha">20</span></div>
+        <div style="font-size:9px;color:var(--dim);">🔧 Manual override active</div>
+      </div>
     </div>
-    <div id="advanced-controls" style="display:none;">
-      <div class="control-row"><span class="control-label">Polygons</span><input type="range" id="sl-poly" min="10" max="300" value="50"><span class="control-val" id="vl-poly">50</span></div>
-      <div class="control-row"><span class="control-label">Speed</span><input type="range" id="sl-speed" min="1" max="100" value="20"><span class="control-val" id="vl-speed">20</span></div>
-      <div class="control-row"><span class="control-label">Mut. Rate</span><input type="range" id="sl-mut" min="1" max="50" value="10" step="1"><span class="control-val" id="vl-mut">1.0×</span></div>
-      <div class="control-row"><span class="control-label">Min Alpha</span><input type="range" id="sl-alpha" min="5" max="120" value="20"><span class="control-val" id="vl-alpha">20</span></div>
-      <div style="font-size:9px; color:var(--dim);">🔧 Manual mode</div>
-    </div>
-  </div>
 
-  <!-- === AI INSIGHTS === -->
-  <div class="sidebar-section">
-    <div class="section-label">🧠 AI INSIGHTS <span id="api-status-dot" style="font-size:9px;color:#555;float:right;margin-top:2px">○ offline</span></div>
-    <div class="ai-stats">
-      <div class="ai-stat-row"><span class="ai-stat-label">Training samples:</span><span class="ai-stat-value" id="ai-samples">171,381</span></div>
-      <div class="ai-stat-row"><span class="ai-stat-label">Q-states:</span><span class="ai-stat-value" id="ai-qstates">14</span></div>
-      <div class="ai-stat-row"><span class="ai-stat-label">Session samples:</span><span class="ai-stat-value" id="ai-session">0</span></div>
-      <div class="ai-stat-row"><span class="ai-stat-label">Success rate:</span><span class="ai-stat-value" id="ai-success">0%</span></div>
-      <div class="ai-stat-row"><span class="ai-stat-label">Best operator:</span><span class="ai-stat-value" id="ai-bestop">scale</span></div>
+    <!-- API CONNECT -->
+    <div class="sidebar-section">
+      <div class="section-label">🔌 API Connect <span id="api-status-dot">○ offline</span></div>
+      <div class="prompt-row">
+        <input type="text" class="prompt-input" id="api-key-manual" placeholder="pigment_… key (blank = auto)" style="font-size:9px">
+        <button class="btn btn-ghost" id="btn-api-connect" style="flex:0;padding:7px 10px;font-size:9px">↗</button>
+      </div>
+      <div id="ws-status" style="font-size:8px;color:#444;margin-top:4px;min-height:12px"></div>
+      <div style="background:#111;border-radius:2px;height:3px;margin-top:3px;overflow:hidden"><div id="ws-progress" style="background:var(--accent);height:100%;width:0%;transition:width .5s"></div></div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn btn-ghost" id="btn-api-save" style="flex:1;font-size:9px">💾 Save</button>
+        <button class="btn btn-ghost" id="btn-api-evolve" style="flex:1;font-size:9px">🧬 Evolve+</button>
+        <button class="btn btn-ghost" id="btn-api-kinship" style="flex:1;font-size:9px">🔗 Kin</button>
+      </div>
+      <div id="api-kinship-panel" style="display:none;margin-top:8px;font-size:9px;color:#888;line-height:1.6"></div>
     </div>
-  </div>
 
-  <!-- === ERROR FOCUS === -->
-  <div class="sidebar-section">
-    <div class="section-label">🔥 ERROR FOCUS</div>
-    <div class="error-summary">
-      <div class="error-row"><span>Worst area:</span><span class="error-badge" id="error-worst">center (0%)</span></div>
-      <div class="error-row"><span>Top-left · Top-right:</span><span id="error-top">0% · 0%</span></div>
-      <div class="error-row"><span>Center:</span><span id="error-center">0%</span></div>
-      <div class="error-row"><span>Bottom:</span><span id="error-bottom">0%</span></div>
+    <!-- AI EVOLVE PROMPT -->
+    <div class="sidebar-section">
+      <div class="section-label">✨ AI Evolve</div>
+      <div class="prompt-row">
+        <input type="text" class="prompt-input" id="prompt-input" placeholder="glitchy, more contrast, organic…">
+        <button class="btn btn-ghost" id="btn-prompt" style="flex:0;padding:9px 12px;">→</button>
+      </div>
+      <div id="prompt-result" style="font-size:9px;color:var(--accent);margin-top:5px;display:none;line-height:1.5"></div>
     </div>
-  </div>
 
-  <!-- === STRATEGY === -->
-  <div class="sidebar-section">
-    <div class="section-label">🧠 STRATEGY</div>
-    <div class="strategy-box">
-      <div class="strategy-name" id="strategy-name">explore · general</div>
-      <div class="strategy-desc" id="strategy-desc">Trying everything, big jumps</div>
+    <!-- GENOME EDITOR -->
+    <div class="sidebar-section">
+      <div class="section-label">🧬 Genome Editor</div>
+      <textarea class="genome-editor" id="genome-editor" placeholder="Paste or edit genome code…"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btn-apply-genome">Apply</button>
+        <button class="btn btn-ghost" id="btn-export-genome">Export</button>
+      </div>
     </div>
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="btn-ai-suggest">🤖 GET SUGGESTION</button>
-    </div>
-    <div id="suggestion-result" style="font-size:10px; color:var(--accent); margin-top:8px; display:none;"></div>
-  </div>
 
-  <!-- === OPERATOR STATS === -->
-  <div class="sidebar-section">
-    <div class="section-label">📊 OPERATOR STATS</div>
-    <div class="op-grid" id="live-op-grid"></div>
-  </div>
-
-  <!-- === API CONNECT === -->
-  <div class="sidebar-section">
-    <div class="section-label">🔌 API CONNECT</div>
-    <div class="prompt-row">
-      <input type="text" class="prompt-input" id="api-key-manual" placeholder="pigment_… key (auto if blank)" style="font-size:9px">
-      <button class="btn btn-ghost" id="btn-api-connect" style="flex:0;padding:7px 10px;font-size:9px">↗</button>
+    <!-- SNAPSHOTS -->
+    <div class="sidebar-section">
+      <div class="section-label">Snapshots</div>
+      <div class="history-grid" id="history-grid"><div style="font-size:11px;color:#333;padding:16px;">No snapshots yet</div></div>
     </div>
-    <div id="ws-status" style="font-size:8px;color:#444;margin-top:4px;min-height:12px"></div>
-    <div style="background:#111;border-radius:2px;height:3px;margin-top:3px;overflow:hidden">
-      <div id="ws-progress" style="background:var(--accent);height:100%;width:0%;transition:width 0.5s"></div>
-    </div>
-    <div class="btn-row" style="margin-top:6px">
-      <button class="btn btn-ghost" id="btn-api-save" style="flex:1;font-size:9px" title="Save current work to server">💾 Save</button>
-      <button class="btn btn-ghost" id="btn-api-evolve" style="flex:1;font-size:9px" title="Evolve saved work on server">🧬 Evolve+</button>
-      <button class="btn btn-ghost" id="btn-api-kinship" style="flex:1;font-size:9px" title="Show kinship graph">🔗 Kin</button>
-    </div>
-    <div id="api-kinship-panel" style="display:none;margin-top:8px;font-size:9px;color:#888;line-height:1.6"></div>
-  </div>
-
-  <!-- === AI EVOLVE PROMPT === -->
-  <div class="sidebar-section">
-    <div class="section-label">✨ AI EVOLVE</div>
-    <div class="prompt-row">
-      <input type="text" class="prompt-input" id="prompt-input" placeholder="make it glitchy, more contrast…">
-      <button class="btn btn-ghost" id="btn-prompt" style="flex:0; padding:10px 14px;">→</button>
-    </div>
-    <div id="prompt-result" style="font-size:9px;color:var(--accent);margin-top:6px;display:none;line-height:1.5"></div>
-  </div>
-
-  <!-- === GENOME EDITOR === -->
-  <div class="sidebar-section">
-    <div class="section-label">🧬 GENOME EDITOR</div>
-    <textarea class="genome-editor" id="genome-editor" placeholder="Paste or edit genome code..."></textarea>
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="btn-apply-genome">Apply</button>
-      <button class="btn btn-ghost" id="btn-export-genome">Export Current</button>
-    </div>
-  </div>
-
-  <!-- === SNAPSHOTS === -->
-  <div class="sidebar-section">
-    <div class="section-label">Snapshots</div>
-    <div class="history-grid" id="history-grid"><div style="font-size:11px; color:#333; padding:20px;">No snapshots yet</div></div>
   </div>
 </div>
 
-<!-- ==================== FOOTER ==================== -->
+<!-- ── FOOTER ── -->
 <footer>
   <span class="kbd">Space</span><span class="kbd-desc">Play</span>
   <span class="kbd">R</span><span class="kbd-desc">Reset</span>
   <span class="kbd">D</span><span class="kbd-desc">Diff</span>
+  <span class="kbd">H</span><span class="kbd-desc">HUD</span>
   <span class="kbd">S</span><span class="kbd-desc">Snap</span>
   <span class="kbd">E</span><span class="kbd-desc">Export</span>
   <span class="kbd">G</span><span class="kbd-desc">Viewer</span>
   <span class="kbd">⌘V</span><span class="kbd-desc">Paste</span>
-  <div class="ftr-right">PIGMENT v6 L1-L4 · <span id="live-samples">171k</span></div>
+  <div class="ftr-right">PIGMENT v6 · <span id="live-samples">—</span></div>
 </footer>
-
-<!-- ==================== TOAST ==================== -->
 <div id="toast"></div>
 
 <script>
-// ============================================
-// PIGMENT v6 — COMPLETE JAVASCRIPT
-// ============================================
+// ═══════════════════════════════════════════════
+// PIGMENT v6 — HUD + ENHANCED STRATEGY ENGINE
+// ═══════════════════════════════════════════════
 
-// ==================== GLOBAL CONFIGURATION ====================
-
+// ── API ──────────────────────────────────────
 const API = {
-  // Your live backend URL (Render)
   base: 'https://pigment-api.onrender.com',
-  key: null,
-  currentWorkId: null,
-  connected: false,
-
-  headers() {
-    return { 'Content-Type': 'application/json', 'X-API-Key': this.key || '' };
-  },
-
+  key: null, currentWorkId: null, connected: false,
+  headers() { return { 'Content-Type':'application/json', 'X-API-Key': this.key||'' }; },
   async ensureUser() {
     if (this.key) return true;
     try {
-      const r = await fetch(`${this.base}/v1/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: `auto_${Date.now()}@pigment.local` })
-      });
-      const d = await r.json();
-      if (d.api_key) {
-        this.key = d.api_key;
-        localStorage.setItem('pigment_api_key', this.key);
-        return true;
-      }
-    } catch(e) {}
-    return false;
+      const r = await fetch(`${this.base}/v1/users`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:`auto_${Date.now()}@pigment.local`})});
+      const d = await r.json(); if (d.api_key) { this.key=d.api_key; localStorage.setItem('pigment_api_key',this.key); return true; }
+    } catch(e) {} return false;
   },
-
   async connect(keyOverride) {
-    if (keyOverride) this.key = keyOverride;
-    else {
-      const saved = localStorage.getItem('pigment_api_key');
-      if (saved) this.key = saved;
-    }
+    if (keyOverride) this.key=keyOverride;
+    else { const s=localStorage.getItem('pigment_api_key'); if(s) this.key=s; }
     try {
-      const r = await fetch(`${this.base}/health`, { signal: AbortSignal.timeout(3000) });
-      if (!r.ok) throw new Error('bad response');
+      const r = await fetch(`${this.base}/health`,{signal:AbortSignal.timeout(4000)});
+      if (!r.ok) throw new Error();
       const h = await r.json();
-      this.connected = true;
-      this._lastLabel = `v${h.version} · ${h.database.works} works`;
-      updateApiStatus(true, this._lastLabel);
+      this.connected=true;
+      this._label=`v${h.version} · ${h.database?.works??'?'} works`;
+      updateApiDot(true, this._label);
       if (!this.key) await this.ensureUser();
-      if (this.key) WS.connect(this.key.replace('pigment_', 'u_') + '_' + Date.now().toString(36));
-      return true;
-    } catch(e) {
-      this.connected = false;
-      updateApiStatus(false, 'offline');
-      return false;
-    }
+      if (this.key) WS.connect(this.key.replace('pigment_','u_')+'_'+Date.now().toString(36));
+      this.fetchStats(); return true;
+    } catch(e) { this.connected=false; updateApiDot(false,'offline'); return false; }
   },
-
-  async saveWork(title, content, tags) {
-    if (!this.connected) { await this.connect(); if (!this.connected) return null; }
-    if (!this.key) await this.ensureUser();
+  async fetchStats() {
     try {
-      const r = await fetch(`${this.base}/v1/works`, {
-        method: 'POST',
-        headers: this.headers(),
-        body: JSON.stringify({ title: title || 'Untitled', content, tags: tags || ['pigment-v6'] })
-      });
-      const d = await r.json();
-      if (d.id) { this.currentWorkId = d.id; return d; }
-    } catch(e) {}
-    return null;
+      const r=await fetch(`${this.base}/v1/stats`,{headers:this.headers(),signal:AbortSignal.timeout(4000)});
+      if (r.ok) { const d=await r.json(); const n=d.total_samples??d.training_samples; $('live-samples').textContent=fmtNum(n); $('hud-server').textContent=this._label||'online'; $('hud-server').style.color='var(--accent)'; }
+    } catch(e) { $('hud-server').textContent='offline'; }
   },
-
-  async evolveWork(workId, steps) {
-    if (!this.connected || !workId) return null;
-    try {
-      const r = await fetch(`${this.base}/v1/evolve`, {
-        method: 'POST',
-        headers: this.headers(),
-        body: JSON.stringify({ work_id: workId, steps: steps || 500 })
-      });
-      const d = await r.json();
-      if (d.child_id) { this.currentWorkId = d.child_id; return d; }
-    } catch(e) {}
-    return null;
+  async saveWork(title,content,tags) {
+    if(!this.connected){await this.connect();if(!this.connected)return null;}
+    if(!this.key)await this.ensureUser();
+    try { const r=await fetch(`${this.base}/v1/works`,{method:'POST',headers:this.headers(),body:JSON.stringify({title:title||'Untitled',content,tags:tags||['pigment-v6']})}); const d=await r.json(); if(d.id){this.currentWorkId=d.id;return d;} } catch(e) {} return null;
   },
-
-  async getKinship(workId) {
-    if (!this.connected || !workId) return null;
-    try {
-      const r = await fetch(`${this.base}/v1/kinship`, {
-        method: 'POST',
-        headers: this.headers(),
-        body: JSON.stringify({ work_id: workId })
-      });
-      return await r.json();
-    } catch(e) { return null; }
-  },
-
-  async getGallery(limit) {
-    if (!this.connected) return null;
-    try {
-      const r = await fetch(`${this.base}/v1/gallery?limit=${limit || 12}`, { headers: this.headers() });
-      return await r.json();
-    } catch(e) { return null; }
-  },
-
-  async getWork(id) {
-    if (!this.connected) return null;
-    try {
-      const r = await fetch(`${this.base}/v1/works/${id}`, { headers: this.headers() });
-      return await r.json();
-    } catch(e) { return null; }
-  },
-
   async postTraining(records) {
-    if (!this.connected || !records.length) return;
-    try {
-      await fetch(`${this.base}/v1/training`, {
-        method: 'POST',
-        headers: this.headers(),
-        body: JSON.stringify(records)
-      });
-    } catch(e) {}
+    if(!this.connected||!records.length)return;
+    try { await fetch(`${this.base}/v1/training`,{method:'POST',headers:this.headers(),body:JSON.stringify(records)}); } catch(e) {}
   }
 };
-
-// ==================== UI HELPERS ====================
-
-function updateApiStatus(online, label) {
-  const el = document.getElementById('api-status-dot');
-  if (!el) return;
-  el.textContent = online ? `● ${label}` : `○ ${label}`;
-  el.style.color = online ? '#c8ff00' : '#555';
-}
-
-const $ = id => document.getElementById(id);
-
-// ==================== CANVAS POOL ====================
-
-const canvasPool = {
-  pool: [],
-  get(w, h) {
-    let canvas = this.pool.pop();
-    if (!canvas) canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    return canvas;
-  },
-  release(canvas) {
-    if (this.pool.length < 10) this.pool.push(canvas);
-  }
-};
-
-// ==================== WEBSOCKET CLIENT ====================
 
 const WS = {
-  socket: null,
-  userId: null,
-  reconnectDelay: 2000,
-  maxReconnect: 8,
-  reconnectCount: 0,
-  subscribedJob: null,
-
+  socket:null, userId:null, reconnectDelay:2000, maxReconnect:8, reconnectCount:0, subscribedJob:null,
   connect(userId) {
-    if (!userId) return;
-    this.userId = userId;
-    const base = API.base.replace(/^http/, 'ws');
-    this.socket = new WebSocket(`${base}/ws/${userId}`);
-
-    this.socket.onopen = () => {
-      this.reconnectCount = 0;
-      updateApiStatus(true, API._lastLabel || 'connected');
-      if (this.subscribedJob) this.subscribeJob(this.subscribedJob);
-    };
-
-    this.socket.onmessage = (e) => {
-      try { this.handleMessage(JSON.parse(e.data)); }
-      catch(err) {}
-    };
-
-    this.socket.onclose = () => {
-      if (this.reconnectCount < this.maxReconnect) {
-        setTimeout(() => { this.reconnectCount++; this.connect(this.userId); },
-          this.reconnectDelay * Math.pow(1.5, this.reconnectCount));
-      }
-    };
-
-    this.socket.onerror = () => {};
+    if(!userId)return; this.userId=userId;
+    const base=API.base.replace(/^http/,'ws');
+    this.socket=new WebSocket(`${base}/ws/${userId}`);
+    this.socket.onopen=()=>{ this.reconnectCount=0; };
+    this.socket.onmessage=e=>{ try{this.handleMessage(JSON.parse(e.data));}catch(err){} };
+    this.socket.onclose=()=>{ if(this.reconnectCount<this.maxReconnect) setTimeout(()=>{this.reconnectCount++;this.connect(this.userId);},this.reconnectDelay*Math.pow(1.5,this.reconnectCount)); };
+    this.socket.onerror=()=>{};
   },
-
-  subscribeJob(jobId) {
-    this.subscribedJob = jobId;
-    if (this.socket?.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify({ type: 'subscribe_job', job_id: jobId }));
-    }
-  },
-
+  subscribeJob(jobId) { this.subscribedJob=jobId; if(this.socket?.readyState===WebSocket.OPEN) this.socket.send(JSON.stringify({type:'subscribe_job',job_id:jobId})); },
   handleMessage(msg) {
-    switch (msg.type) {
-      case 'evolution_tick':
-        this._onTick(msg);
-        break;
-      case 'evolution_done':
-        this._onDone(msg);
-        break;
-      case 'kinship_update':
-        this._onKinship(msg);
-        break;
-      case 'fitness_milestone':
-        toast(`🏆 Milestone: fitness ${msg.milestone}!`, 4000);
-        break;
-      case 'error':
-        toast(`❌ Job error: ${msg.error}`);
-        break;
-    }
+    if(msg.type==='evolution_tick'){const p=Math.round(msg.progress*100);const fb=$('ws-progress');if(fb)fb.style.width=`${p}%`;const ws=$('ws-status');if(ws)ws.textContent=`🧬 ${p}% · ${msg.fitness}% · ${msg.operator}`;}
+    else if(msg.type==='evolution_done'){const ws=$('ws-status');if(ws)ws.textContent=`✅ Done · ${msg.fitness_after}% fit`;toast(`✅ Server done: +${msg.improvement||0} fitness`);this.subscribedJob=null;setTimeout(()=>API.fetchStats(),1000);}
+    else if(msg.type==='fitness_milestone') toast(`🏆 ${msg.milestone}% reached!`,4000);
+    else if(msg.type==='error') toast(`❌ ${msg.error}`);
   },
-
-  _onTick(msg) {
-    const pct = Math.round(msg.progress * 100);
-    const fitnessBar = document.getElementById('ws-progress');
-    if (fitnessBar) {
-      fitnessBar.style.width = `${pct}%`;
-      fitnessBar.title = `Step ${msg.generation}/${msg.steps_total || '?'} · fitness ${msg.fitness}%`;
-    }
-    const wsStatus = document.getElementById('ws-status');
-    if (wsStatus) wsStatus.textContent = `🧬 ${pct}% · ${msg.fitness}% fit · ${msg.operator}`;
-  },
-
-  _onDone(msg) {
-    if (document.getElementById('ws-status'))
-      document.getElementById('ws-status').textContent = `✅ Done · ${msg.fitness_after}% fit`;
-    toast(`✅ Server evolution complete: +${msg.improvement || 0} fitness via ${msg.operator}`);
-    this.subscribedJob = null;
-  },
-
-  _onKinship(msg) {
-    const panel = document.getElementById('api-kinship-panel');
-    if (panel && panel.style.display !== 'none') {
-      // Kinship was already open, refresh it
-    }
-  },
-
-  ping() {
-    if (this.socket?.readyState === WebSocket.OPEN)
-      this.socket.send(JSON.stringify({ type: 'ping' }));
-  },
+  ping(){if(this.socket?.readyState===WebSocket.OPEN)this.socket.send(JSON.stringify({type:'ping'}));}
 };
+setInterval(()=>WS.ping(),30000);
 
-setInterval(() => WS.ping(), 30000);
+// ── HELPERS ──────────────────────────────────
+const $ = id => document.getElementById(id);
+function fmtNum(n){if(!n&&n!==0)return'—';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'k';return n.toLocaleString();}
+function updateApiDot(on,label){const el=$('api-status-dot');if(!el)return;el.textContent=(on?'● ':'○ ')+label;el.style.color=on?'#c8ff00':'#555';}
+function toast(msg,dur=2500){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.remove('show'),dur);}
 
-// ==================== OPERATOR DEFINITIONS ====================
+// ── CANVAS POOL ───────────────────────────────
+const pool={p:[],get(w,h){let c=this.p.pop();if(!c)c=document.createElement('canvas');c.width=w;c.height=h;return c;},rel(c){if(this.p.length<12)this.p.push(c);}};
 
+// ── OPERATORS ─────────────────────────────────
 const OPS = [
-  { name: 'Scale', key: 'scale', prob: 0.35, color: '#c8ff00', attempts: 0, successes: 0 },
-  { name: 'Translate', key: 'translate', prob: 0.25, color: '#0051ff', attempts: 0, successes: 0 },
-  { name: 'Color', key: 'color', prob: 0.20, color: '#ff9f0a', attempts: 0, successes: 0 },
-  { name: 'Opacity', key: 'opacity', prob: 0.10, color: '#bf5af2', attempts: 0, successes: 0 },
-  { name: 'Rotate', key: 'rotate', prob: 0.07, color: '#ff3b2f', attempts: 0, successes: 0 },
-  { name: 'Intelligent', key: 'intelligent', prob: 0.03, color: '#64d2ff', attempts: 0, successes: 0 }
+  {name:'Scale',      key:'scale',      color:'#c8ff00', attempts:0, successes:0},
+  {name:'Translate',  key:'translate',  color:'#0051ff', attempts:0, successes:0},
+  {name:'Color',      key:'color',      color:'#ff9f0a', attempts:0, successes:0},
+  {name:'Opacity',    key:'opacity',    color:'#bf5af2', attempts:0, successes:0},
+  {name:'Rotate',     key:'rotate',     color:'#ff3b2f', attempts:0, successes:0},
+  {name:'Reshape',    key:'reshape',    color:'#64d2ff', attempts:0, successes:0},
+  {name:'Spawn',      key:'spawn',      color:'#30d158', attempts:0, successes:0},
+  {name:'Merge',      key:'merge',      color:'#ff6b6b', attempts:0, successes:0},
+  {name:'Intelligent',key:'intelligent',color:'#ffe066', attempts:0, successes:0}
 ];
 
-// ==================== STRATEGY DESCRIPTIONS ====================
+// ── ROBUST STRATEGY ENGINE ────────────────────
+// Each strategy entry defines:
+//   name / desc — display text
+//   phase — 'explore' | 'refine' | 'polish' | 'stagnant' | 'sprint'
+//   context — 'general' | 'face' | 'sky' | 'ground' | 'edge'
+//   weights — operator probability map
+//   mutScale — multiplier on state.mutRate
+//   minFit / maxFit — fitness range where this strategy activates
+//   stagnation — true if this is a stagnation-break strategy
+const STRATEGY_TABLE = [
+  // ── EARLY EXPLORATION ──
+  {
+    id:'explore_cold', name:'❄️ Cold Start — Coarse Seeding', desc:'Spawning large polygons to cover blank canvas fast',
+    phase:'explore', context:'general', minFit:0, maxFit:8,
+    weights:{scale:.15,translate:.10,color:.15,opacity:.05,rotate:.05,reshape:.05,spawn:.35,merge:.05,intelligent:.05},
+    mutScale:2.5
+  },
+  {
+    id:'explore_general', name:'🔍 Exploration — Full Canvas', desc:'Large random mutations, discovering the composition',
+    phase:'explore', context:'general', minFit:8, maxFit:30,
+    weights:{scale:.30,translate:.25,color:.18,opacity:.08,rotate:.07,reshape:.05,spawn:.04,merge:.02,intelligent:.01},
+    mutScale:1.8
+  },
+  {
+    id:'explore_sky', name:'🌤 Exploration — Upper Region', desc:'Building sky and background gradients',
+    phase:'explore', context:'sky', minFit:8, maxFit:30,
+    weights:{scale:.28,translate:.20,color:.25,opacity:.12,rotate:.05,reshape:.04,spawn:.04,merge:.01,intelligent:.01},
+    mutScale:1.6
+  },
+  {
+    id:'explore_ground', name:'🌱 Exploration — Lower Region', desc:'Shaping ground and foreground structure',
+    phase:'explore', context:'ground', minFit:8, maxFit:30,
+    weights:{scale:.32,translate:.22,color:.18,opacity:.08,rotate:.06,reshape:.06,spawn:.05,merge:.02,intelligent:.01},
+    mutScale:1.7
+  },
+  {
+    id:'explore_face', name:'🎭 Exploration — Center Focus', desc:'Probing the centre region with large jumps',
+    phase:'explore', context:'face', minFit:8, maxFit:30,
+    weights:{scale:.25,translate:.20,color:.22,opacity:.10,rotate:.08,reshape:.06,spawn:.05,merge:.02,intelligent:.02},
+    mutScale:1.6
+  },
+  // ── REFINEMENT ──
+  {
+    id:'refine_general', name:'🎯 Refinement — Structure Pass', desc:'Moderate mutations improving overall composition',
+    phase:'refine', context:'general', minFit:30, maxFit:60,
+    weights:{scale:.28,translate:.18,color:.18,opacity:.18,rotate:.08,reshape:.06,spawn:.01,merge:.02,intelligent:.01},
+    mutScale:1.0
+  },
+  {
+    id:'refine_color', name:'🎨 Refinement — Colour Tuning', desc:'Focusing on hue and saturation alignment',
+    phase:'refine', context:'general', minFit:30, maxFit:60,
+    weights:{scale:.12,translate:.10,color:.42,opacity:.18,rotate:.04,reshape:.04,spawn:.02,merge:.04,intelligent:.04},
+    mutScale:0.9
+  },
+  {
+    id:'refine_sky', name:'🌥 Refinement — Upper Detail', desc:'Tightening sky and background polygons',
+    phase:'refine', context:'sky', minFit:30, maxFit:60,
+    weights:{scale:.22,translate:.16,color:.28,opacity:.16,rotate:.06,reshape:.06,spawn:.02,merge:.02,intelligent:.02},
+    mutScale:0.95
+  },
+  {
+    id:'refine_ground', name:'🌿 Refinement — Lower Detail', desc:'Improving ground / foreground coverage',
+    phase:'refine', context:'ground', minFit:30, maxFit:60,
+    weights:{scale:.26,translate:.18,color:.20,opacity:.16,rotate:.08,reshape:.06,spawn:.02,merge:.02,intelligent:.02},
+    mutScale:1.0
+  },
+  {
+    id:'refine_face', name:'🖼 Refinement — Centre Detail', desc:'Tightening central feature polygons',
+    phase:'refine', context:'face', minFit:30, maxFit:60,
+    weights:{scale:.20,translate:.14,color:.24,opacity:.20,rotate:.10,reshape:.08,spawn:.01,merge:.01,intelligent:.02},
+    mutScale:0.85
+  },
+  {
+    id:'refine_edge', name:'✂️ Refinement — Edge Sharpening', desc:'Reducing aliasing along high-contrast edges',
+    phase:'refine', context:'edge', minFit:30, maxFit:60,
+    weights:{scale:.18,translate:.12,color:.18,opacity:.22,rotate:.14,reshape:.10,spawn:.01,merge:.02,intelligent:.03},
+    mutScale:0.7
+  },
+  // ── POLISH ──
+  {
+    id:'polish_general', name:'✨ Polish — Final Pass', desc:'Micro-mutations maximising per-pixel accuracy',
+    phase:'polish', context:'general', minFit:60, maxFit:100,
+    weights:{scale:.20,translate:.12,color:.20,opacity:.22,rotate:.10,reshape:.08,spawn:.00,merge:.04,intelligent:.04},
+    mutScale:0.45
+  },
+  {
+    id:'polish_color', name:'🌈 Polish — Colour Precision', desc:'Fine colour channel nudges to close remaining gap',
+    phase:'polish', context:'general', minFit:60, maxFit:100,
+    weights:{scale:.08,translate:.08,color:.48,opacity:.16,rotate:.04,reshape:.04,spawn:.00,merge:.04,intelligent:.08},
+    mutScale:0.3
+  },
+  {
+    id:'polish_face', name:'🔬 Polish — Centre Pixels', desc:'Sub-pixel accuracy in the most complex zone',
+    phase:'polish', context:'face', minFit:60, maxFit:100,
+    weights:{scale:.14,translate:.10,color:.28,opacity:.22,rotate:.10,reshape:.10,spawn:.00,merge:.02,intelligent:.04},
+    mutScale:0.35
+  },
+  {
+    id:'polish_sky', name:'🌫 Polish — Atmosphere', desc:'Blending sky colour and atmospheric haze',
+    phase:'polish', context:'sky', minFit:60, maxFit:100,
+    weights:{scale:.12,translate:.10,color:.36,opacity:.24,rotate:.06,reshape:.06,spawn:.00,merge:.02,intelligent:.04},
+    mutScale:0.35
+  },
+  {
+    id:'polish_ground', name:'🍂 Polish — Foreground Detail', desc:'Final foreground texture and contrast pass',
+    phase:'polish', context:'ground', minFit:60, maxFit:100,
+    weights:{scale:.16,translate:.10,color:.28,opacity:.22,rotate:.08,reshape:.08,spawn:.00,merge:.04,intelligent:.04},
+    mutScale:0.4
+  },
+  // ── STAGNATION BREAKERS ──
+  {
+    id:'stag_shake', name:'💥 Stagnation Break — Shake', desc:'High-energy jolt to escape local minimum',
+    phase:'stagnant', context:'general', minFit:0, maxFit:100, stagnation:true,
+    weights:{scale:.20,translate:.30,color:.18,opacity:.08,rotate:.10,reshape:.08,spawn:.04,merge:.02,intelligent:.00},
+    mutScale:4.0
+  },
+  {
+    id:'stag_recolor', name:'🎲 Stagnation Break — Recolour', desc:'Mass colour randomisation to find a new basin',
+    phase:'stagnant', context:'general', minFit:0, maxFit:100, stagnation:true,
+    weights:{scale:.05,translate:.05,color:.70,opacity:.10,rotate:.02,reshape:.02,spawn:.03,merge:.02,intelligent:.01},
+    mutScale:3.0
+  },
+  {
+    id:'stag_reshape', name:'🔀 Stagnation Break — Reshape', desc:'Aggressively reshaping worst polygons',
+    phase:'stagnant', context:'general', minFit:0, maxFit:100, stagnation:true,
+    weights:{scale:.15,translate:.15,color:.10,opacity:.08,rotate:.12,reshape:.35,spawn:.03,merge:.02,intelligent:.00},
+    mutScale:3.5
+  },
+  // ── SPRINT ──
+  {
+    id:'sprint', name:'⚡ Sprint — Rapid Convergence', desc:'Exploiting recent gains with best-performing operator',
+    phase:'sprint', context:'general', minFit:0, maxFit:100,
+    weights:{scale:.30,translate:.20,color:.20,opacity:.15,rotate:.08,reshape:.04,spawn:.01,merge:.01,intelligent:.01},
+    mutScale:0.6
+  }
+];
 
-const STRATEGY_DESCS = {
-  'explore.general': { name: 'explore · general', desc: 'Trying everything, big jumps' },
-  'explore.face': { name: 'explore · face', desc: 'Finding facial features' },
-  'explore.sky': { name: 'explore · sky', desc: 'Building sky/background' },
-  'explore.ground': { name: 'explore · ground', desc: 'Shaping ground' },
-  'refine.general': { name: 'refine · general', desc: 'Refining overall composition' },
-  'refine.face': { name: 'refine · face', desc: 'Shaping facial features' },
-  'refine.sky': { name: 'refine · sky', desc: 'Adding sky details' },
-  'refine.ground': { name: 'refine · ground', desc: 'Refining foreground' },
-  'polish.general': { name: 'polish · general', desc: 'Fine-tuning details' },
-  'polish.face': { name: 'polish · face', desc: 'Perfecting facial features' },
-  'polish.sky': { name: 'polish · sky', desc: 'Polishing sky/atmosphere' },
-  'polish.ground': { name: 'polish · ground', desc: 'Final ground touches' }
-};
-
-// ==================== APPLICATION STATE ====================
-
+// ── STATE ─────────────────────────────────────
 const state = {
-  running: false,
-  hasTarget: false,
-  generation: 0,
-  fitness: 0,
-  bestFitness: 0,
-  fitnessHistory: [],
-  polygons: [],
-  bestPolygons: [],
-  targetPixels: null,
-  targetW: 200,
-  targetH: 200,
-  dispW: 200,
-  dispH: 200,
-  diffMode: false,
-  mutRate: 1.0,
-  minAlpha: 20,
-  polyCount: 50,
-  speed: 20,
-  rafId: null,
-  lastFitTime: performance.now(),
-  lastFitVal: 0,
-  mutThisSecond: 0,
-  snapshots: [],
-  pendingRecords: [],
-  samples: 171381,
-  qstates: 14,
-  errorGrid: Array(5).fill().map(() => Array(5).fill(0)),
-  worstCell: { x: 2, y: 2, error: 0 },
-  context: 'general',
-  phase: 'explore',
-  resolution: 'auto',
-  autoParams: true,
-  intelligentMemory: [],
-  sessionStats: { totalAttempts: 0, totalSuccesses: 0 }
+  running:false, hasTarget:false,
+  generation:0, fitness:0, bestFitness:0,
+  fitnessHistory:[], polygons:[], bestPolygons:[],
+  targetPixels:null, targetW:200, targetH:200,
+  diffMode:false, mutRate:1.0, minAlpha:20, polyCount:50, speed:20,
+  rafId:null, lastFitTime:performance.now(), lastFitVal:0,
+  mutThisSecond:0, snapshots:[], pendingRecords:[],
+  errorGrid:Array(5).fill().map(()=>Array(5).fill(0)),
+  worstCell:{x:2,y:2,error:0},
+  // Enhanced strategy tracking
+  phase:'explore', context:'general',
+  currentStrategyId:'explore_general',
+  stagnationCounter:0,
+  stagnationThreshold:400,    // gens without improvement before breaking
+  lastImprovementGen:0,
+  consecutiveSuccesses:0,
+  sprintGen:0,
+  inStagnation:false,
+  strategyLockGen:0,          // lock strategy for N gens after switching
+  strategyLockDuration:150,
+  resolution:'auto', autoParams:true,
+  intelligentMemory:[],
+  sessionStats:{totalAttempts:0,totalSuccesses:0},
+  hudVisible:true
 };
 
-// ==================== CANVAS ELEMENTS ====================
+// ── CANVAS ELEMENTS ───────────────────────────
+const cvT=$('cv-target'), cvE=$('cv-evolved'), cvD=$('cv-diff');
+const ctxT=cvT?.getContext('2d'), ctxE=cvE?.getContext('2d'), ctxD=cvD?.getContext('2d');
 
-const cvT = $('cv-target');
-const cvE = $('cv-evolved');
-const cvD = $('cv-diff');
-const ctxT = cvT?.getContext('2d');
-const ctxE = cvE?.getContext('2d');
-const ctxD = cvD?.getContext('2d');
-
-// ==================== CORE FUNCTIONS ====================
-
-function getCurrentResolution() {
-  if (state.resolution === 'full') return { scale: 1.0, w: state.targetW, h: state.targetH };
-  if (state.fitness < 30) return { scale: 0.25, w: Math.max(50, Math.floor(state.targetW * 0.25)), h: Math.max(75, Math.floor(state.targetH * 0.25)) };
-  if (state.fitness < 60) return { scale: 0.5, w: Math.floor(state.targetW * 0.5), h: Math.floor(state.targetH * 0.5) };
-  return { scale: 1.0, w: state.targetW, h: state.targetH };
+// ── RESOLUTION ───────────────────────────────
+function getRes(){
+  if(state.resolution==='full')return{w:state.targetW,h:state.targetH};
+  if(state.fitness<30)return{w:Math.max(50,Math.floor(state.targetW*.25)),h:Math.max(75,Math.floor(state.targetH*.25))};
+  if(state.fitness<60)return{w:Math.floor(state.targetW*.5),h:Math.floor(state.targetH*.5)};
+  return{w:state.targetW,h:state.targetH};
 }
 
-function calcFitness(polys) {
-  if (!state.targetPixels) return 0;
+// ── FITNESS ───────────────────────────────────
+function calcFitness(polys){
+  if(!state.targetPixels)return 0;
+  const res=getRes();
+  const cv=pool.get(res.w,res.h), ctx=cv.getContext('2d');
+  ctx.fillStyle='#000';ctx.fillRect(0,0,res.w,res.h);
+  const sx=res.w/state.targetW, sy=res.h/state.targetH;
+  for(const p of polys){
+    if(!p.pts||p.pts.length<3)continue;
+    ctx.beginPath();ctx.moveTo(p.pts[0][0]*sx,p.pts[0][1]*sy);
+    for(let i=1;i<p.pts.length;i++)ctx.lineTo(p.pts[i][0]*sx,p.pts[i][1]*sy);
+    ctx.closePath();ctx.fillStyle=`rgba(${p.r|0},${p.g|0},${p.b|0},${p.a/255})`;ctx.fill();
+  }
+  const ev=ctx.getImageData(0,0,res.w,res.h).data;
+  const tc=pool.get(res.w,res.h), tctx=tc.getContext('2d');
+  tctx.putImageData(new ImageData(new Uint8ClampedArray(state.targetPixels),state.targetW,state.targetH),0,0);
+  const st=tctx.getImageData(0,0,res.w,res.h).data;
+  pool.rel(cv);pool.rel(tc);
+  let diff=0; const len=st.length;
+  for(let i=0;i<len;i+=16){const dr=ev[i]-st[i],dg=ev[i+1]-st[i+1],db=ev[i+2]-st[i+2];diff+=dr*dr+dg*dg+db*db;}
+  return 100*(1-diff/(3*255*255*(len/16)));
+}
 
-  const res = getCurrentResolution();
-  const canvas = canvasPool.get(res.w, res.h);
-  const ctx = canvas.getContext('2d');
+// ── POLYGON HELPERS ───────────────────────────
+function randPoly(){
+  const w=state.targetW,h=state.targetH;
+  const size=10+Math.random()*Math.min(w,h)*.35;
+  const cx=Math.random()*w,cy=Math.random()*h;
+  const sides=3+Math.floor(Math.random()*3),pts=[];
+  for(let i=0;i<sides;i++){const a=(i/sides)*Math.PI*2+Math.random()*.8,r=size*(.4+Math.random()*.9);pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}
+  return{pts,r:Math.random()*255|0,g:Math.random()*255|0,b:Math.random()*255|0,a:state.minAlpha+Math.random()*160};
+}
+function clone(p){return{pts:p.pts.map(pt=>[...pt]),r:p.r,g:p.g,b:p.b,a:p.a};}
 
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const scaleX = res.w / state.targetW;
-  const scaleY = res.h / state.targetH;
-
-  for (const p of polys) {
-    if (!p.pts || p.pts.length < 3) continue;
-    ctx.beginPath();
-    ctx.moveTo(p.pts[0][0] * scaleX, p.pts[0][1] * scaleY);
-    for (let i = 1; i < p.pts.length; i++) {
-      ctx.lineTo(p.pts[i][0] * scaleX, p.pts[i][1] * scaleY);
+// ── MUTATION OPERATORS (expanded) ────────────
+function applyMutation(op, poly){
+  const p=clone(poly); const mr=state.mutRate;
+  if(op.key==='translate'){const dx=(Math.random()-.5)*30*mr,dy=(Math.random()-.5)*30*mr;p.pts.forEach(pt=>{pt[0]+=dx;pt[1]+=dy;});}
+  else if(op.key==='color'){const ch=['r','g','b'][Math.random()*3|0];p[ch]=Math.max(0,Math.min(255,p[ch]+(Math.random()-.5)*80*mr));}
+  else if(op.key==='opacity'){p.a=Math.max(state.minAlpha,Math.min(240,p.a+(Math.random()-.5)*60*mr));}
+  else if(op.key==='scale'){
+    const cx=p.pts.reduce((s,pt)=>s+pt[0],0)/p.pts.length,cy=p.pts.reduce((s,pt)=>s+pt[1],0)/p.pts.length;
+    const sc=0.6+Math.random()*1.2*mr;
+    p.pts.forEach(pt=>{pt[0]=cx+(pt[0]-cx)*sc;pt[1]=cy+(pt[1]-cy)*sc;});
+  }
+  else if(op.key==='rotate'){
+    const cx=p.pts.reduce((s,pt)=>s+pt[0],0)/p.pts.length,cy=p.pts.reduce((s,pt)=>s+pt[1],0)/p.pts.length;
+    const a=(Math.random()-.5)*Math.PI*.5*mr,co=Math.cos(a),si=Math.sin(a);
+    p.pts.forEach(pt=>{const dx=pt[0]-cx,dy=pt[1]-cy;pt[0]=cx+dx*co-dy*si;pt[1]=cy+dx*si+dy*co;});
+  }
+  else if(op.key==='reshape'){
+    // Move a single vertex significantly — changes polygon shape without moving it
+    const vi=Math.floor(Math.random()*p.pts.length);
+    p.pts[vi][0]+=(Math.random()-.5)*50*mr;
+    p.pts[vi][1]+=(Math.random()-.5)*50*mr;
+  }
+  else if(op.key==='spawn'){
+    // Replace with a brand new polygon near the worst error zone
+    const wx=state.worstCell.x/4*state.targetW,wy=state.worstCell.y/4*state.targetH;
+    const jitter=state.targetW*.2;
+    const cx=wx+(Math.random()-.5)*jitter,cy=wy+(Math.random()-.5)*jitter;
+    const size=6+Math.random()*Math.min(state.targetW,state.targetH)*.2;
+    const sides=3+Math.floor(Math.random()*3);
+    p.pts=[];
+    for(let i=0;i<sides;i++){const a=(i/sides)*Math.PI*2+Math.random()*.8,r=size*(.4+Math.random()*.9);p.pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}
+    // Sample target colour near spawn point
+    if(state.targetPixels){
+      const px=Math.max(0,Math.min(state.targetW-1,cx|0)),py=Math.max(0,Math.min(state.targetH-1,cy|0));
+      const idx=(py*state.targetW+px)*4;
+      p.r=state.targetPixels[idx]+(Math.random()-.5)*40;
+      p.g=state.targetPixels[idx+1]+(Math.random()-.5)*40;
+      p.b=state.targetPixels[idx+2]+(Math.random()-.5)*40;
+      p.r=Math.max(0,Math.min(255,p.r|0));
+      p.g=Math.max(0,Math.min(255,p.g|0));
+      p.b=Math.max(0,Math.min(255,p.b|0));
     }
-    ctx.closePath();
-    ctx.fillStyle = `rgba(${p.r|0},${p.g|0},${p.b|0},${p.a/255})`;
-    ctx.fill();
   }
-
-  const evolved = ctx.getImageData(0, 0, res.w, res.h).data;
-
-  const tempCanvas = canvasPool.get(res.w, res.h);
-  const tempCtx = tempCanvas.getContext('2d');
-  tempCtx.putImageData(new ImageData(new Uint8ClampedArray(state.targetPixels), state.targetW, state.targetH), 0, 0);
-  const scaledTarget = tempCtx.getImageData(0, 0, res.w, res.h).data;
-
-  canvasPool.release(canvas);
-  canvasPool.release(tempCanvas);
-
-  const len = scaledTarget.length;
-  let diff = 0;
-
-  for (let i = 0; i < len; i += 16) {
-    const dr = evolved[i]   - scaledTarget[i];
-    const dg = evolved[i+1] - scaledTarget[i+1];
-    const db = evolved[i+2] - scaledTarget[i+2];
-    diff += dr*dr + dg*dg + db*db;
-  }
-
-  const maxDiff = 3 * 255 * 255 * (len / 16);
-  return 100 * (1 - diff / maxDiff);
-}
-
-function randPoly() {
-  const w = state.targetW, h = state.targetH;
-  const size = 10 + Math.random() * Math.min(w, h) * 0.35;
-  const cx = Math.random() * w, cy = Math.random() * h;
-  const sides = 3 + Math.floor(Math.random() * 3);
-  const pts = [];
-  for (let i = 0; i < sides; i++) {
-    const a = (i / sides) * Math.PI * 2 + Math.random() * 0.8;
-    const r = size * (0.4 + Math.random() * 0.9);
-    pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
-  }
-  return { pts, r: Math.random()*255|0, g: Math.random()*255|0, b: Math.random()*255|0, a: state.minAlpha + Math.random() * 160 };
-}
-
-function clonePoly(p) {
-  return { pts: p.pts.map(pt => [...pt]), r: p.r, g: p.g, b: p.b, a: p.a };
-}
-
-function applyMutation(op, poly) {
-  const p = clonePoly(poly);
-  const mr = state.mutRate;
-
-  if (op.key === 'translate') {
-    const dx = (Math.random() - 0.5) * 30 * mr;
-    const dy = (Math.random() - 0.5) * 30 * mr;
-    p.pts.forEach(pt => { pt[0] += dx; pt[1] += dy; });
-
-  } else if (op.key === 'color') {
-    const ch = ['r','g','b'][Math.random()*3|0];
-    p[ch] = Math.max(0, Math.min(255, p[ch] + (Math.random()-0.5)*80*mr));
-
-  } else if (op.key === 'opacity') {
-    p.a = Math.max(state.minAlpha, Math.min(240, p.a + (Math.random()-0.5)*60*mr));
-
-  } else if (op.key === 'scale') {
-    const cx = p.pts.reduce((s,pt)=>s+pt[0],0)/p.pts.length;
-    const cy = p.pts.reduce((s,pt)=>s+pt[1],0)/p.pts.length;
-    const sc = 0.6 + Math.random() * 1.2 * mr;
-    p.pts.forEach(pt => {
-      pt[0] = cx + (pt[0]-cx)*sc;
-      pt[1] = cy + (pt[1]-cy)*sc;
-    });
-
-  } else if (op.key === 'rotate') {
-    const cx = p.pts.reduce((s,pt)=>s+pt[0],0)/p.pts.length;
-    const cy = p.pts.reduce((s,pt)=>s+pt[1],0)/p.pts.length;
-    const angle = (Math.random()-0.5) * Math.PI * 0.5 * mr;
-    const cos = Math.cos(angle), sin = Math.sin(angle);
-    p.pts.forEach(pt => {
-      const dx = pt[0]-cx, dy = pt[1]-cy;
-      pt[0] = cx + dx*cos - dy*sin;
-      pt[1] = cy + dx*sin + dy*cos;
-    });
-
-  } else if (op.key === 'intelligent') {
-    if (state.intelligentMemory.length > 10) {
-      const bestOp = state.intelligentMemory.sort((a,b) => (b.successes/b.attempts || 0) - (a.successes/a.attempts || 0))[0];
-      return applyMutation(bestOp, p);
+  else if(op.key==='merge'){
+    // Average this poly's colour toward a random neighbour
+    if(state.polygons.length>1){
+      const other=state.polygons[Math.floor(Math.random()*state.polygons.length)];
+      p.r=((p.r+other.r)/2)|0; p.g=((p.g+other.g)/2)|0; p.b=((p.b+other.b)/2)|0;
     }
-    return applyMutation(OPS[Math.floor(Math.random() * 5)], p);
+  }
+  else if(op.key==='intelligent'){
+    // Pick operator with best recent success rate
+    const best=OPS.filter(o=>o.key!=='intelligent').reduce((b,o)=>(o.attempts>5&&(o.successes/o.attempts)>(b.successes/b.attempts+.001))?o:b, OPS[0]);
+    return applyMutation(best, poly);
   }
   return p;
 }
 
-function renderPolygons(ctx, polys, w, h) {
-  if (!ctx) return;
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, w, h);
-  for (const p of polys) {
-    if (!p.pts || p.pts.length < 3) continue;
-    ctx.beginPath();
-    ctx.moveTo(p.pts[0][0], p.pts[0][1]);
-    for (let i = 1; i < p.pts.length; i++) ctx.lineTo(p.pts[i][0], p.pts[i][1]);
-    ctx.closePath();
-    ctx.fillStyle = `rgba(${p.r|0},${p.g|0},${p.b|0},${p.a/255})`;
-    ctx.fill();
+// ── STRATEGY ENGINE ───────────────────────────
+function pickStrategy(){
+  const f=state.fitness;
+  // Phase boundaries
+  if(f<8)        state.phase='explore';
+  else if(f<30)  state.phase='explore';
+  else if(f<60)  state.phase='refine';
+  else           state.phase='polish';
+
+  // Stagnation detection: no improvement in N generations
+  const gensSinceLast=state.generation-state.lastImprovementGen;
+  const wasStagnant=state.inStagnation;
+  state.inStagnation=gensSinceLast>state.stagnationThreshold;
+
+  if(state.inStagnation!==wasStagnant){
+    $('stag-alert').classList.toggle('show', state.inStagnation);
   }
+
+  // If in strategy lock, keep current
+  if(state.generation-state.strategyLockGen < state.strategyLockDuration && !state.inStagnation){
+    return STRATEGY_TABLE.find(s=>s.id===state.currentStrategyId)||STRATEGY_TABLE[0];
+  }
+
+  // Sprint: if we had 3+ consecutive successes, exploit that
+  if(state.consecutiveSuccesses>=3 && !state.inStagnation && f>15){
+    state.phase='sprint';
+    return STRATEGY_TABLE.find(s=>s.id==='sprint');
+  }
+
+  // Stagnation break — rotate through breakers
+  if(state.inStagnation){
+    const breakers=STRATEGY_TABLE.filter(s=>s.stagnation);
+    const pick=breakers[Math.floor(Date.now()/8000)%breakers.length];
+    if(pick.id!==state.currentStrategyId){
+      state.currentStrategyId=pick.id;
+      state.strategyLockGen=state.generation;
+    }
+    return pick;
+  }
+
+  // Normal: pick best-fit strategy by phase + context + fitness range
+  const candidates=STRATEGY_TABLE.filter(s=>
+    !s.stagnation &&
+    s.phase===state.phase &&
+    s.context===state.context &&
+    f>=s.minFit && f<s.maxFit
+  );
+
+  // Fallback: phase-general
+  const pool2=candidates.length?candidates:STRATEGY_TABLE.filter(s=>!s.stagnation&&s.phase===state.phase&&s.context==='general'&&f>=s.minFit&&f<s.maxFit);
+  const chosen=pool2.length?pool2[0]:STRATEGY_TABLE[0];
+
+  if(chosen.id!==state.currentStrategyId){
+    state.currentStrategyId=chosen.id;
+    state.strategyLockGen=state.generation;
+  }
+  return chosen;
 }
 
-function selectOperator() {
-  const weights = {
-    explore: { scale:0.35, translate:0.25, color:0.20, opacity:0.10, rotate:0.07, intelligent:0.03 },
-    refine:  { scale:0.30, translate:0.15, color:0.20, opacity:0.20, rotate:0.10, intelligent:0.05 },
-    polish:  { scale:0.25, translate:0.15, color:0.20, opacity:0.20, rotate:0.12, intelligent:0.08 }
-  };
-  const base = weights[state.phase] || weights.explore;
-  const probs = Object.values(base);
-  const total = probs.reduce((a,b)=>a+b,0);
-  let r = Math.random() * total;
-  const keys = Object.keys(base);
-  for (let i = 0; i < keys.length; i++) {
-    r -= probs[i];
-    if (r <= 0) return OPS.find(o => o.key === keys[i]) || OPS[0];
-  }
+function selectOperator(){
+  const strat=pickStrategy();
+  const keys=Object.keys(strat.weights), probs=Object.values(strat.weights);
+  let r=Math.random()*probs.reduce((a,b)=>a+b,0);
+  for(let i=0;i<keys.length;i++){r-=probs[i];if(r<=0)return OPS.find(o=>o.key===keys[i])||OPS[0];}
   return OPS[0];
 }
 
-function evolveStep() {
-  const op = selectOperator();
-  const idx = Math.random() * state.polygons.length | 0;
-  const mutated = applyMutation(op, state.polygons[idx]);
+function renderPolygons(ctx,polys,w,h){
+  if(!ctx)return;
+  ctx.clearRect(0,0,w,h);ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);
+  for(const p of polys){
+    if(!p.pts||p.pts.length<3)continue;
+    ctx.beginPath();ctx.moveTo(p.pts[0][0],p.pts[0][1]);
+    for(let i=1;i<p.pts.length;i++)ctx.lineTo(p.pts[i][0],p.pts[i][1]);
+    ctx.closePath();ctx.fillStyle=`rgba(${p.r|0},${p.g|0},${p.b|0},${p.a/255})`;ctx.fill();
+  }
+}
 
-  const oldPoly = state.polygons[idx];
-  state.polygons[idx] = mutated;
-  const newFit = calcFitness(state.polygons);
-  const improved = newFit >= state.fitness;
+// ── EVOLVE STEP ───────────────────────────────
+function evolveStep(){
+  const strat=pickStrategy();
+  // Apply strategy's mutScale on top of adaptive mutRate
+  const savedMR=state.mutRate;
+  state.mutRate=state.mutRate*strat.mutScale;
 
-  op.attempts++;
-  state.sessionStats.totalAttempts++;
+  const op=selectOperator();
+  const idx=Math.random()*state.polygons.length|0;
+  const old=state.polygons[idx];
+  state.polygons[idx]=applyMutation(op,old);
+  const newFit=calcFitness(state.polygons);
+  const improved=newFit>=state.fitness;
 
-  if (improved) {
-    state.fitness = newFit;
-    op.successes++;
-    state.sessionStats.totalSuccesses++;
+  state.mutRate=savedMR; // restore
 
-    if (newFit > state.bestFitness) {
-      state.bestFitness = newFit;
-      state.bestPolygons = state.polygons.map(clonePoly);
-    }
-    state.mutRate = Math.max(0.1, state.mutRate * 0.9995);
-
+  op.attempts++;state.sessionStats.totalAttempts++;
+  if(improved){
+    state.fitness=newFit;op.successes++;state.sessionStats.totalSuccesses++;
+    if(newFit>state.bestFitness){state.bestFitness=newFit;state.bestPolygons=state.polygons.map(clone);}
+    state.mutRate=Math.max(0.1,state.mutRate*.9995);
+    state.lastImprovementGen=state.generation;
+    state.stagnationCounter=0;
+    state.consecutiveSuccesses++;
     state.intelligentMemory.push(op);
-    if (state.intelligentMemory.length > 50) state.intelligentMemory.shift();
-
+    if(state.intelligentMemory.length>60)state.intelligentMemory.shift();
   } else {
-    state.polygons[idx] = oldPoly;
-    state.mutRate = Math.min(5.0, state.mutRate * 1.0005);
+    state.polygons[idx]=old;
+    state.mutRate=Math.min(6.0,state.mutRate*1.0005);
+    state.stagnationCounter++;
+    state.consecutiveSuccesses=0;
   }
 
-  state.pendingRecords.push({
-    operator: op.key,
-    success: improved,
-    fitness: state.fitness,
-    generation: state.generation,
-    context: state.context,
-    phase: state.phase
-  });
-
-  if (state.pendingRecords.length >= 10) {
-    API.postTraining(state.pendingRecords.map(r => ({
-      operator_used: r.operator,
-      mutation_success: r.success,
-      offspring_fitness: r.fitness,
-      generation: r.generation,
-      metadata: { context: r.context, phase: r.phase }
-    }))).catch(() => {});
-    state.pendingRecords = [];
+  state.pendingRecords.push({operator:op.key,success:improved,fitness:state.fitness,generation:state.generation,context:state.context,phase:state.phase,strategy:state.currentStrategyId});
+  if(state.pendingRecords.length>=50){
+    API.postTraining(state.pendingRecords.map(r=>({operator_used:r.operator,mutation_success:r.success,offspring_fitness:r.fitness,generation:r.generation,metadata:{context:r.context,phase:r.phase,strategy:r.strategy}}))).catch(()=>{});
+    state.pendingRecords=[];
   }
-
   state.generation++;
   state.mutThisSecond++;
-
-  if (state.generation % 100 === 0) {
-    state.fitnessHistory.push({ gen: state.generation, fitness: state.fitness, timestamp: Date.now() });
-  }
-
-  updateOperatorStats();
-  updateErrorGrid();
+  if(state.generation%100===0)state.fitnessHistory.push({gen:state.generation,fitness:state.fitness,ts:Date.now()});
 }
 
-// ==================== ERROR GRID & STRATEGY ====================
-
-function updateErrorGrid() {
-  if (!state.targetPixels) return;
-
-  const canvas = canvasPool.get(state.targetW, state.targetH);
-  const ctx = canvas.getContext('2d');
-  renderPolygons(ctx, state.polygons, state.targetW, state.targetH);
-  const evolved = ctx.getImageData(0, 0, state.targetW, state.targetH).data;
-
-  const cellW = state.targetW / 5;
-  const cellH = state.targetH / 5;
-
-  for (let gy = 0; gy < 5; gy++) for (let gx = 0; gx < 5; gx++) state.errorGrid[gy][gx] = 0;
-
-  for (let y = 0; y < state.targetH; y++) {
-    for (let x = 0; x < state.targetW; x++) {
-      const i = (y * state.targetW + x) * 4;
-      const dr = Math.abs(evolved[i] - state.targetPixels[i]);
-      const dg = Math.abs(evolved[i+1] - state.targetPixels[i+1]);
-      const db = Math.abs(evolved[i+2] - state.targetPixels[i+2]);
-      const err = (dr + dg + db) / (3 * 255);
-      const gx = Math.floor(x / cellW);
-      const gy = Math.floor(y / cellH);
-      if (gy < 5 && gx < 5) state.errorGrid[gy][gx] += err;
-    }
+// ── MAIN LOOP ─────────────────────────────────
+function loop(){
+  if(!state.running)return;
+  if(state.fitness>=99.99){
+    state.running=false;$('btn-play').textContent='▶ PLAY';
+    $('status-pill').textContent='COMPLETE';$('status-pill').style.color='var(--accent)';
+    toast('🏆 Evolution complete!',5000);renderPolygons(ctxE,state.polygons,state.targetW,state.targetH);updateHUD();return;
   }
-
-  let maxErr = 0, worstX = 2, worstY = 2;
-  for (let gy = 0; gy < 5; gy++) {
-    for (let gx = 0; gx < 5; gx++) {
-      state.errorGrid[gy][gx] = (state.errorGrid[gy][gx] / (cellW * cellH)) * 100;
-      if (state.errorGrid[gy][gx] > maxErr) {
-        maxErr = state.errorGrid[gy][gx];
-        worstX = gx; worstY = gy;
-      }
-    }
+  const t0=performance.now(); let steps=0;
+  while(performance.now()-t0<14&&steps<state.speed*3){evolveStep();steps++;}
+  renderPolygons(ctxE,state.polygons,state.targetW,state.targetH);
+  if(state.diffMode&&ctxT&&ctxE&&ctxD){
+    const td=ctxT.getImageData(0,0,state.targetW,state.targetH);
+    const ed=ctxE.getImageData(0,0,state.targetW,state.targetH);
+    const dd=ctxD.createImageData(state.targetW,state.targetH);
+    for(let i=0;i<td.data.length;i+=4){dd.data[i]=Math.abs(td.data[i]-ed.data[i])*3;dd.data[i+1]=Math.abs(td.data[i+1]-ed.data[i+1])*3;dd.data[i+2]=Math.abs(td.data[i+2]-ed.data[i+2])*3;dd.data[i+3]=255;}
+    ctxD.putImageData(dd,0,0);
   }
-  state.worstCell = { x: worstX, y: worstY, error: maxErr };
-
-  if (worstY >= 1 && worstY <= 3 && worstX >= 1 && worstX <= 3) state.context = 'face';
-  else if (worstY < 2) state.context = 'sky';
-  else if (worstY > 2) state.context = 'ground';
-  else state.context = 'general';
-
-  if (state.fitness < 30) state.phase = 'explore';
-  else if (state.fitness < 60) state.phase = 'refine';
-  else state.phase = 'polish';
-
-  updateErrorDisplay();
-  updateStrategyDisplay();
-
-  canvasPool.release(canvas);
-}
-
-function updateErrorDisplay() {
-  let tl = 0, tr = 0, center = 0, bottom = 0, tlC = 0, trC = 0, cC = 0, bC = 0;
-  for (let y = 0; y < 5; y++) {
-    for (let x = 0; x < 5; x++) {
-      if (y < 2) {
-        if (x < 2) { tl += state.errorGrid[y][x]; tlC++; }
-        else if (x > 2) { tr += state.errorGrid[y][x]; trC++; }
-      } else if (y >= 2 && y <= 3) {
-        if (x >= 1 && x <= 3) { center += state.errorGrid[y][x]; cC++; }
-      } else if (y > 3) {
-        bottom += state.errorGrid[y][x]; bC++;
-      }
-    }
-  }
-  $('error-worst').textContent = `${state.context} (${state.worstCell.error.toFixed(1)}%)`;
-  $('error-top').textContent = `${(tlC ? tl/tlC : 0).toFixed(1)}% · ${(trC ? tr/trC : 0).toFixed(1)}%`;
-  $('error-center').textContent = (cC ? center/cC : 0).toFixed(1) + '%';
-  $('error-bottom').textContent = (bC ? bottom/bC : 0).toFixed(1) + '%';
-}
-
-function updateStrategyDisplay() {
-  const key = `${state.phase}.${state.context}`;
-  const s = STRATEGY_DESCS[key] || STRATEGY_DESCS['explore.general'];
-  $('strategy-name').textContent = s.name;
-  $('strategy-desc').textContent = s.desc;
-}
-
-// ==================== UI UPDATES ====================
-
-function updateOperatorStats() {
-  const grid = $('live-op-grid');
-  if (!grid) return;
-
-  grid.innerHTML = '';
-
-  OPS.forEach(op => {
-    const rate = op.attempts > 0 ? (op.successes / op.attempts * 100).toFixed(1) : 0;
-    grid.innerHTML += `
-      <div class="op-row">
-        <span class="op-name">${op.key}</span>
-        <div class="op-bar-bg"><div class="op-bar-fill" style="width:${rate}%;background:${op.color}"></div></div>
-        <span class="op-pct">${rate}%</span>
-      </div>`;
-  });
-
-  if (state.sessionStats.totalAttempts > 0) {
-    const overallRate = (state.sessionStats.totalSuccesses / state.sessionStats.totalAttempts * 100).toFixed(1);
-    $('ai-success').textContent = overallRate + '%';
-    $('ai-session').textContent = state.sessionStats.totalAttempts.toLocaleString();
-  }
-
-  let bestOp = 'scale', bestRate = 0;
-  OPS.forEach(op => {
-    const rate = op.attempts > 0 ? (op.successes / op.attempts) : 0;
-    if (rate > bestRate) { bestRate = rate; bestOp = op.key; }
-  });
-  $('ai-bestop').textContent = bestOp;
-}
-
-function updateHUD() {
-  const now = performance.now();
-
-  $('h-gen').textContent = state.generation.toLocaleString();
-  $('h-fit').textContent = state.fitness.toFixed(2) + '%';
-
-  const elapsed = (now - state.lastFitTime) / 1000;
-  if (elapsed >= 1) {
-    const delta = state.fitness - state.lastFitVal;
-    $('h-dfit').textContent = (delta >= 0 ? '+' : '') + delta.toFixed(3) + '%';
-    state.lastFitVal = state.fitness;
-    state.lastFitTime = now;
-    $('h-mps').textContent = state.mutThisSecond.toLocaleString();
-    state.mutThisSecond = 0;
-  }
-
-  $('fitness-fill').style.width = state.fitness + '%';
-  $('live-samples').textContent = state.samples.toLocaleString();
-  $('ai-samples').textContent = state.samples.toLocaleString();
-  $('ai-qstates').textContent = state.qstates;
-}
-
-// ==================== SNAPSHOTS ====================
-
-async function saveSnapshot() {
-  if (!cvE) return;
-  const thumb = document.createElement('canvas');
-  const ts = 80;
-  thumb.width = ts; thumb.height = ts;
-  const tc = thumb.getContext('2d');
-  tc.drawImage(cvE, 0, 0, ts, ts);
-
-  const snap = {
-    canvas: thumb,
-    gen: state.generation,
-    fit: state.fitness,
-    polys: state.polygons.map(clonePoly),
-  };
-  state.snapshots.unshift(snap);
-  if (state.snapshots.length > 9) state.snapshots.pop();
-  renderSnapshots();
-  toast(`Snapshot @ gen ${state.generation.toLocaleString()}`);
-}
-
-function renderSnapshots() {
-  const grid = $('history-grid');
-  if (!grid) return;
-
-  if (!state.snapshots.length) {
-    grid.innerHTML = '<div style="font-size:11px; color:#333; padding:20px;">No snapshots yet</div>';
-    return;
-  }
-
-  grid.innerHTML = '';
-  for (const snap of state.snapshots) {
-    const wrap = document.createElement('div');
-    wrap.className = 'history-thumb';
-    wrap.appendChild(snap.canvas);
-    wrap.innerHTML += `<span class="gen-label">${snap.gen.toLocaleString()}</span>`;
-    wrap.innerHTML += `<span class="fit-label">${snap.fit.toFixed(1)}%</span>`;
-    wrap.addEventListener('click', (e) => {
-      e.stopPropagation();
-      state.polygons = snap.polys.map(clonePoly);
-      state.fitness = snap.fit;
-      renderPolygons(ctxE, state.polygons, state.targetW, state.targetH);
-      updateErrorGrid();
-      toast(`Restored gen ${snap.gen.toLocaleString()}`);
-    });
-    grid.appendChild(wrap);
-  }
-}
-
-// ==================== EVOLUTION LOOP ====================
-
-function loop() {
-  if (!state.running) return;
-
-  const t0 = performance.now();
-  let steps = 0;
-
-  while (performance.now() - t0 < 14 && steps < state.speed * 3) {
-    evolveStep();
-    steps++;
-  }
-
-  renderPolygons(ctxE, state.polygons, state.targetW, state.targetH);
-
-  if (state.diffMode && ctxT && ctxE && ctxD) {
-    const td = ctxT.getImageData(0, 0, state.targetW, state.targetH);
-    const ed = ctxE.getImageData(0, 0, state.targetW, state.targetH);
-    const dd = ctxD.createImageData(state.targetW, state.targetH);
-    for (let i = 0; i < td.data.length; i += 4) {
-      const dr = Math.abs(td.data[i] - ed.data[i]);
-      const dg = Math.abs(td.data[i+1] - ed.data[i+1]);
-      const db = Math.abs(td.data[i+2] - ed.data[i+2]);
-      dd.data[i] = dr * 3;
-      dd.data[i+1] = dg * 3;
-      dd.data[i+2] = db * 3;
-      dd.data[i+3] = 255;
-    }
-    ctxD.putImageData(dd, 0, 0);
-  }
-
   updateHUD();
-  state.rafId = requestAnimationFrame(loop);
+  if(state.generation%250===0){updateErrorGrid();updateHudOps();}
+  state.rafId=requestAnimationFrame(loop);
 }
 
-// ==================== INITIALIZATION ====================
-
-function initPolygons() {
-  state.polygons = Array.from({ length: state.polyCount }, randPoly);
-  state.bestPolygons = state.polygons.map(clonePoly);
-  state.generation = 0;
-  state.fitness = calcFitness(state.polygons);
-  state.bestFitness = state.fitness;
-  state.mutRate = 1.0;
-  state.fitnessHistory = [];
-  state.intelligentMemory = [];
-  state.sessionStats = { totalAttempts: 0, totalSuccesses: 0 };
-  OPS.forEach(op => { op.attempts = 0; op.successes = 0; });
-
-  renderPolygons(ctxE, state.polygons, state.targetW, state.targetH);
-  updateErrorGrid();
-  updateOperatorStats();
-  updateHUD();
-}
-
-// ==================== IMAGE LOADING ====================
-
-function setupCanvases(img) {
-  const MAX = Math.min(400, window.innerWidth * 0.35);
-  const scale = Math.min(MAX / img.naturalWidth, MAX / img.naturalHeight, 1);
-  state.targetW = Math.max(100, Math.round(img.naturalWidth * scale));
-  state.targetH = Math.max(100, Math.round(img.naturalHeight * scale));
-
-  for (const cv of [cvT, cvE, cvD]) {
-    if (cv) {
-      cv.width = state.targetW;
-      cv.height = state.targetH;
-      cv.style.width = '100%';
-      cv.style.height = 'auto';
-      cv.style.maxWidth = Math.min(400, state.targetW) + 'px';
-    }
+// ── ERROR GRID ────────────────────────────────
+function updateErrorGrid(){
+  if(!state.targetPixels)return;
+  const cv=pool.get(state.targetW,state.targetH),ctx=cv.getContext('2d');
+  renderPolygons(ctx,state.polygons,state.targetW,state.targetH);
+  const ev=ctx.getImageData(0,0,state.targetW,state.targetH).data;
+  const cw=state.targetW/5,ch=state.targetH/5;
+  for(let gy=0;gy<5;gy++)for(let gx=0;gx<5;gx++)state.errorGrid[gy][gx]=0;
+  for(let y=0;y<state.targetH;y++)for(let x=0;x<state.targetW;x++){
+    const i=(y*state.targetW+x)*4;
+    const err=(Math.abs(ev[i]-state.targetPixels[i])+Math.abs(ev[i+1]-state.targetPixels[i+1])+Math.abs(ev[i+2]-state.targetPixels[i+2]))/(3*255);
+    const gx2=Math.min(4,Math.floor(x/cw)),gy2=Math.min(4,Math.floor(y/ch));
+    state.errorGrid[gy2][gx2]+=err;
   }
+  let maxErr=0,wx=2,wy=2;
+  for(let gy=0;gy<5;gy++)for(let gx=0;gx<5;gx++){
+    state.errorGrid[gy][gx]=(state.errorGrid[gy][gx]/(cw*ch))*100;
+    if(state.errorGrid[gy][gx]>maxErr){maxErr=state.errorGrid[gy][gx];wx=gx;wy=gy;}
+  }
+  state.worstCell={x:wx,y:wy,error:maxErr};
+  // context detection — also detect 'edge' when error is high at borders
+  const borderErr=(state.errorGrid[0].reduce((a,b)=>a+b,0)+state.errorGrid[4].reduce((a,b)=>a+b,0))/10;
+  if(wy>=1&&wy<=3&&wx>=1&&wx<=3)state.context='face';
+  else if(wy<2)state.context='sky';
+  else if(wy>2)state.context='ground';
+  else if(borderErr>maxErr*.7)state.context='edge';
+  else state.context='general';
+  pool.rel(cv);
+  updateHudHeatmap();
+}
 
-  if (ctxT && img) {
-    ctxT.drawImage(img, 0, 0, state.targetW, state.targetH);
-    state.targetPixels = ctxT.getImageData(0, 0, state.targetW, state.targetH).data;
+// ── HUD UPDATES ───────────────────────────────
+function updateHUD(){
+  const now=performance.now();
+  const f=state.fitness.toFixed(2)+'%';
+  // header
+  $('h-gen').textContent=state.generation.toLocaleString();
+  $('h-fit').textContent=f;
+  const el=(now-state.lastFitTime)/1000;
+  if(el>=1){
+    const delta=state.fitness-state.lastFitVal;
+    $('h-dfit').textContent=(delta>=0?'+':'')+delta.toFixed(3)+'%';
+    state.lastFitVal=state.fitness; state.lastFitTime=now;
+    $('h-mps').textContent=state.mutThisSecond.toLocaleString();
+    state.mutThisSecond=0;
+  }
+  $('fitness-fill').style.width=state.fitness+'%';
+
+  if(!state.hudVisible)return;
+  // hud panel
+  $('hud-gen').textContent=state.generation.toLocaleString();
+  $('hud-fit').textContent=f;
+  $('hud-best').textContent=state.bestFitness.toFixed(2)+'%';
+  const dd=$('h-dfit').textContent; $('hud-dfit').textContent=dd;
+  $('hud-mps').textContent=state.mutThisSecond.toLocaleString()||$('h-mps').textContent;
+  $('hud-mut').textContent=state.mutRate.toFixed(2)+'×';
+  if(state.sessionStats.totalAttempts>0){
+    const sr=(state.sessionStats.totalSuccesses/state.sessionStats.totalAttempts*100).toFixed(1)+'%';
+    $('hud-success').textContent=sr;
+  }
+  // strategy
+  const strat=STRATEGY_TABLE.find(s=>s.id===state.currentStrategyId)||STRATEGY_TABLE[0];
+  $('hud-strat-name').textContent=strat.name;
+  $('hud-strat-desc').textContent=strat.desc;
+}
+
+function updateHudOps(){
+  const grid=$('hud-ops'); if(!grid)return;
+  grid.innerHTML='';
+  OPS.forEach(op=>{
+    const rate=op.attempts>0?(op.successes/op.attempts*100).toFixed(0):0;
+    grid.innerHTML+=`<div class="hud-op-row"><span class="hud-op-name">${op.key}</span><div class="hud-op-bar"><div class="hud-op-fill" style="width:${rate}%;background:${op.color}"></div></div><span class="hud-op-pct">${rate}%</span></div>`;
+  });
+}
+
+function updateHudHeatmap(){
+  const g=$('hud-heatmap-grid'); if(!g)return;
+  g.innerHTML='';
+  let maxE=0; for(let y=0;y<5;y++)for(let x=0;x<5;x++)maxE=Math.max(maxE,state.errorGrid[y][x]);
+  for(let y=0;y<5;y++)for(let x=0;x<5;x++){
+    const t=maxE>0?state.errorGrid[y][x]/maxE:0;
+    // colour: dark green → yellow → red
+    const r=Math.round(t<.5?t*2*200:200+(t-.5)*2*55);
+    const gr=Math.round(t<.5?200:200-(t-.5)*2*200);
+    const isWorst=x===state.worstCell.x&&y===state.worstCell.y;
+    g.innerHTML+=`<div class="heatmap-cell" style="background:rgb(${r},${gr},0);${isWorst?'box-shadow:0 0 0 2px white;':''}" title="${state.errorGrid[y][x].toFixed(1)}%"></div>`;
   }
 }
 
-function loadImage(src) {
-  const img = new Image();
-  img.onload = () => {
-    setupCanvases(img);
-    state.hasTarget = true;
+// ── INIT POLYGONS ─────────────────────────────
+function initPolygons(){
+  state.polygons=Array.from({length:state.polyCount},randPoly);
+  state.bestPolygons=state.polygons.map(clone);
+  state.generation=0;state.fitness=calcFitness(state.polygons);state.bestFitness=state.fitness;
+  state.mutRate=1.0;state.fitnessHistory=[];state.intelligentMemory=[];
+  state.sessionStats={totalAttempts:0,totalSuccesses:0};
+  state.stagnationCounter=0;state.lastImprovementGen=0;state.consecutiveSuccesses=0;
+  state.inStagnation=false;state.currentStrategyId='explore_cold';
+  OPS.forEach(op=>{op.attempts=0;op.successes=0;});
+  renderPolygons(ctxE,state.polygons,state.targetW,state.targetH);
+  updateErrorGrid();updateHudOps();updateHUD();
+}
 
-    $('drop-overlay').classList.add('hidden');
-    $('canvas-wrap').style.display = 'flex';
-    $('btn-play').disabled = false;
-    $('btn-reset').disabled = false;
-    $('btn-download').disabled = false;
-    $('mode-pill').textContent = `${state.targetW}×${state.targetH}`;
-
+// ── IMAGE LOADING ─────────────────────────────
+function setupCanvases(img){
+  const MAX=Math.min(400,window.innerWidth*.35);
+  const sc=Math.min(MAX/img.naturalWidth,MAX/img.naturalHeight,1);
+  state.targetW=Math.max(100,Math.round(img.naturalWidth*sc));
+  state.targetH=Math.max(100,Math.round(img.naturalHeight*sc));
+  for(const cv of[cvT,cvE,cvD]){if(cv){cv.width=state.targetW;cv.height=state.targetH;cv.style.width='100%';cv.style.height='auto';cv.style.maxWidth=Math.min(400,state.targetW)+'px';}}
+  if(ctxT&&img){ctxT.drawImage(img,0,0,state.targetW,state.targetH);state.targetPixels=ctxT.getImageData(0,0,state.targetW,state.targetH).data;}
+}
+function loadImage(src){
+  const img=new Image();
+  img.onload=()=>{
+    setupCanvases(img);state.hasTarget=true;
+    $('drop-overlay').classList.add('hidden');$('canvas-wrap').style.display='flex';
+    $('btn-play').disabled=false;$('btn-reset').disabled=false;
+    $('mode-pill').textContent=`${state.targetW}×${state.targetH}`;
     initPolygons();
+    if(state.hudVisible)$('live-hud').classList.add('visible');
     toast('Image loaded — press PLAY to evolve');
   };
-  img.src = src;
+  img.src=src;
 }
+function loadFile(file){if(!file||!file.type.startsWith('image/'))return;const r=new FileReader();r.onload=e=>loadImage(e.target.result);r.readAsDataURL(file);}
 
-function loadFile(file) {
-  if (!file || !file.type.startsWith('image/')) return;
-  const reader = new FileReader();
-  reader.onload = e => loadImage(e.target.result);
-  reader.readAsDataURL(file);
+// ── SNAPSHOTS ─────────────────────────────────
+async function saveSnapshot(){
+  if(!cvE)return;
+  const t=document.createElement('canvas');t.width=80;t.height=80;t.getContext('2d').drawImage(cvE,0,0,80,80);
+  const snap={canvas:t,gen:state.generation,fit:state.fitness,polys:state.polygons.map(clone)};
+  state.snapshots.unshift(snap);if(state.snapshots.length>9)state.snapshots.pop();renderSnapshots();
+  toast(`Snapshot @ gen ${state.generation.toLocaleString()}`);
 }
-
-// ==================== GENOME PARSING ====================
-
-let currentGenome = null;
-let currentGenomeSource = null;
-
-function parseGenome(content) {
-  const genome = { canvas: {}, palette: {}, polygons: [], metadata: {} };
-  const lines = content.split('\n');
-  let section = null;
-  let currentZone = null;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-
-    if (trimmed.startsWith('--')) {
-      const metaMatch = trimmed.match(/--\s*@(\w+)\s+(.+)/);
-      if (metaMatch) genome.metadata[metaMatch[1]] = metaMatch[2];
-      else if (trimmed.includes('Generated:')) genome.metadata.date = trimmed.split('Generated:')[1].trim();
-      else if (trimmed.includes('Fitness:')) genome.metadata.fitness = trimmed.split('Fitness:')[1].trim();
-      else if (trimmed.includes('Generations:')) genome.metadata.generations = trimmed.split('Generations:')[1].trim();
-      continue;
-    }
-
-    if (!trimmed || trimmed === '}') {
-      if (currentZone) { genome.polygons.push(currentZone); currentZone = null; }
-      if (trimmed === '}') section = null;
-      continue;
-    }
-
-    if (trimmed === 'canvas {') { section = 'canvas'; continue; }
-    if (trimmed === 'palette {') { section = 'palette'; continue; }
-    if (trimmed.startsWith('layer ')) { section = 'layer'; continue; }
-
-    if (section === 'canvas') {
-      const match = trimmed.match(/(\w+):\s*(\d+)/);
-      if (match) genome.canvas[match[1]] = parseInt(match[2]);
-    }
-
-    if (section === 'palette') {
-      const match = trimmed.match(/(\w+):\s*(#[0-9a-fA-F]{6})/);
-      if (match) genome.palette[match[1]] = match[2];
-    }
-
-    if (section === 'layer') {
-      if (trimmed.startsWith('zone ')) {
-        currentZone = { name: trimmed.split(' ')[1] };
-      } else if (currentZone) {
-        const colorMatch = trimmed.match(/color:\s*palette\.(\w+)/);
-        const opacityMatch = trimmed.match(/opacity:\s*([0-9.]+)/);
-        const pointsMatch = trimmed.match(/points:\s*(.+)/);
-
-        if (colorMatch) {
-          currentZone.colorName = colorMatch[1];
-          currentZone.color = genome.palette[colorMatch[1]];
-        }
-        if (opacityMatch) currentZone.opacity = parseFloat(opacityMatch[1]);
-        if (pointsMatch) {
-          currentZone.points = pointsMatch[1].split(' ').map(p => {
-            const [x, y] = p.split(',').map(parseFloat);
-            return { x, y };
-          });
-        }
-      }
-    }
+function renderSnapshots(){
+  const g=$('history-grid');if(!g)return;
+  if(!state.snapshots.length){g.innerHTML='<div style="font-size:11px;color:#333;padding:16px;">No snapshots yet</div>';return;}
+  g.innerHTML='';
+  for(const s of state.snapshots){
+    const w=document.createElement('div');w.className='history-thumb';w.appendChild(s.canvas);
+    w.innerHTML+=`<span class="gen-label">${s.gen.toLocaleString()}</span><span class="fit-label">${s.fit.toFixed(1)}%</span>`;
+    w.addEventListener('click',e=>{e.stopPropagation();state.polygons=s.polys.map(clone);state.fitness=s.fit;renderPolygons(ctxE,state.polygons,state.targetW,state.targetH);updateErrorGrid();toast(`Restored gen ${s.gen.toLocaleString()}`);});
+    g.appendChild(w);
   }
-  return genome;
 }
 
-function renderGenomeToCanvas(genome, canvasId) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  canvas.width = genome.canvas.width || 200;
-  canvas.height = genome.canvas.height || 200;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  for (const poly of genome.polygons) {
-    if (!poly.points || poly.points.length < 3) continue;
-    ctx.beginPath();
-    ctx.moveTo(poly.points[0].x, poly.points[0].y);
-    for (let i = 1; i < poly.points.length; i++) ctx.lineTo(poly.points[i].x, poly.points[i].y);
+// ── GENOME ────────────────────────────────────
+let cGenome=null,cGenomeSrc=null;
+function parseGenome(content){
+  const g={canvas:{},palette:{},polygons:[],metadata:{}}; const lines=content.split('\n'); let sec=null,cz=null;
+  for(const line of lines){
+    const t=line.trim();
+    if(t.startsWith('--')){const m=t.match(/--\s*@(\w+)\s+(.+)/);if(m)g.metadata[m[1]]=m[2];else if(t.includes('Fitness:'))g.metadata.fitness=t.split('Fitness:')[1].trim();else if(t.includes('Generations:'))g.metadata.generations=t.split('Generations:')[1].trim();continue;}
+    if(!t||t==='}'){if(cz){g.polygons.push(cz);cz=null;}if(t==='}')sec=null;continue;}
+    if(t==='canvas {'){sec='canvas';continue;}if(t==='palette {'){sec='palette';continue;}if(t.startsWith('layer ')){sec='layer';continue;}
+    if(sec==='canvas'){const m=t.match(/(\w+):\s*(\d+)/);if(m)g.canvas[m[1]]=parseInt(m[2]);}
+    if(sec==='palette'){const m=t.match(/(\w+):\s*(#[0-9a-fA-F]{6})/);if(m)g.palette[m[1]]=m[2];}
+    if(sec==='layer'){if(t.startsWith('zone ')){cz={name:t.split(' ')[1]};}else if(cz){const cm=t.match(/color:\s*palette\.(\w+)/),om=t.match(/opacity:\s*([0-9.]+)/),pm=t.match(/points:\s*(.+)/);if(cm){cz.colorName=cm[1];cz.color=g.palette[cm[1]];}if(om)cz.opacity=parseFloat(om[1]);if(pm)cz.points=pm[1].split(' ').map(p=>{const[x,y]=p.split(',').map(parseFloat);return{x,y};});}}
+  }
+  return g;
+}
+function renderGenomeToCanvas(genome,canvasId){
+  const cv=document.getElementById(canvasId);if(!cv)return;
+  cv.width=genome.canvas.width||200;cv.height=genome.canvas.height||200;
+  const ctx=cv.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,cv.width,cv.height);
+  for(const p of genome.polygons){
+    if(!p.points||p.points.length<3)continue;
+    ctx.beginPath();ctx.moveTo(p.points[0].x,p.points[0].y);
+    for(let i=1;i<p.points.length;i++)ctx.lineTo(p.points[i].x,p.points[i].y);
     ctx.closePath();
-    const r = parseInt(poly.color.slice(1, 3), 16);
-    const g = parseInt(poly.color.slice(3, 5), 16);
-    const b = parseInt(poly.color.slice(5, 7), 16);
-    const a = poly.opacity || 1;
-    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
-    ctx.fill();
+    const r=parseInt(p.color.slice(1,3),16),gr=parseInt(p.color.slice(3,5),16),b=parseInt(p.color.slice(5,7),16);
+    ctx.fillStyle=`rgba(${r},${gr},${b},${p.opacity||1})`;ctx.fill();
   }
 }
-
-function displayViewerGenome(filename) {
-  $('viewer-info').style.display = 'block';
-  $('viewer-filename').textContent = filename;
-  $('viewer-dimensions').textContent = `${currentGenome.canvas.width || 200} × ${currentGenome.canvas.height || 200}`;
-  $('viewer-fitness').textContent = currentGenome.metadata.fitness || 'N/A';
-  $('viewer-generations').textContent = currentGenome.metadata.generations || 'N/A';
-  $('viewer-polygons').textContent = currentGenome.polygons.length;
-  renderGenomeToCanvas(currentGenome, 'viewer-canvas');
+function loadViewerFile(file){
+  const r=new FileReader();r.onload=e=>{cGenomeSrc=e.target.result;try{cGenome=parseGenome(cGenomeSrc);$('viewer-info').style.display='block';$('viewer-filename').textContent=file.name;$('viewer-dimensions').textContent=`${cGenome.canvas.width||200}×${cGenome.canvas.height||200}`;$('viewer-fitness').textContent=cGenome.metadata.fitness||'N/A';$('viewer-generations').textContent=cGenome.metadata.generations||'N/A';$('viewer-polygons').textContent=cGenome.polygons.length;renderGenomeToCanvas(cGenome,'viewer-canvas');}catch(e){toast('Error parsing .pg file');}};r.readAsText(file);
+}
+function exportCurrentGenome(){
+  if(!state.hasTarget)return null;
+  let g=`-- @version 1.0\n-- Generated: ${new Date().toISOString().split('T')[0]}\n-- Fitness: ${state.fitness.toFixed(1)}%\n-- Generations: ${state.generation}\n\ncanvas {\n  width: ${state.targetW}\n  height: ${state.targetH}\n}\n\npalette {\n`;
+  const uc=[];state.polygons.forEach(p=>{const h='#'+[p.r,p.g,p.b].map(c=>c.toString(16).padStart(2,'0')).join('');if(!uc.includes(h))uc.push(h);});
+  uc.slice(0,8).forEach((h,i)=>{g+=`  c${i}: ${h}\n`;});g+=`}\n\nlayer evolved {\n`;
+  state.polygons.forEach((p,i)=>{const h='#'+[p.r,p.g,p.b].map(c=>c.toString(16).padStart(2,'0')).join('');const ci=uc.indexOf(h);g+=`  zone poly_${i} {\n    color: palette.c${ci}\n    opacity: ${(p.a/255).toFixed(2)}\n    points: ${p.pts.map(pt=>`${Math.round(pt[0])},${Math.round(pt[1])}`).join(' ')}\n  }\n`;});
+  g+=`}\n`;return g;
 }
 
-function loadViewerFile(file) {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    currentGenomeSource = e.target.result;
-    try {
-      currentGenome = parseGenome(currentGenomeSource);
-      displayViewerGenome(file.name);
-    } catch (error) {
-      toast('Error parsing .pg file');
-      console.error(error);
-    }
-  };
-  reader.readAsText(file);
-}
+// ── GENOME EDITOR BUTTONS ─────────────────────
+$('btn-apply-genome').addEventListener('click',()=>{
+  const txt=$('genome-editor').value.trim();if(!txt){toast('Paste genome first');return;}
+  try{const parsed=parseGenome(txt),np=[];for(const poly of parsed.polygons){if(!poly.points||poly.points.length<3)continue;const pts=poly.points.map(p=>[p.x,p.y]);let r=255,gr=255,b=255;if(poly.color){r=parseInt(poly.color.slice(1,3),16);gr=parseInt(poly.color.slice(3,5),16);b=parseInt(poly.color.slice(5,7),16);}np.push({pts,r,g:gr,b,a:Math.round((poly.opacity||1)*255)});}
+  if(np.length>0){state.polygons=np;state.polyCount=np.length;$('sl-poly').value=np.length;$('vl-poly').textContent=np.length;state.fitness=calcFitness(state.polygons);renderPolygons(ctxE,state.polygons,state.targetW,state.targetH);updateErrorGrid();toast(`Loaded ${np.length} polygons`);}else toast('No valid polygons');}catch(err){toast('Error: '+err.message);}
+});
+$('btn-export-genome').addEventListener('click',()=>{if(!state.hasTarget){toast('Load a target first');return;}$('genome-editor').value=exportCurrentGenome()||'';toast('Genome exported');});
 
-// ==================== GENOME EDITOR ====================
-
-$('btn-apply-genome').addEventListener('click', () => {
-  const genomeText = $('genome-editor').value.trim();
-  if (!genomeText) { toast('Paste genome code first'); return; }
-  try {
-    const parsed = parseGenome(genomeText);
-    const newPolys = [];
-    for (const poly of parsed.polygons) {
-      if (!poly.points || poly.points.length < 3) continue;
-      const pts = poly.points.map(p => [p.x, p.y]);
-      let r = 255, g = 255, b = 255;
-      if (poly.color) {
-        r = parseInt(poly.color.slice(1, 3), 16);
-        g = parseInt(poly.color.slice(3, 5), 16);
-        b = parseInt(poly.color.slice(5, 7), 16);
-      }
-      newPolys.push({ pts, r, g, b, a: Math.round((poly.opacity || 1) * 255) });
-    }
-    if (newPolys.length > 0) {
-      state.polygons = newPolys;
-      state.polyCount = newPolys.length;
-      $('sl-poly').value = newPolys.length;
-      $('vl-poly').textContent = newPolys.length;
-      state.fitness = calcFitness(state.polygons);
-      renderPolygons(ctxE, state.polygons, state.targetW, state.targetH);
-      updateErrorGrid();
-      toast(`Loaded ${newPolys.length} polygons`);
-    } else toast('No valid polygons');
-  } catch (err) { toast('Error: ' + err.message); }
+// ── PLAY / PAUSE ──────────────────────────────
+$('btn-play').addEventListener('click',()=>{
+  state.running=!state.running;
+  if(state.running){$('btn-play').textContent='⏸ PAUSE';$('status-pill').textContent='EVOLVING';$('status-pill').style.color='var(--accent)';loop();}
+  else{$('btn-play').textContent='▶ PLAY';$('status-pill').textContent='PAUSED';$('status-pill').style.color='';cancelAnimationFrame(state.rafId);}
+});
+$('btn-reset').addEventListener('click',()=>{state.running=false;cancelAnimationFrame(state.rafId);$('btn-play').textContent='▶ PLAY';$('status-pill').textContent='IDLE';$('status-pill').style.color='';initPolygons();toast('Reset');});
+$('btn-diff').addEventListener('click',()=>{state.diffMode=!state.diffMode;$('cv-diff').classList.toggle('visible',state.diffMode);$('btn-diff').style.color=state.diffMode?'var(--accent)':'';});
+$('btn-snapshot').addEventListener('click',saveSnapshot);
+$('btn-clear').addEventListener('click',()=>{
+  if(!confirm('End process?'))return;
+  state.running=false;cancelAnimationFrame(state.rafId);
+  $('btn-play').textContent='▶ PLAY';$('btn-play').disabled=true;$('btn-reset').disabled=true;
+  $('status-pill').textContent='IDLE';$('status-pill').style.color='';$('mode-pill').textContent='NO TARGET';
+  $('drop-overlay').classList.remove('hidden');$('canvas-wrap').style.display='none';
+  $('live-hud').classList.remove('visible');$('stag-alert').classList.remove('show');
+  state.hasTarget=false;
 });
 
-$('btn-export-genome').addEventListener('click', () => {
-  if (!state.hasTarget) { toast('Load a target first'); return; }
-  let genome = `-- @version 1.0\n-- Generated: ${new Date().toISOString().split('T')[0]}\n`;
-  genome += `-- Fitness: ${state.fitness.toFixed(1)}%\n-- Generations: ${state.generation}\n\n`;
-  genome += `canvas {\n  width: ${state.targetW}\n  height: ${state.targetH}\n}\n\npalette {\n`;
-  const usedColors = new Set();
-  state.polygons.forEach(p => {
-    const hex = '#' + [p.r, p.g, p.b].map(c => c.toString(16).padStart(2,'0')).join('');
-    usedColors.add(hex);
-  });
-  Array.from(usedColors).slice(0,8).forEach((hex,i) => { genome += `  c${i}: ${hex}\n`; });
-  genome += `}\n\nlayer evolved {\n`;
-  state.polygons.forEach((p,i) => {
-    const hex = '#' + [p.r,p.g,p.b].map(c=>c.toString(16).padStart(2,'0')).join('');
-    const colorIndex = Array.from(usedColors).indexOf(hex);
-    genome += `  zone poly_${i} {\n    color: palette.c${colorIndex}\n`;
-    genome += `    opacity: ${(p.a/255).toFixed(2)}\n    points: `;
-    genome += p.pts.map(pt => `${Math.round(pt[0])},${Math.round(pt[1])}`).join(' ') + '\n  }\n';
-  });
-  genome += `}\n`;
-  $('genome-editor').value = genome;
-  toast('Genome exported to editor');
+// ── HUD TOGGLE ────────────────────────────────
+$('btn-hud').addEventListener('click',()=>{
+  state.hudVisible=!state.hudVisible;
+  $('live-hud').classList.toggle('visible',state.hudVisible&&state.hasTarget);
+  $('btn-hud').classList.toggle('active',state.hudVisible);
 });
 
-// ==================== EVENT LISTENERS ====================
-
-$('btn-play').addEventListener('click', () => {
-  state.running = !state.running;
-  $('btn-play').textContent = state.running ? '⏸ PAUSE' : '▶ PLAY';
-  $('status-pill').textContent = state.running ? 'EVOLVING' : 'PAUSED';
-  if (state.running) loop();
+// ── DOWNLOAD MENU ─────────────────────────────
+const dlMenu=$('download-menu');
+$('btn-download').addEventListener('click',e=>{
+  e.stopPropagation();
+  if(dlMenu.classList.contains('show')){dlMenu.classList.remove('show');return;}
+  const br=$('btn-download').getBoundingClientRect();
+  dlMenu.style.left=br.left+'px';dlMenu.style.width=br.width+'px';dlMenu.style.top=(br.top-8)+'px';
+  dlMenu.classList.add('show');
+  requestAnimationFrame(()=>{const mh=dlMenu.offsetHeight;const top=br.top-mh-4;dlMenu.style.top=(top<8?br.bottom+4:top)+'px';});
 });
-
-$('btn-reset').addEventListener('click', () => {
-  state.running = false;
-  cancelAnimationFrame(state.rafId);
-  $('btn-play').textContent = '▶ PLAY';
-  $('status-pill').textContent = 'IDLE';
-  initPolygons();
-  toast('Reset');
-});
-
-$('btn-diff').addEventListener('click', () => {
-  state.diffMode = !state.diffMode;
-  $('cv-diff').classList.toggle('visible', state.diffMode);
-  $('btn-diff').style.color = state.diffMode ? 'var(--accent)' : '';
-});
-
-$('btn-snapshot').addEventListener('click', saveSnapshot);
-
-$('btn-clear').addEventListener('click', () => {
-  if (confirm('End process?')) {
-    state.running = false;
-    cancelAnimationFrame(state.rafId);
-    $('btn-play').textContent = '▶ PLAY';
-    $('btn-play').disabled = true;
-    $('btn-reset').disabled = true;
-    $('btn-download').disabled = true;
-    $('status-pill').textContent = 'IDLE';
-    $('mode-pill').textContent = 'NO TARGET';
-    $('drop-overlay').classList.remove('hidden');
-    $('canvas-wrap').style.display = 'none';
-    state.hasTarget = false;
-    $('sidebar').classList.remove('visible');
-    $('sidebar-backdrop').classList.remove('visible');
-  }
-});
-
-$('btn-download').addEventListener('click', e => { e.stopPropagation(); $('download-menu').classList.toggle('show'); });
-document.addEventListener('click', e => { if (!e.target.closest('.download-container')) $('download-menu').classList.remove('show'); });
-document.querySelectorAll('.download-menu-item').forEach(item => {
-  item.addEventListener('click', e => {
-    e.stopPropagation();
-    let canvas;
-    const type = item.dataset.export;
-    if (type === 'png-target') canvas = cvT;
-    else if (type === 'png-evolved') canvas = cvE;
-    else if (type === 'png-diff') {
-      if (!state.diffMode) { toast('Enable DIFF first'); return; }
-      canvas = cvD;
-    }
-    if (canvas) {
-      const a = document.createElement('a');
-      a.download = `pigment_${type}.png`;
-      a.href = canvas.toDataURL('image/png');
-      a.click();
-      toast('Downloaded');
-    }
-    $('download-menu').classList.remove('show');
+document.addEventListener('click',()=>dlMenu.classList.remove('show'));
+document.querySelectorAll('.download-menu-item').forEach(item=>{
+  item.addEventListener('click',e=>{
+    e.stopPropagation();const t=item.dataset.export;let cv2;
+    if(t==='png-target')cv2=cvT;else if(t==='png-evolved')cv2=cvE;else if(t==='png-diff'){if(!state.diffMode){toast('Enable DIFF first');return;}cv2=cvD;}
+    if(cv2){const a=document.createElement('a');a.download=`pigment_${t}.png`;a.href=cv2.toDataURL('image/png');a.click();toast('Downloaded');}
+    dlMenu.classList.remove('show');
   });
 });
 
-$('btn-ai-suggest').addEventListener('click', () => {
-  const bestOp = OPS.reduce((best, op) => (op.successes/op.attempts || 0) > (best.successes/best.attempts || 0) ? op : best);
-  const rate = bestOp.attempts ? ((bestOp.successes/bestOp.attempts)*100).toFixed(1) : '0';
-  const conf = Math.min(99, Math.floor(bestOp.attempts/2));
-  const msg = `🤖 Try ${bestOp.key} — ${rate}% success in ${state.context} · Confidence ${conf}%`;
-  $('suggestion-result').style.display = 'block';
-  $('suggestion-result').textContent = msg;
-  toast(msg);
+// ── SLIDERS ───────────────────────────────────
+$('resolution-mode').addEventListener('change',e=>{
+  const m=e.target.value,adv=$('advanced-controls');
+  if(m==='auto'){adv.style.display='none';state.autoParams=true;state.resolution='auto';toast('🤖 Auto mode');}
+  else if(m==='full'){adv.style.display='none';state.autoParams=false;state.resolution='full';toast('📐 Full res');}
+  else{adv.style.display='block';state.autoParams=false;state.resolution='full';toast('🔧 Advanced');}
 });
+function bindSlider(id,vid,cb){const el=$(id),d=$(vid);if(!el)return;el.addEventListener('input',()=>{cb(+el.value);d.textContent=id==='sl-mut'?(el.value/10).toFixed(1)+'×':el.value;});}
+bindSlider('sl-poly','vl-poly',v=>{if(!state.autoParams)state.polyCount=v;while(state.polygons.length<v)state.polygons.push(randPoly());if(state.polygons.length>v)state.polygons.length=v;});
+bindSlider('sl-speed','vl-speed',v=>{if(!state.autoParams)state.speed=v;});
+bindSlider('sl-mut','vl-mut',v=>{if(!state.autoParams)state.mutRate=v/10;});
+bindSlider('sl-alpha','vl-alpha',v=>{if(!state.autoParams)state.minAlpha=v;});
 
-$('resolution-mode').addEventListener('change', e => {
-  const mode = e.target.value;
-  const adv = $('advanced-controls');
-  if (mode === 'auto') { adv.style.display = 'none'; state.autoParams = true; state.resolution = 'auto'; toast('🤖 Auto mode'); }
-  else if (mode === 'full') { adv.style.display = 'none'; state.autoParams = false; state.resolution = 'full'; toast('📐 Full resolution'); }
-  else if (mode === 'advanced') { adv.style.display = 'block'; state.autoParams = false; state.resolution = 'full'; toast('🔧 Advanced mode'); }
-});
+// ── DRAG & DROP / PASTE ───────────────────────
+const area=$('canvas-area');
+if(area){area.addEventListener('dragover',e=>e.preventDefault());area.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});}
+document.addEventListener('paste',e=>{for(const item of e.clipboardData.items){if(item.type.startsWith('image/')){loadFile(item.getAsFile());break;}}});
+$('browse-btn').addEventListener('click',()=>$('file-input').click());
+$('file-input').addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
 
-function bindSlider(id, valId, cb) {
-  const el = $(id), disp = $(valId);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    cb(+el.value);
-    disp.textContent = id === 'sl-mut' ? (el.value/10).toFixed(1) + '×' : el.value;
-  });
-}
-bindSlider('sl-poly', 'vl-poly', v => {
-  if (!state.autoParams) state.polyCount = v;
-  while (state.polygons.length < v) state.polygons.push(randPoly());
-  if (state.polygons.length > v) state.polygons.length = v;
-});
-bindSlider('sl-speed', 'vl-speed', v => { if (!state.autoParams) state.speed = v; });
-bindSlider('sl-mut', 'vl-mut', v => { if (!state.autoParams) state.mutRate = v / 10; });
-bindSlider('sl-alpha', 'vl-alpha', v => { if (!state.autoParams) state.minAlpha = v; });
+// ── SIDEBAR ───────────────────────────────────
+const sidebar=$('sidebar'),backdrop=$('sidebar-backdrop');
+function toggleSidebar(show){if(show){sidebar.classList.add('open');backdrop.classList.add('visible');}else{sidebar.classList.remove('open');backdrop.classList.remove('visible');}}
+$('controls-header').addEventListener('click',e=>{e.stopPropagation();toggleSidebar(!sidebar.classList.contains('open'));});
+backdrop.addEventListener('click',()=>toggleSidebar(false));
+sidebar.addEventListener('click',e=>e.stopPropagation());
 
-const area = $('canvas-area');
-if (area) {
-  area.addEventListener('dragover', e => { e.preventDefault(); document.body.classList.add('dragging'); });
-  area.addEventListener('dragleave', () => document.body.classList.remove('dragging'));
-  area.addEventListener('drop', e => {
-    e.preventDefault();
-    document.body.classList.remove('dragging');
-    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
-  });
-}
-document.addEventListener('paste', e => {
-  for (const item of e.clipboardData.items) {
-    if (item.type.startsWith('image/')) { loadFile(item.getAsFile()); break; }
-  }
-});
-$('browse-btn').addEventListener('click', () => $('file-input').click());
-$('file-input').addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
-
-const sidebar = $('sidebar');
-const header = $('controls-header');
-const backdrop = $('sidebar-backdrop');
-function toggleSidebar(show) {
-  if (show) { sidebar.classList.add('visible'); backdrop.classList.add('visible'); }
-  else { sidebar.classList.remove('visible'); backdrop.classList.remove('visible'); }
-}
-header.addEventListener('click', e => { e.stopPropagation(); toggleSidebar(!sidebar.classList.contains('visible')); });
-backdrop.addEventListener('click', () => toggleSidebar(false));
-sidebar.addEventListener('click', e => e.stopPropagation());
-
-function setupDraggableSidebar() {
-  const dragArea = $('sidebar-drag');
-  if (!dragArea) return;
-  let startY = 0, isDragging = false;
-  const onTouchStart = (e) => { startY = e.touches[0].clientY; isDragging = true; sidebar.style.transition = 'none'; e.preventDefault(); };
-  const onTouchMove = (e) => {
-    if (!isDragging) return;
-    const deltaY = e.touches[0].clientY - startY;
-    const wh = window.innerHeight;
-    if (sidebar.classList.contains('visible')) {
-      const percent = Math.min(100, Math.max(0, (deltaY / (wh * 0.3)) * 100));
-      sidebar.style.transform = `translateY(${percent}%)`;
-    } else {
-      const percent = Math.min(100, Math.max(0, 100 - (Math.abs(deltaY) / (wh * 0.3)) * 100));
-      sidebar.style.transform = `translateY(${100 - percent}%)`;
-    }
-    e.preventDefault();
-  };
-  const onTouchEnd = (e) => {
-    if (!isDragging) return;
-    sidebar.style.transition = 'transform 0.3s cubic-bezier(0.4,0.0,0.2,1)';
-    isDragging = false;
-    const match = sidebar.style.transform.match(/translateY\(([\d.]+)%\)/);
-    if (match) {
-      const percent = parseFloat(match[1]);
-      if (sidebar.classList.contains('visible')) {
-        if (percent > 30) { toggleSidebar(false); sidebar.style.transform = ''; }
-        else sidebar.style.transform = 'translateY(0%)';
-      } else {
-        if (percent < 70) { toggleSidebar(true); sidebar.style.transform = 'translateY(0%)'; }
-        else sidebar.style.transform = '';
-      }
-    }
-    e.preventDefault();
-  };
-  dragArea.addEventListener('touchstart', onTouchStart, { passive: false });
-  dragArea.addEventListener('touchmove', onTouchMove, { passive: false });
-  dragArea.addEventListener('touchend', onTouchEnd, { passive: false });
-}
-
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-  switch (e.key.toLowerCase()) {
-    case ' ': e.preventDefault(); if (state.hasTarget) $('btn-play').click(); break;
-    case 'r': if (!e.ctrlKey && !e.metaKey) $('btn-reset').click(); break;
-    case 'd': $('btn-diff').click(); break;
-    case 's': $('btn-snapshot').click(); break;
-    case 'e': if (state.hasTarget) $('btn-download').click(); break;
-    case 'g': $('viewer-modal').classList.toggle('visible'); break;
+// ── KEYBOARD ─────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  switch(e.key.toLowerCase()){
+    case ' ':e.preventDefault();if(state.hasTarget)$('btn-play').click();break;
+    case 'r':if(!e.ctrlKey&&!e.metaKey)$('btn-reset').click();break;
+    case 'd':$('btn-diff').click();break;
+    case 'h':$('btn-hud').click();break;
+    case 's':$('btn-snapshot').click();break;
+    case 'e':if(state.hasTarget)$('btn-download').click();break;
+    case 'g':$('viewer-modal').classList.toggle('visible');break;
   }
 });
 
-function toast(msg, dur = 2500) {
-  const el = $('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => el.classList.remove('show'), dur);
-}
-
-$('modal-close').addEventListener('click', () => $('viewer-modal').classList.remove('visible'));
-$('viewer-close').addEventListener('click', () => $('viewer-modal').classList.remove('visible'));
-$('viewer-dropzone').addEventListener('click', () => $('viewer-file').click());
-$('viewer-dropzone').addEventListener('dragover', e => { e.preventDefault(); $('viewer-dropzone').classList.add('active'); });
-$('viewer-dropzone').addEventListener('dragleave', () => $('viewer-dropzone').classList.remove('active'));
-$('viewer-dropzone').addEventListener('drop', e => {
-  e.preventDefault(); $('viewer-dropzone').classList.remove('active');
-  const file = e.dataTransfer.files[0];
-  if (file && file.name.endsWith('.pg')) loadViewerFile(file);
-  else toast('Please drop a .pg file');
-});
-$('viewer-file').addEventListener('change', e => { if (e.target.files[0]) loadViewerFile(e.target.files[0]); });
-$('viewer-png').addEventListener('click', () => {
-  const canvas = $('viewer-canvas');
-  canvas.toBlob(blob => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'genome.png'; a.click();
-    URL.revokeObjectURL(url);
-  });
-});
-$('viewer-svg').addEventListener('click', () => {
-  if (!currentGenome) return;
-  let svg = `<?xml version="1.0"?><svg width="${currentGenome.canvas.width||200}" height="${currentGenome.canvas.height||200}" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/>`;
-  for (const poly of currentGenome.polygons) {
-    if (!poly.points) continue;
-    const points = poly.points.map(p => `${p.x},${p.y}`).join(' ');
-    svg += `<polygon points="${points}" fill="${poly.color}" opacity="${poly.opacity||1}"/>`;
-  }
-  svg += '</svg>';
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'genome.svg'; a.click();
-  URL.revokeObjectURL(url);
-});
-$('viewer-source').addEventListener('click', () => {
-  const textDiv = $('viewer-genome');
-  textDiv.textContent = currentGenomeSource;
-  textDiv.style.display = textDiv.style.display === 'none' ? 'block' : 'none';
-});
-$('viewer-copy').addEventListener('click', () => {
-  navigator.clipboard.writeText(currentGenomeSource).then(() => toast('✅ Genome copied!')).catch(() => toast('❌ Copy failed'));
+// ── AI SUGGEST ────────────────────────────────
+$('btn-ai-suggest').addEventListener('click',()=>{
+  const strat=STRATEGY_TABLE.find(s=>s.id===state.currentStrategyId)||STRATEGY_TABLE[0];
+  const bestOp=OPS.filter(o=>o.attempts>5).reduce((b,o)=>(o.successes/o.attempts)>(b.successes/b.attempts+.001)?o:b,OPS[0]);
+  const rate=bestOp.attempts?((bestOp.successes/bestOp.attempts)*100).toFixed(1):'0';
+  const conf=Math.min(99,Math.floor(bestOp.attempts/3));
+  const msg=`🤖 Strategy: ${strat.name.replace(/[^\w\s\-—]/g,'').trim()} · Best op: ${bestOp.key} ${rate}% · Confidence ${conf}%`;
+  $('suggestion-result').style.display='block';$('suggestion-result').textContent=msg;toast(msg,3500);
 });
 
-function exportCurrentGenome() {
-  if (!state.hasTarget) return null;
-  let genome = `-- @version 1.0\n-- Generated: ${new Date().toISOString().split('T')[0]}\n`;
-  genome += `-- Fitness: ${state.fitness.toFixed(1)}%\n-- Generations: ${state.generation}\n\n`;
-  genome += `canvas {\n  width: ${state.targetW}\n  height: ${state.targetH}\n}\n\npalette {\n`;
-  const usedColors = [];
-  state.polygons.forEach(p => {
-    const hex = '#' + [p.r, p.g, p.b].map(c => c.toString(16).padStart(2,'0')).join('');
-    if (!usedColors.includes(hex)) usedColors.push(hex);
-  });
-  usedColors.slice(0,8).forEach((hex,i) => { genome += `  c${i}: ${hex}\n`; });
-  genome += `}\n\nlayer evolved {\n`;
-  state.polygons.forEach((p,i) => {
-    const hex = '#' + [p.r,p.g,p.b].map(c=>c.toString(16).padStart(2,'0')).join('');
-    const ci = usedColors.indexOf(hex);
-    genome += `  zone poly_${i} {\n    color: palette.c${ci}\n`;
-    genome += `    opacity: ${(p.a/255).toFixed(2)}\n    points: `;
-    genome += p.pts.map(pt => `${Math.round(pt[0])},${Math.round(pt[1])}`).join(' ') + '\n  }\n';
-  });
-  genome += `}\n`;
-  return genome;
-}
+// ── VIEWER MODAL ─────────────────────────────
+$('modal-close').addEventListener('click',()=>$('viewer-modal').classList.remove('visible'));
+$('viewer-close').addEventListener('click',()=>$('viewer-modal').classList.remove('visible'));
+$('viewer-dropzone').addEventListener('click',()=>$('viewer-file').click());
+$('viewer-dropzone').addEventListener('dragover',e=>{e.preventDefault();$('viewer-dropzone').classList.add('active');});
+$('viewer-dropzone').addEventListener('dragleave',()=>$('viewer-dropzone').classList.remove('active'));
+$('viewer-dropzone').addEventListener('drop',e=>{e.preventDefault();$('viewer-dropzone').classList.remove('active');const f=e.dataTransfer.files[0];if(f&&f.name.endsWith('.pg'))loadViewerFile(f);else toast('Drop a .pg file');});
+$('viewer-file').addEventListener('change',e=>{if(e.target.files[0])loadViewerFile(e.target.files[0]);});
+$('viewer-png').addEventListener('click',()=>{$('viewer-canvas').toBlob(blob=>{const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='genome.png';a.click();URL.revokeObjectURL(url);});});
+$('viewer-svg').addEventListener('click',()=>{
+  if(!cGenome)return;
+  let svg=`<?xml version="1.0"?><svg width="${cGenome.canvas.width||200}" height="${cGenome.canvas.height||200}" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/>`;
+  for(const p of cGenome.polygons){if(!p.points)continue;svg+=`<polygon points="${p.points.map(pt=>`${pt.x},${pt.y}`).join(' ')}" fill="${p.color}" opacity="${p.opacity||1}"/>`;}
+  svg+='</svg>';const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'})),a=document.createElement('a');a.href=url;a.download='genome.svg';a.click();URL.revokeObjectURL(url);
+});
+$('viewer-source').addEventListener('click',()=>{const d=$('viewer-genome');d.textContent=cGenomeSrc;d.style.display=d.style.display==='none'?'block':'none';});
+$('viewer-copy').addEventListener('click',()=>{navigator.clipboard.writeText(cGenomeSrc).then(()=>toast('✅ Copied!')).catch(()=>toast('❌ Copy failed'));});
 
-// ==================== API BUTTON HANDLERS ====================
-
-$('btn-api-connect').addEventListener('click', async () => {
-  const key = $('api-key-manual').value.trim() || null;
-  const ok = await API.connect(key);
-  toast(ok ? `✅ Connected to PIGMENT server` : `❌ Server not found at ${API.base}`);
+// ── API BUTTONS ───────────────────────────────
+$('btn-api-connect').addEventListener('click',async()=>{const k=$('api-key-manual').value.trim()||null;const ok=await API.connect(k);toast(ok?`✅ Connected`:`❌ Server not found`);});
+$('btn-api-save').addEventListener('click',async()=>{if(!state.hasTarget){toast('Load an image first');return;}if(!API.connected){toast('Connecting…');const ok=await API.connect();if(!ok){toast('❌ No server');return;}}toast('Saving…');const result=await API.saveWork(`Gen ${state.generation}`,exportCurrentGenome(),['pigment-v6']);toast(result?`✅ Saved`:'❌ Save failed');});
+$('btn-api-evolve').addEventListener('click',async()=>{
+  if(!API.connected){toast('❌ Not connected');return;}
+  if(!API.currentWorkId){toast('Saving first…');const g=exportCurrentGenome();if(!g){toast('Load a target first');return;}await API.saveWork(`Gen ${state.generation}`,g);if(!API.currentWorkId){toast('❌ Save failed');return;}}
+  toast('🧬 Queuing…');
+  const r=await fetch(`${API.base}/v1/evolve`,{method:'POST',headers:API.headers(),body:JSON.stringify({work_id:API.currentWorkId,steps:500})}).then(r=>r.json()).catch(()=>null);
+  if(r?.job_id){WS.subscribeJob(r.job_id);$('ws-status').textContent='🔄 Queued…';toast('🧬 Job queued');}
+  else if(r?.child_id)toast(`✅ ${r.fitness_before}→${r.fitness_after}`);
+  else toast('❌ Evolve failed');
+});
+$('btn-api-kinship').addEventListener('click',async()=>{
+  const panel=$('api-kinship-panel');if(panel.style.display!=='none'){panel.style.display='none';return;}
+  if(!API.connected||!API.currentWorkId){toast('Save a work first');return;}
+  panel.style.display='block';panel.innerHTML='Loading…';
+  let k=null;
+  try{const r=await fetch(`${API.base}/v1/kinship`,{method:'POST',headers:API.headers(),body:JSON.stringify({work_id:API.currentWorkId})});k=await r.json();}catch(e){}
+  if(!k){panel.innerHTML='No kinship data';return;}
+  const fmt=(list,label)=>list.length?`<div style="color:#c8ff00;margin-top:4px">${label}</div>`+list.slice(0,3).map(w=>`<div>· ${w.title} (${w.similarity}%)</div>`).join(''):'';
+  panel.innerHTML=`<div>Work: <span style="color:#c8ff00">${k.work?.title||'?'}</span></div>${fmt(k.parents||[],'Parents')}${fmt(k.siblings||[],'Siblings')}${fmt(k.similar||[],'Similar')}`;
 });
 
-$('btn-api-save').addEventListener('click', async () => {
-  if (!state.hasTarget) { toast('Load a target image first'); return; }
-  if (!API.connected) { toast('Connecting…'); const ok = await API.connect(); if (!ok) { toast('❌ No server at localhost:8000'); return; } }
-  const genome = exportCurrentGenome();
-  toast('Saving…');
-  const result = await API.saveWork(`Evolution gen ${state.generation}`, genome, ['pigment-v6']);
-  if (result) {
-    toast(`✅ Saved · style: ${result.style} · fitness: ${result.fitness}`);
-    $('ai-session').textContent = parseInt($('ai-session').textContent || 0) + 1;
-  } else {
-    toast('❌ Save failed');
-  }
+// ── AI EVOLVE PROMPT ─────────────────────────
+$('btn-prompt').addEventListener('click',async()=>{
+  const prompt=$('prompt-input').value.trim();if(!prompt)return;
+  const result=$('prompt-result');result.style.display='block';result.textContent='🤖 Thinking…';
+  const p=prompt.toLowerCase();let action=null,param={};
+  if(p.includes('glitch')||p.includes('corrupt')||p.includes('noise')){action='style';param={style:'glitch'};}
+  else if(p.includes('organic')||p.includes('smooth')){action='style';param={style:'organic'};}
+  else if(p.includes('dark')||p.includes('void')){action='style';param={style:'void'};}
+  else if(p.includes('fast')||p.includes('quick')){action='param';param={speed:80};}
+  else if(p.includes('slow')||p.includes('precise')){action='param';param={speed:5,mutRate:0.2};}
+  else if(p.includes('detail')||p.includes('complex')||p.includes('more polygon')){action='param';param={polyCount:Math.min(300,state.polyCount+50)};}
+  else if(p.includes('simple')||p.includes('fewer')||p.includes('minimal')){action='param';param={polyCount:Math.max(10,state.polyCount-30)};}
+  else if(p.includes('shake')||p.includes('unstuck')||p.includes('escape')){action='strat';param={id:'stag_shake'};}
+  else if(p.includes('recolour')||p.includes('recolor')){action='strat';param={id:'stag_recolor'};}
+  else if(p.includes('reshape')){action='strat';param={id:'stag_reshape'};}
+  else if(p.includes('sprint')){action='strat';param={id:'sprint'};}
+
+  if(action==='style'&&param.style==='glitch'){state.mutRate=3.0;state.minAlpha=5;state.polygons.forEach(q=>{if(Math.random()<.3){q.r=Math.floor(Math.random()*255);q.g=Math.floor(Math.random()*255);q.b=Math.floor(Math.random()*255);}});result.textContent='🎨 Glitch mode';toast('✨ Glitch');}
+  else if(action==='style'&&param.style==='organic'){state.mutRate=0.5;result.textContent='🌿 Organic mode';toast('✨ Organic');}
+  else if(action==='style'&&param.style==='void'){state.minAlpha=60;state.polygons.forEach(q=>{q.r=Math.floor(q.r*.3);q.g=Math.floor(q.g*.3);q.b=Math.floor(q.b*.3);});result.textContent='🖤 Void mode';toast('✨ Void');}
+  else if(action==='param'){if(param.speed!=null)state.speed=param.speed;if(param.mutRate!=null)state.mutRate=param.mutRate;if(param.polyCount!=null){while(state.polygons.length<param.polyCount)state.polygons.push(randPoly());state.polygons.length=Math.max(state.polygons.length,param.polyCount);state.polyCount=param.polyCount;}result.textContent=`✅ Applied`;toast('✨ Updated');}
+  else if(action==='strat'){state.currentStrategyId=param.id;state.strategyLockGen=state.generation;state.strategyLockDuration=500;result.textContent=`✅ Strategy: ${STRATEGY_TABLE.find(s=>s.id===param.id)?.name||param.id}`;toast('✨ Strategy applied');}
+  else{result.textContent='Try: "glitchy", "organic", "void", "fast", "slow", "more detail", "shake", "sprint", "recolour"';}
 });
 
-$('btn-api-evolve').addEventListener('click', async () => {
-  if (!API.connected) { toast('❌ Not connected'); return; }
-  if (!API.currentWorkId) {
-    toast('Saving first…');
-    const genome = exportCurrentGenome();
-    if (!genome) { toast('Load a target first'); return; }
-    await API.saveWork(`Evolution gen ${state.generation}`, genome);
-    if (!API.currentWorkId) { toast('❌ Save failed'); return; }
-  }
-  toast('🧬 Queuing server evolution…');
-  const r = await fetch(`${API.base}/v1/evolve`, {
-    method: 'POST', headers: API.headers(),
-    body: JSON.stringify({ work_id: API.currentWorkId, steps: 500 })
-  }).then(r => r.json()).catch(() => null);
-  if (r?.job_id) {
-    WS.subscribeJob(r.job_id);
-    document.getElementById('ws-status').textContent = `🔄 Job queued · watching via WebSocket…`;
-    toast('🧬 Job queued — streaming via WebSocket');
-  } else if (r?.child_id) {
-    toast(`✅ Server: ${r.fitness_before}→${r.fitness_after} (+${r.improvement}) via ${r.operator}`);
-  } else {
-    toast('❌ Server evolve failed');
-  }
-});
-
-$('btn-api-kinship').addEventListener('click', async () => {
-  const panel = $('api-kinship-panel');
-  if (panel.style.display !== 'none') { panel.style.display = 'none'; return; }
-  if (!API.connected || !API.currentWorkId) { toast('Save a work first to see kinship'); return; }
-  panel.style.display = 'block';
-  panel.innerHTML = 'Loading kinship…';
-  const k = await API.getKinship(API.currentWorkId);
-  if (!k) { panel.innerHTML = 'No kinship data'; return; }
-  const fmt = (list, label) => list.length
-    ? `<div style="color:#c8ff00;margin-top:4px">${label}</div>` +
-      list.slice(0,3).map(w => `<div>· ${w.title} <span style="color:#555">(${w.similarity}%)</span></div>`).join('')
-    : '';
-  panel.innerHTML = `
-    <div>Work: <span style="color:#c8ff00">${k.work?.title || '?'}</span> · gen ${k.work?.generation || 0}</div>
-    ${fmt(k.parents || [], 'Parents')}
-    ${fmt(k.siblings || [], 'Siblings')}
-    ${fmt(k.similar || [], 'Similar')}
-    <div style="color:#555;margin-top:4px">${k.total_relationships || 0} total relationships</div>
-  `;
-});
-
-// ==================== AI PROMPT HANDLER ====================
-
-$('btn-prompt').addEventListener('click', async () => {
-  const prompt = $('prompt-input').value.trim();
-  if (!prompt) return;
-  const result = $('prompt-result');
-  result.style.display = 'block';
-  result.textContent = '🤖 Thinking…';
-
-  if (API.connected && API.currentWorkId) {
-    result.textContent = '✨ Asking Claude…';
-    try {
-      const r = await fetch(`${API.base}/v1/prompt`, {
-        method: 'POST', headers: API.headers(),
-        body: JSON.stringify({ work_id: API.currentWorkId, prompt })
-      }).then(r => r.json());
-      if (r.child_id) {
-        API.currentWorkId = r.child_id;
-        const src = r.used_claude ? '✨ Claude' : '🤖 local';
-        result.textContent = `${src}: ${r.intent} · ${r.operations_applied?.join(', ')}`;
-        toast(`${src}: ${r.intent}`);
-        return;
-      }
-    } catch(e) {}
-    result.textContent = '⚠️ Server prompt failed, applying locally…';
-  }
-
-  const p = prompt.toLowerCase();
-  let action = null;
-  let param = {};
-
-  if (p.includes('glitch') || p.includes('corrupt') || p.includes('noise')) {
-    action = 'style'; param = { style: 'glitch', mutRate: 3.0, minAlpha: 5 };
-  } else if (p.includes('organic') || p.includes('nature') || p.includes('smooth')) {
-    action = 'style'; param = { style: 'organic', mutRate: 0.5 };
-  } else if (p.includes('dark') || p.includes('void') || p.includes('black')) {
-    action = 'style'; param = { style: 'void', minAlpha: 60 };
-  } else if (p.includes('contrast') || p.includes('vivid') || p.includes('saturate')) {
-    action = 'boost'; param = { boost: 'contrast' };
-  } else if (p.includes('fast') || p.includes('speed') || p.includes('quick')) {
-    action = 'param'; param = { speed: 80 };
-  } else if (p.includes('slow') || p.includes('precise') || p.includes('careful')) {
-    action = 'param'; param = { speed: 5, mutRate: 0.2 };
-  } else if (p.includes('more polygon') || p.includes('detail') || p.includes('complex')) {
-    action = 'param'; param = { polyCount: Math.min(300, state.polyCount + 50) };
-  } else if (p.includes('fewer') || p.includes('simple') || p.includes('minimal')) {
-    action = 'param'; param = { polyCount: Math.max(10, state.polyCount - 30) };
-  }
-
-  if (action === 'style' && param.style === 'glitch') {
-    state.mutRate = param.mutRate || 3.0;
-    state.minAlpha = param.minAlpha || 5;
-    state.polygons.forEach(p => {
-      if (Math.random() < 0.3) {
-        p.r = Math.floor(Math.random() * 255);
-        p.g = Math.floor(Math.random() * 255);
-        p.b = Math.floor(Math.random() * 255);
-      }
-    });
-    result.textContent = '🎨 Glitch mode: high mutation, color chaos applied';
-    toast('✨ Glitch mode engaged');
-  } else if (action === 'style' && param.style === 'organic') {
-    state.mutRate = param.mutRate || 0.5;
-    result.textContent = '🌿 Organic mode: slow careful mutations';
-    toast('✨ Organic mode');
-  } else if (action === 'style' && param.style === 'void') {
-    state.minAlpha = param.minAlpha || 60;
-    state.polygons.forEach(p => { p.r = Math.floor(p.r * 0.3); p.g = Math.floor(p.g * 0.3); p.b = Math.floor(p.b * 0.3); });
-    result.textContent = '🖤 Void mode: darkened palette, high opacity';
-    toast('✨ Void mode');
-  } else if (action === 'param') {
-    if (param.speed !== undefined) state.speed = param.speed;
-    if (param.mutRate !== undefined) state.mutRate = param.mutRate;
-    if (param.polyCount !== undefined) {
-      while (state.polygons.length < param.polyCount) state.polygons.push(randPoly());
-      state.polygons.length = Math.max(state.polygons.length, param.polyCount);
-      state.polyCount = param.polyCount;
-    }
-    result.textContent = `✅ Applied: ${JSON.stringify(param)}`;
-    toast('✨ Parameters updated');
-  } else {
-    if (API.connected && API.currentWorkId) {
-      result.textContent = `🤖 No specific action for "${prompt}" — try: glitch, organic, void, fast, slow, more detail`;
-    } else {
-      result.textContent = `Try: "make it glitchy", "more contrast", "organic", "void", "fast", "more detail"`;
-    }
-  }
-
-  if (API.connected && state.hasTarget && action) {
-    setTimeout(async () => {
-      const genome = exportCurrentGenome();
-      const saved = await API.saveWork(`${prompt} · gen ${state.generation}`, genome, ['ai-prompt', action]);
-      if (saved) result.textContent += ` · saved to server (${saved.style})`;
-    }, 500);
-  }
-});
-
-// ==================== INITIALIZATION ====================
-
-updateOperatorStats();
+// ── STARTUP ───────────────────────────────────
 updateHUD();
-setupDraggableSidebar();
-setTimeout(() => API.connect(), 500);
-setInterval(() => { updateHUD(); }, 30000);
-window.addEventListener('orientationchange', () => { setTimeout(setupDraggableSidebar, 100); });
-
+$('btn-hud').classList.add('active');
+setTimeout(()=>API.connect(),800);
+setInterval(()=>{if(API.connected)API.fetchStats();},60000);
 </script>
 </body>
 </html>
