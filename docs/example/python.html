@@ -2,87 +2,219 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Examples - PIGMENT API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Python Examples - PIGMENT v6 API</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../../css/docs.css">
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">[header]</header>
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">[sidebar]</aside>
         <main class="docs-content">
             <div class="content-container">
                 <h1>Python Examples</h1>
-                <p class="lead">Complete Python examples for all PIGMENT API endpoints.</p>
+                <p class="lead">Complete Python examples using the <code>requests</code> library.</p>
 
                 <h2>Installation</h2>
-                <pre><code>pip install pigment-api</code></pre>
+                <div class="code-block">
+                    <pre><code>pip install requests</code></pre>
+                </div>
 
-                <h2>Basic Setup</h2>
-                <pre><code>import os
-from pigment import PigmentClient
+                <h2>Complete Example Script</h2>
+                <div class="code-block">
+                    <pre><code>import requests
+import time
+import json
 
-client = PigmentClient(
-    api_key=os.environ.get('PIGMENT_API_KEY')
-)</code></pre>
+# Configuration
+API_URL = "https://pigment-api.onrender.com"
+API_KEY = None  # Will be set after registration
 
-                <h2>Evolve Image</h2>
-                <pre><code>import time
-
-def evolve_image():
-    job = client.evolve(
-        target_url='https://example.com/image.jpg',
-        generations=1000
+def get_api_key(email):
+    """Register a new user and get API key"""
+    response = requests.post(
+        f"{API_URL}/v1/users",
+        json={"email": email}
     )
+    response.raise_for_status()
+    data = response.json()
+    return data["api_key"]
 
-    while True:
-        status = client.get_job_status(job['job_id'])
-        print(f"Progress: {status['progress']}%")
-        
-        if status['status'] != 'processing':
-            break
-        time.sleep(1)
-
-    print(f"Result: {status['result']['image_url']}")</code></pre>
-
-                <h2>Using Prompts</h2>
-                <pre><code>def generate_with_prompt():
-    result = client.prompt(
-        prompt='a serene landscape with mountains',
-        style='realistic',
-        iterations=500
+def create_work(api_key, title, content, tags=None):
+    """Create a new artwork"""
+    response = requests.post(
+        f"{API_URL}/v1/works",
+        headers={"X-API-Key": api_key},
+        json={
+            "title": title,
+            "content": content,
+            "tags": tags or []
+        }
     )
-    return result</code></pre>
+    response.raise_for_status()
+    return response.json()
 
-                <h2>Kinship Analysis</h2>
-                <pre><code>def analyze_family_tree():
-    lineage = client.kinship.get_lineage(
-        work_id='work_123',
-        generations=3
+def evolve_work(api_key, work_id, steps=500, mutation_rate=1.0):
+    """Evolve an artwork"""
+    response = requests.post(
+        f"{API_URL}/v1/evolve",
+        headers={"X-API-Key": api_key},
+        json={
+            "work_id": work_id,
+            "steps": steps,
+            "mutation_rate": mutation_rate
+        }
     )
+    response.raise_for_status()
+    return response.json()
+
+def get_kinship(api_key, work_id):
+    """Get kinship relationships"""
+    response = requests.post(
+        f"{API_URL}/v1/kinship",
+        headers={"X-API-Key": api_key},
+        json={"work_id": work_id}
+    )
+    response.raise_for_status()
+    return response.json()
+
+def search_similar(api_key, work_id, limit=5):
+    """Find similar works"""
+    response = requests.post(
+        f"{API_URL}/v1/search/similar",
+        headers={"X-API-Key": api_key},
+        json={"work_id": work_id, "limit": limit}
+    )
+    response.raise_for_status()
+    return response.json()
+
+def apply_prompt(api_key, work_id, prompt):
+    """Apply AI prompt to artwork"""
+    response = requests.post(
+        f"{API_URL}/v1/prompt",
+        headers={"X-API-Key": api_key},
+        json={"work_id": work_id, "prompt": prompt}
+    )
+    response.raise_for_status()
+    return response.json()
+
+def list_gallery(api_key, limit=10):
+    """Browse public gallery"""
+    response = requests.get(
+        f"{API_URL}/v1/gallery",
+        headers={"X-API-Key": api_key},
+        params={"limit": limit}
+    )
+    response.raise_for_status()
+    return response.json()
+
+def main():
+    # 1. Get API key
+    print("Registering user...")
+    api_key = get_api_key("user@example.com")
+    print(f"API Key: {api_key}")
     
-    for ancestor in lineage['ancestors']:
-        print(f"Ancestor: {ancestor['id']} - "
-              f"Similarity: {ancestor['similarity']}")</code></pre>
+    # 2. Sample genome
+    genome = '''-- PIGMENT Genome v6.0.0
+-- @fitness 0.0
 
-                <h2>Async Support</h2>
-                <pre><code>import asyncio
-from pigment import AsyncPigmentClient
+canvas { width: 400 height: 400 }
 
-async def async_example():
-    client = AsyncPigmentClient(api_key=os.environ.get('PIGMENT_API_KEY'))
-    result = await client.evolve(target_url='https://example.com/image.jpg')
-    return result</code></pre>
+palette { color_0: #ff3366 }
 
-                <div class="pagination">
-                    <a href="javascript.html" class="prev">← JavaScript</a>
-                    <a href="curl.html" class="next">cURL Examples →</a>
+layer base {
+  zone poly_0 {
+    color: palette.color_0
+    opacity: 0.8
+    points: 120,140 180,120 160,200
+  }
+}'''
+    
+    # 3. Create work
+    print("\nCreating artwork...")
+    work = create_work(api_key, "Python Example", genome, ["python", "demo"])
+    print(f"Created work: {work['id']}")
+    
+    # 4. Evolve it
+    print("\nEvolving artwork...")
+    evolved = evolve_work(api_key, work['id'], steps=500)
+    print(f"Evolved: {evolved['fitness_before']}% → {evolved['fitness_after']}%")
+    print(f"Best operator: {evolved['operator']}")
+    
+    # 5. Check kinship
+    print("\nChecking kinship...")
+    kinship = get_kinship(api_key, evolved['child_id'])
+    print(f"Parents: {len(kinship.get('parents', []))}")
+    print(f"Children: {len(kinship.get('children', []))}")
+    print(f"Siblings: {len(kinship.get('siblings', []))}")
+    
+    # 6. Apply prompt
+    print("\nApplying AI prompt...")
+    prompt_result = apply_prompt(api_key, evolved['child_id'], "make it glitchy")
+    print(f"AI intent: {prompt_result.get('intent', 'N/A')}")
+    print(f"Operations: {prompt_result.get('operations_applied', [])}")
+    
+    # 7. Browse gallery
+    print("\nBrowsing gallery...")
+    gallery = list_gallery(api_key, limit=5)
+    print(f"Total works: {gallery['total']}")
+    for work in gallery['works'][:3]:
+        print(f"  - {work['title']}: {work['fitness']}% ({work['style']})")
+
+if __name__ == "__main__":
+    main()</code></pre>
+                </div>
+
+                <h2>Async Python with aiohttp</h2>
+                <div class="code-block">
+                    <pre><code>import aiohttp
+import asyncio
+
+async def evolve_async():
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            "https://pigment-api.onrender.com/v1/evolve",
+            headers={"X-API-Key": "your-key"},
+            json={"work_id": "work_abc123", "steps": 500}
+        ) as response:
+            return await response.json()
+
+# Run
+result = asyncio.run(evolve_async())</code></pre>
+                </div>
+
+                <h2>Error Handling Example</h2>
+                <div class="code-block">
+                    <pre><code>import requests
+from requests.exceptions import RequestException
+import time
+
+def safe_api_call(func, *args, max_retries=3, **kwargs):
+    """Make API call with retry logic"""
+    for attempt in range(max_retries):
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 429:  # Rate limited
+                wait = (2 ** attempt) + 1
+                print(f"Rate limited. Waiting {wait}s...")
+                time.sleep(wait)
+                continue
+            elif e.response.status_code == 401:
+                print("Authentication error - check your API key")
+                break
+            else:
+                print(f"HTTP Error: {e}")
+                break
+        except RequestException as e:
+            print(f"Network error: {e}")
+            break
+    return None</code></pre>
                 </div>
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+    <footer class="docs-footer">[footer]</footer>
 </body>
 </html>
