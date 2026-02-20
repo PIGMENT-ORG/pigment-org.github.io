@@ -1,0 +1,127 @@
+/* PIGMENT v6 - Main Stylesheet */
+:root {
+  --ink: #0a0a0a;
+  --paper: #f0ede6;
+  --dim: #b8b4ac;
+  --accent: #c8ff00;
+  --red: #ff3b2f;
+  --blue: #0051ff;
+  --purple: #8a6ae0;
+  --mono: 'DM Mono', monospace;
+  --display: 'Unbounded', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--mono);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--display);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h1 { font-size: 48px; }
+h2 { font-size: 36px; }
+h3 { font-size: 24px; }
+
+.accent { color: var(--accent); }
+
+/* Links */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+a:hover {
+  opacity: 0.8;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--ink);
+}
+.btn-primary:hover {
+  background: #d4ff26;
+  transform: translateY(-2px);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid #2a2a2a;
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Cards */
+.card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* Code blocks */
+pre, code {
+  font-family: var(--mono);
+  background: #0a0a0a;
+  border-radius: 6px;
+}
+pre {
+  padding: 16px;
+  overflow-x: auto;
+  border: 1px solid #2a2a2a;
+}
+code {
+  padding: 2px 6px;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: 24px;
+}
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  h1 { font-size: 36px; }
+  h2 { font-size: 28px; }
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
