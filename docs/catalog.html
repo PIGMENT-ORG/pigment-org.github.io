@@ -2,58 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Changelog - PIGMENT API</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../css/docs.css">
+    <style>
+        .version-block {
+            border-left: 3px solid var(--accent);
+            padding: 1.5rem 0 1.5rem 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+        .version-marker {
+            position: absolute;
+            left: -12px;
+            top: 1.5rem;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 3px solid var(--ink);
+        }
+        .version-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .version-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        .tag-feature { background: #1a3a1a; color: #2dce89; }
+        .tag-fix { background: #3a1a1a; color: #ff6b6b; }
+        .tag-api { background: #1a1a3a; color: #6b9aff; }
+    </style>
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo"><a href="../index.html">PIGMENT <span>changelog</span></a></div>
+            <nav class="header-nav">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="../blog/index.html">Blog</a>
+                <a href="../showcase/index.html">Showcase</a>
+            </nav>
+        </div>
+    </header>
+
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Documentation</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html">Introduction</a></li>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                    <li><a href="errors.html">Error Handling</a></li>
+                    <li><a href="changelog.html" class="active">Changelog</a></li>
+                </ul>
+            </div>
+        </aside>
+
         <main class="docs-content">
             <div class="content-container">
                 <h1>Changelog</h1>
-                <p class="lead">Latest updates and improvements to the PIGMENT API.</p>
+                <p class="lead">All notable changes to the PIGMENT v6 API.</p>
 
-                <h2>v6.0.0 - March 2026</h2>
-                <ul>
-                    <li>✨ AI-powered evolution with Claude integration</li>
-                    <li>🔗 Kinship system for tracking artwork relationships</li>
-                    <li>⚡ WebSocket support for real-time updates</li>
-                    <li>📊 New 16D feature vectors for similarity matching</li>
-                    <li>🚀 3x faster evolution engine</li>
-                </ul>
-
-                <h2>v5.2.0 - February 2026</h2>
-                <ul>
-                    <li>Added batch processing endpoint</li>
-                    <li>Improved error messages</li>
-                    <li>Lower latency for small images</li>
-                </ul>
-
-                <h2>v5.1.0 - January 2026</h2>
-                <ul>
-                    <li>Webhook support for job completion</li>
-                    <li>New mutation strategies</li>
-                    <li>API client libraries for JS/Python</li>
-                </ul>
-
-                <h2>v5.0.0 - December 2025</h2>
-                <ul>
-                    <li>Initial public release</li>
-                    <li>Basic evolution API</li>
-                    <li>REST endpoints</li>
-                </ul>
-
-                <div class="pagination">
-                    <a href="faq.html" class="prev">← FAQ</a>
-                    <a href="#" class="next disabled">Latest →</a>
+                <div class="version-block">
+                    <div class="version-marker"></div>
+                    <h2>v6.1.0 <span class="version-date">March 2026</span></h2>
+                    <p><span class="version-tag tag-feature">FEATURE</span> <span class="version-tag tag-api">NEW ENDPOINT</span></p>
+                    <ul>
+                        <li>Added <code>/v1/prompt</code> endpoint for AI-guided evolution</li>
+                        <li>Introduced 8 new mutation operators for richer evolution</li>
+                        <li>Kinship system now includes "cousin" relationships</li>
+                        <li>WebSocket support for real-time evolution progress</li>
+                    </ul>
                 </div>
+
+                <div class="version-block">
+                    <div class="version-marker"></div>
+                    <h2>v6.0.0 <span class="version-date">February 2026</span></h2>
+                    <p><span class="version-tag tag-feature">MAJOR RELEASE</span></p>
+                    <ul>
+                        <li>Complete rewrite with pure Python stdlib backend</li>
+                        <li>16-dimensional feature vectors for kinship analysis</li>
+                        <li>6 mutation operators: scale, rotate, color, translate, opacity, intelligent</li>
+                        <li>Real-time evolution with adaptive strategies</li>
+                        <li>SQLite database with full kinship tracking</li>
+                    </ul>
+                </div>
+
+                <div class="version-block">
+                    <div class="version-marker"></div>
+                    <h2>v5.3.0 <span class="version-date">December 2025</span></h2>
+                    <p><span class="version-tag tag-feature">FEATURE</span> <span class="version-tag tag-fix">IMPROVEMENT</span></p>
+                    <ul>
+                        <li>Improved error messages with <code>request_id</code> tracking</li>
+                        <li>Added <code>/v1/search/similar</code> endpoint for finding related works</li>
+                        <li>Rate limiting headers now included in all responses</li>
+                        <li>Performance optimizations for large works</li>
+                    </ul>
+                </div>
+
+                <div class="version-block">
+                    <div class="version-marker"></div>
+                    <h2>v5.2.0 <span class="version-date">October 2025</span></h2>
+                    <p><span class="version-tag tag-feature">FEATURE</span></p>
+                    <ul>
+                        <li>Added <code>/v1/ancestry</code> endpoint for full lineage tracking</li>
+                        <li>Style detection now classifies glitch/organic/void</li>
+                        <li>Genome editor with .pg file support</li>
+                        <li>Training data collection for operator success rates</li>
+                    </ul>
+                </div>
+
+                <div class="version-block">
+                    <div class="version-marker"></div>
+                    <h2>v5.1.0 <span class="version-date">August 2025</span></h2>
+                    <p><span class="version-tag tag-fix">FIX</span> <span class="version-tag tag-api">ENDPOINT</span></p>
+                    <ul>
+                        <li>Fixed pagination in <code>/v1/works</code> and <code>/v1/gallery</code></li>
+                        <li>Added style filtering to list endpoints</li>
+                        <li>Improved JSON validation error messages</li>
+                        <li>Documentation updates with examples</li>
+                    </ul>
+                </div>
+
+                <div class="version-block">
+                    <div class="version-marker"></div>
+                    <h2>v5.0.0 <span class="version-date">June 2025</span></h2>
+                    <p><span class="version-tag tag-feature">INITIAL RELEASE</span></p>
+                    <ul>
+                        <li>Initial public release of PIGMENT v5</li>
+                        <li>Basic evolution endpoints (<code>/v1/works</code>, <code>/v1/evolve</code>)</li>
+                        <li>Simple kinship based on cosine similarity</li>
+                        <li>SQLite persistence with 5 mutation operators</li>
+                    </ul>
+                </div>
+
+                <h2>Upcoming Features</h2>
+                <ul>
+                    <li>Batch evolution for multiple works simultaneously</li>
+                    <li>Custom mutation operator plugins</li>
+                    <li>FAISS-powered kinship for faster similarity search</li>
+                    <li>Export to multiple image formats (SVG, PNG, PDF)</li>
+                    <li>User collections and galleries</li>
+                </ul>
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+
+    <footer class="docs-footer">[footer]</footer>
 </body>
 </html>
