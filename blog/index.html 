@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIGMENT v6 Blog - AI Art Evolution</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .blog-header {
+      text-align: center;
+      padding: 60px 24px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 32px;
+      max-width: 1200px;
+      margin: 48px auto;
+      padding: 0 24px;
+    }
+    .blog-card {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .blog-card:hover {
+      transform: translateY(-4px);
+      border-color: #c8ff00;
+    }
+    .blog-card-image {
+      height: 200px;
+      background: linear-gradient(45deg, #2a2a2a, #1a1a1a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+    .blog-card-content {
+      padding: 24px;
+    }
+    .blog-card-date {
+      color: #666;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .blog-card-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .blog-card-excerpt {
+      color: #b8b4ac;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .blog-card-link {
+      color: #c8ff00;
+      text-decoration: none;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>...</header>
+
+  <div class="blog-header">
+    <h1>PIGMENT <span class="accent">Blog</span></h1>
+    <p style="color: #b8b4ac; max-width: 600px; margin: 0 auto;">Deep dives into genetic algorithms, AI art, and the future of creative coding.</p>
+  </div>
+
+  <div class="blog-grid">
+    <a href="/blog/genetic-algorithms.html" class="blog-card" style="text-decoration: none;">
+      <div class="blog-card-image">🧬</div>
+      <div class="blog-card-content">
+        <div class="blog-card-date">March 15, 2026</div>
+        <div class="blog-card-title">How Genetic Algorithms Create Art</div>
+        <div class="blog-card-excerpt">Explore the science behind evolutionary art — from random mutations to fitness landscapes.</div>
+        <span class="blog-card-link">Read more →</span>
+      </div>
+    </a>
+
+    <a href="/blog/kinship-explained.html" class="blog-card" style="text-decoration: none;">
+      <div class="blog-card-image">🔗</div>
+      <div class="blog-card-content">
+        <div class="blog-card-date">March 10, 2026</div>
+        <div class="blog-card-title">Kinship: Family Trees for Art</div>
+        <div class="blog-card-excerpt">How FAISS vector search finds parents, siblings, and cousins in your art collection.</div>
+        <span class="blog-card-link">Read more →</span>
+      </div>
+    </a>
+
+    <a href="/blog/ai-prompts.html" class="blog-card" style="text-decoration: none;">
+      <div class="blog-card-image">🤖</div>
+      <div class="blog-card-content">
+        <div class="blog-card-date">March 5, 2026</div>
+        <div class="blog-card-title">Claude + Genetic Algorithms</div>
+        <div class="blog-card-excerpt">How we use Anthropic's Claude to translate "make it glitchy" into structured mutations.</div>
+        <span class="blog-card-link">Read more →</span>
+      </div>
+    </a>
+
+    <a href="/blog/feature-vectors.html" class="blog-card" style="text-decoration: none;">
+      <div class="blog-card-image">📊</div>
+      <div class="blog-card-content">
+        <div class="blog-card-date">February 28, 2026</div>
+        <div class="blog-card-title">16 Dimensions of Art</div>
+        <div class="blog-card-excerpt">Breaking down the perceptual features that make each artwork unique.</div>
+        <span class="blog-card-link">Read more →</span>
+      </div>
+    </a>
+  </div>
+</body>
+</html>
