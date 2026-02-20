@@ -2,89 +2,365 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>/v1/evolve - PIGMENT API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Evolve API - PIGMENT v6 Docs</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../../css/docs.css">
+    <style>
+        .layer-note {
+            background: #1a1a1a;
+            border-left: 4px solid var(--accent);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .sync-badge {
+            display: inline-block;
+            background: #1a3a1a;
+            color: #2dce89;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .async-badge {
+            display: inline-block;
+            background: #3a1a1a;
+            color: #ff9f0a;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+            <nav class="header-nav">
+                <a href="../../index.html">Home</a>
+                <a href="../index.html" class="active">Docs</a>
+                <a href="../../blog/index.html">Blog</a>
+                <a href="../../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="../getting-started.html" class="btn btn-primary">Quick Start</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../index.html">Introduction</a></li>
+                    <li><a href="../getting-started.html">Quick Start</a></li>
+                    <li><a href="../authentication.html">Authentication</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="works.html">/v1/works</a></li>
+                    <li><a href="evolve.html" class="active">/v1/evolve</a></li>
+                    <li><a href="kinship.html">/v1/kinship</a></li>
+                    <li><a href="prompt.html">/v1/prompt</a></li>
+                    <li><a href="gallery.html">/v1/gallery</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Examples</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../examples/javascript.html">JavaScript</a></li>
+                    <li><a href="../examples/python.html">Python</a></li>
+                    <li><a href="../examples/curl.html">cURL</a></li>
+                </ul>
+            </div>
+        </aside>
+
         <main class="docs-content">
             <div class="content-container">
-                <h1><code>/v1/evolve</code></h1>
-                <p class="lead">Start an evolution job to generate artwork from a target image.</p>
+                <div class="endpoint-header">
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-path">/v1/evolve</span>
+                </div>
+
+                <h1>Evolve API</h1>
+                <p class="lead">Apply genetic algorithm mutations to an existing artwork to create a new evolved version.</p>
+
+                <div class="layer-note">
+                    <strong>📌 Deployment Note:</strong> PIGMENT v6 has two deployment modes:
+                    <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                        <li><span class="sync-badge">Layer 2 (server.py)</span> — Synchronous: returns result immediately</li>
+                        <li><span class="async-badge">Layer 3/4 (FastAPI)</span> — Asynchronous: returns job_id, poll for result</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem; margin-bottom: 0;">Your current deployment at <code>https://pigment-api.onrender.com</code> uses <strong>Layer 2 (synchronous)</strong>.</p>
+                </div>
 
                 <h2>Start Evolution</h2>
-                <p><code>POST /v1/evolve</code></p>
+                <p>Evolve an existing artwork by applying genetic mutations.</p>
 
-                <h3>Request Body</h3>
-                <table>
-                    <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
-                    <tr><td>target_url</td><td>string</td><td>Yes*</td><td>Publicly accessible image URL</td></tr>
-                    <tr><td>target_image</td><td>string</td><td>Yes*</td><td>Base64 encoded image</td></tr>
-                    <tr><td>generations</td><td>integer</td><td>No</td><td>Number of generations (100-10000, default 1000)</td></tr>
-                    <tr><td>polygons</td><td>integer</td><td>No</td><td>Number of polygons (10-500, default 100)</td></tr>
-                    <tr><td>mutation_rate</td><td>float</td><td>No</td><td>Mutation rate (0.01-1.0, default 0.1)</td></tr>
-                    <tr><td>strategy</td><td>string</td><td>No</td><td>Evolution strategy</td></tr>
-                    <tr><td>webhook_url</td><td>string</td><td>No</td><td>URL to notify when complete</td></tr>
-                </table>
-                <p>* Either target_url or target_image is required.</p>
+                <div class="endpoint-card">
+                    <div class="endpoint-card-header">
+                        <span class="method">POST</span>
+                        <span class="path">/v1/evolve</span>
+                    </div>
 
-                <h3>Example Request</h3>
-                <pre><code>curl -X POST https://api.pigment.dev/v1/evolve \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+                    <h3>Request Body</h3>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>work_id</code></td>
+                                <td>string</td>
+                                <td>Yes</td>
+                                <td>ID of the artwork to evolve</td>
+                            </tr>
+                            <tr>
+                                <td><code>steps</code></td>
+                                <td>integer</td>
+                                <td>No</td>
+                                <td>Number of evolution steps (1-2000, default 100)</td>
+                            </tr>
+                            <tr>
+                                <td><code>mutation_rate</code></td>
+                                <td>float</td>
+                                <td>No</td>
+                                <td>Mutation intensity (0.1-5.0, default 1.0)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Example Request</h3>
+                    <div class="code-block">
+                        <pre><code>curl -X POST https://pigment-api.onrender.com/v1/evolve \
+  -H "X-API-Key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{
-    "target_url": "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d",
-    "generations": 1000,
-    "polygons": 150,
-    "mutation_rate": 0.15
+    "work_id": "work_2a7f8c3e1b9d4f6",
+    "steps": 500,
+    "mutation_rate": 1.5
   }'</code></pre>
+                    </div>
 
-                <h3>Response</h3>
-                <pre><code>{
-    "job_id": "job_abc123",
-    "estimated_seconds": 45,
-    "status": "processing"
+                    <h3>Response (Synchronous - Layer 2)</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "parent_id": "work_2a7f8c3e1b9d4f6",
+  "child_id": "work_3b8g9d4f2e1a5c7",
+  "generation": 1,
+  "fitness_before": 38.7,
+  "fitness_after": 52.3,
+  "improvement": 13.6,
+  "steps_run": 500,
+  "operator": "scale",
+  "style": "abstract",
+  "genome_preview": "-- PIGMENT Genome v6.0.0\n-- @fitness 52.3\n-- @generation 1..."
 }</code></pre>
+                    </div>
 
-                <h2>Check Job Status</h2>
-                <p><code>GET /v1/jobs/{job_id}</code></p>
-
-                <h3>Response (Processing)</h3>
-                <pre><code>{
-    "status": "processing",
-    "progress": 42,
-    "current_fitness": 67.3,
-    "best_fitness": 67.3,
-    "generation": 420
+                    <h3>Response (Asynchronous - Layer 3/4)</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "job_id": "job_abc123def456",
+  "status": "queued",
+  "message": "Evolution job queued — poll GET /v1/jobs/job_abc123def456 for result"
 }</code></pre>
+                    </div>
+                </div>
 
-                <h3>Response (Completed)</h3>
-                <pre><code>{
-    "status": "completed",
-    "progress": 100,
-    "result": {
-        "work_id": "work_123",
-        "image_url": "https://storage.pigment.dev/result_123.png",
-        "fitness": 98.5,
-        "generations": 1000,
-        "duration_ms": 45678
-    }
+                <h2>Check Job Status (Layer 3/4 Only)</h2>
+                <p>If you're using the FastAPI deployment, evolution jobs run asynchronously. Poll this endpoint for status updates.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-card-header">
+                        <span class="method">GET</span>
+                        <span class="path">/v1/jobs/{job_id}</span>
+                    </div>
+
+                    <h3>Example Request</h3>
+                    <div class="code-block">
+                        <pre><code>curl https://pigment-api.onrender.com/v1/jobs/job_abc123def456 \
+  -H "X-API-Key: your-api-key"</code></pre>
+                    </div>
+
+                    <h3>Response (Processing)</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "id": "job_abc123def456",
+  "type": "evolve",
+  "status": "running",
+  "payload": {
+    "work_id": "work_2a7f8c3e1b9d4f6",
+    "steps": 500
+  },
+  "created_at": "2026-02-21T12:00:00Z",
+  "started_at": "2026-02-21T12:00:01Z",
+  "worker_id": "worker_01"
 }</code></pre>
+                    </div>
 
-                <h2>WebSocket Real-time Updates</h2>
-                <p>Connect to <code>wss://api.pigment.dev/v1/ws</code> with your API key:</p>
-                <pre><code>const ws = new WebSocket('wss://api.pigment.dev/v1/ws?token=YOUR_API_KEY');
+                    <h3>Response (Completed)</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "id": "job_abc123def456",
+  "type": "evolve",
+  "status": "completed",
+  "result": {
+    "parent_id": "work_2a7f8c3e1b9d4f6",
+    "child_id": "work_3b8g9d4f2e1a5c7",
+    "generation": 1,
+    "fitness_before": 38.7,
+    "fitness_after": 52.3,
+    "improvement": 13.6,
+    "operator": "scale",
+    "style": "abstract"
+  },
+  "created_at": "2026-02-21T12:00:00Z",
+  "completed_at": "2026-02-21T12:00:05Z"
+}</code></pre>
+                    </div>
+                </div>
 
+                <h2>Real-time Updates via WebSocket</h2>
+                <p>For real-time evolution progress (Layer 3/4 only), connect to our WebSocket endpoint:</p>
+
+                <div class="code-block">
+                    <pre><code>// Connect to WebSocket
+const ws = new WebSocket('wss://pigment-api.onrender.com/ws/user_123');
+
+// Send authentication
+ws.onopen = () => {
+    ws.send(JSON.stringify({
+        type: 'auth',
+        api_key: 'your-api-key'
+    }));
+};
+
+// Subscribe to job updates
+ws.send(JSON.stringify({
+    type: 'subscribe_job',
+    job_id: 'job_abc123def456'
+}));
+
+// Listen for updates
 ws.onmessage = (event) => {
-    const update = JSON.parse(event.data);
-    console.log(`Progress: ${update.progress}%`);
-    console.log(`Current fitness: ${update.fitness}%`);
+    const data = JSON.parse(event.data);
+    
+    switch(data.type) {
+        case 'evolution_tick':
+            console.log(`Step ${data.generation}: ${data.fitness}% fitness`);
+            console.log(`Progress: ${Math.round(data.progress * 100)}%`);
+            break;
+            
+        case 'evolution_done':
+            console.log('Evolution complete!', data.result);
+            break;
+            
+        case 'error':
+            console.error('Job error:', data.error);
+            break;
+    }
 };</code></pre>
+                </div>
+
+                <h2>Evolution Parameters Explained</h2>
+
+                <h3>Steps</h3>
+                <p>The number of mutation attempts to perform. More steps = more evolved but slower. Recommended ranges:</p>
+                <ul>
+                    <li><strong>100-500:</strong> Quick experiments</li>
+                    <li><strong>500-1000:</strong> Balanced evolution</li>
+                    <li><strong>1000-2000:</strong> Deep refinement</li>
+                </ul>
+
+                <h3>Mutation Rate</h3>
+                <p>Controls how aggressive mutations are:</p>
+                <ul>
+                    <li><strong>0.1-0.5:</strong> Fine-tuning, small changes</li>
+                    <li><strong>0.5-1.5:</strong> Balanced (default)</li>
+                    <li><strong>1.5-3.0:</strong> Exploration, large jumps</li>
+                    <li><strong>3.0-5.0:</strong> Chaos mode (glitchy effects)</li>
+                </ul>
+
+                <h2>Mutation Operators</h2>
+                <p>The system selects from these operators based on success history:</p>
+
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Operator</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>scale</code></td><td>Resize polygons relative to their center</td></tr>
+                        <tr><td><code>translate</code></td><td>Move polygons in x/y direction</td></tr>
+                        <tr><td><code>color</code></td><td>Shift RGB values of a polygon</td></tr>
+                        <tr><td><code>opacity</code></td><td>Change polygon transparency</td></tr>
+                        <tr><td><code>rotate</code></td><td>Rotate polygon around its center</td></tr>
+                        <tr><td><code>addpoint</code></td><td>Add a vertex to increase complexity</td></tr>
+                        <tr><td><code>intelligent</code></td><td>Use best-performing operator</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>Error Responses</h2>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>400</td><td>Missing work_id or invalid parameters</td></tr>
+                        <tr><td>401</td><td>Missing or invalid API key</td></tr>
+                        <tr><td>403</td><td>Not authorized to evolve this work</td></tr>
+                        <tr><td>404</td><td>Work not found</td></tr>
+                        <tr><td>429</td><td>Rate limit exceeded</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>Complete Example Workflow</h2>
+
+                <div class="code-block">
+                    <pre><code>// 1. Create a work
+const work = await fetch('https://pigment-api.onrender.com/v1/works', {
+    method: 'POST',
+    headers: { 'X-API-Key': 'your-key' },
+    body: JSON.stringify({
+        title: 'My Art',
+        content: '-- PIGMENT Genome...'
+    })
+}).then(r => r.json());
+
+// 2. Evolve it (synchronous)
+const evolved = await fetch('https://pigment-api.onrender.com/v1/evolve', {
+    method: 'POST',
+    headers: { 'X-API-Key': 'your-key' },
+    body: JSON.stringify({
+        work_id: work.id,
+        steps: 1000,
+        mutation_rate: 1.2
+    })
+}).then(r => r.json());
+
+console.log(`Fitness improved: ${evolved.fitness_before}% → ${evolved.fitness_after}%`);
+console.log(`Best operator: ${evolved.operator}`);</code></pre>
+                </div>
 
                 <div class="pagination">
                     <a href="works.html" class="prev">← /v1/works</a>
@@ -93,6 +369,41 @@ ws.onmessage = (event) => {
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+
+    <footer class="docs-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="../../index.html">Home</a></li>
+                    <li><a href="../index.html">Documentation</a></li>
+                    <li><a href="../../blog/index.html">Blog</a></li>
+                    <li><a href="../../showcase/index.html">Showcase</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="../getting-started.html">Quick Start</a></li>
+                    <li><a href="../authentication.html">Authentication</a></li>
+                    <li><a href="works.html">Works</a></li>
+                    <li><a href="evolve.html">Evolve</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="../../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+                    <li><a href="../../blog/kinship-explained.html">Kinship System</a></li>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved. · v6.0.0</p>
+        </div>
+    </footer>
+
+    <script src="../../js/docs.js"></script>
 </body>
 </html>
