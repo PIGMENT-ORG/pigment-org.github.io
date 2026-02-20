@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Showcase - PIGMENT Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .showcase-item {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .showcase-item:hover {
+            transform: scale(1.02);
+            border-color: var(--accent);
+        }
+        .showcase-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        .showcase-info {
+            padding: 1rem;
+        }
+        .showcase-title {
+            font-family: var(--display);
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+        .showcase-meta {
+            color: #666;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .showcase-fitness {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+        .filter-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: var(--dim);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            color: var(--ink);
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo"><a href="../index.html">PIGMENT <span>showcase</span></a></div>
+            <nav class="header-nav">
+                <a href="../index.html">Home</a>
+                <a href="../docs/index.html">Docs</a>
+                <a href="../blog/index.html">Blog</a>
+                <a href="index.html" class="active">Showcase</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="docs-content" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+        <h1>Community Showcase</h1>
+        <p class="lead">Explore artwork created with PIGMENT's genetic algorithms and AI prompts.</p>
+
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="glitch">Glitch</button>
+            <button class="filter-btn" data-filter="organic">Organic</button>
+            <button class="filter-btn" data-filter="void">Void</button>
+            <button class="filter-btn" data-filter="abstract">Abstract</button>
+        </div>
+
+        <div class="showcase-grid" id="showcase-grid">
+            <!-- Populated by JavaScript -->
+        </div>
+    </main>
+
+    <footer class="docs-footer">[footer]</footer>
+
+    <script>
+        const artworks = [
+            { id: 1, title: "Neon Genesis", style: "glitch", fitness: 98.5, generations: 1542, tags: ["featured", "neon"] },
+            { id: 2, title: "Forest Dreams", style: "organic", fitness: 97.2, generations: 2310, tags: ["nature"] },
+            { id: 3, title: "Dark Void", style: "void", fitness: 94.8, generations: 876, tags: ["dark"] },
+            { id: 4, title: "Abstract Forms", style: "abstract", fitness: 92.3, generations: 654, tags: ["geometric"] },
+            { id: 5, title: "Glitch Portrait", style: "glitch", fitness: 91.7, generations: 1203, tags: ["portrait"] },
+            { id: 6, title: "Organic Growth", style: "organic", fitness: 90.2, generations: 892, tags: ["growth"] },
+            { id: 7, title: "Void Echo", style: "void", fitness: 88.9, generations: 543, tags: ["minimal"] },
+            { id: 8, title: "Geometric Study", style: "abstract", fitness: 87.5, generations: 765, tags: ["pattern"] }
+        ];
+
+        const grid = document.getElementById('showcase-grid');
+        
+        function render(filter = 'all') {
+            const filtered = filter === 'all' ? artworks : artworks.filter(a => a.style === filter);
+            
+            grid.innerHTML = filtered.map(art => `
+                <div class="showcase-item" onclick="window.location.href='../docs/endpoints/works.html?id=${art.id}'">
+                    <div class="showcase-preview">${art.style === 'glitch' ? '🌀' : art.style === 'organic' ? '🌿' : art.style === 'void' ? '⚫' : '🔷'}</div>
+                    <div class="showcase-info">
+                        <div class="showcase-title">${art.title}</div>
+                        <div class="showcase-meta">
+                            <span>${art.style} · ${art.generations} gen</span>
+                            <span class="showcase-fitness">${art.fitness}%</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                render(btn.dataset.filter);
+            });
+        });
+
+        render();
+    </script>
+</body>
+</html>
