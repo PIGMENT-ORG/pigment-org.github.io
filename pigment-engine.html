@@ -302,7 +302,11 @@
 
     <hr class="hud-divider">
 
-    <!-- Heatmap -->
+    <!-- Fitness sparkline -->
+    <div class="hud-heatmap-title" style="margin-top:8px;">Fitness history</div>
+    <canvas id="hud-sparkline" width="180" height="36" style="width:100%;height:36px;display:block;border-radius:4px;background:#0a0a0a;margin-top:4px;"></canvas>
+
+    <hr class="hud-divider">
     <div class="hud-heatmap">
       <div class="hud-heatmap-title">Error heatmap</div>
       <div class="heatmap-grid" id="hud-heatmap-grid"></div>
@@ -718,9 +722,11 @@ function calcFitness(polys){
   tctx.putImageData(new ImageData(new Uint8ClampedArray(state.targetPixels),state.targetW,state.targetH),0,0);
   const st=tctx.getImageData(0,0,res.w,res.h).data;
   pool.rel(cv);pool.rel(tc);
+  // Adaptive sampling: sample every 16px early on, every 4px at polish — balances speed vs. accuracy
+  const stride = state.fitness < 30 ? 16 : state.fitness < 60 ? 8 : 4;
   let diff=0; const len=st.length;
-  for(let i=0;i<len;i+=16){const dr=ev[i]-st[i],dg=ev[i+1]-st[i+1],db=ev[i+2]-st[i+2];diff+=dr*dr+dg*dg+db*db;}
-  return 100*(1-diff/(3*255*255*(len/16)));
+  for(let i=0;i<len;i+=stride*4){const dr=ev[i]-st[i],dg=ev[i+1]-st[i+1],db=ev[i+2]-st[i+2];diff+=dr*dr+dg*dg+db*db;}
+  return 100*(1-diff/(3*255*255*(len/(stride*4))));
 }
 
 // ── POLYGON HELPERS ───────────────────────────
@@ -730,12 +736,71 @@ function randPoly(){
   const cx=Math.random()*w,cy=Math.random()*h;
   const sides=3+Math.floor(Math.random()*3),pts=[];
   for(let i=0;i<sides;i++){const a=(i/sides)*Math.PI*2+Math.random()*.8,r=size*(.4+Math.random()*.9);pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}
-  return{pts,r:Math.random()*255|0,g:Math.random()*255|0,b:Math.random()*255|0,a:state.minAlpha+Math.random()*160};
+  // Sample colour from target image if available — massive cold-start boost
+  let r=Math.random()*255|0,g=Math.random()*255|0,b=Math.random()*255|0;
+  if(state.targetPixels){
+    const px=Math.max(0,Math.min(w-1,cx|0)),py=Math.max(0,Math.min(h-1,cy|0));
+    const idx=(py*w+px)*4;
+    // blend sampled colour with some randomness to maintain diversity
+    const blend=0.65+Math.random()*0.2;
+    r=Math.max(0,Math.min(255,Math.round(state.targetPixels[idx]*blend   + (Math.random()*255)*(1-blend))));
+    g=Math.max(0,Math.min(255,Math.round(state.targetPixels[idx+1]*blend + (Math.random()*255)*(1-blend))));
+    b=Math.max(0,Math.min(255,Math.round(state.targetPixels[idx+2]*blend + (Math.random()*255)*(1-blend))));
+  }
+  return{pts,r,g,b,a:state.minAlpha+Math.random()*160};
 }
 function clone(p){return{pts:p.pts.map(pt=>[...pt]),r:p.r,g:p.g,b:p.b,a:p.a};}
 
+// ── POLYGON CULLING ───────────────────────────
+// Periodically remove the polygon contributing the least unique fitness value,
+// then spawn a replacement near the current worst error zone.
+function cullWeakPolygons(){
+  if(!state.hasTarget||state.polygons.length<10)return;
+  // Score each polygon: fitness drop when removed (expensive) — use a lighter proxy:
+  // polygons with very low opacity, or fully buried under others, score low.
+  // We use a fast area-weighted opacity proxy instead of full fitness re-eval.
+  let minScore=Infinity, minIdx=0;
+  for(let i=0;i<state.polygons.length;i++){
+    const p=state.polygons[i];
+    // proxy: small area + low opacity = low contribution
+    let area=0;
+    for(let j=0;j<p.pts.length;j++){
+      const nx=(j+1)%p.pts.length;
+      area+=Math.abs(p.pts[j][0]*p.pts[nx][1]-p.pts[nx][0]*p.pts[j][1]);
+    }
+    area/=2;
+    const score=(area/100)*(p.a/255);
+    if(score<minScore){minScore=score;minIdx=i;}
+  }
+  // Replace weak polygon with a fresh spawn near worst error zone
+  const old=state.polygons[minIdx];
+  const replacement=randPoly(); // uses colour sampling
+  // Bias position toward worst error zone
+  const cellW=state.targetW/5,cellH=state.targetH/5;
+  const wx=(state.worstCell.x+0.5)*cellW,wy=(state.worstCell.y+0.5)*cellH;
+  const jitter=cellW;
+  const cx=Math.max(0,Math.min(state.targetW,wx+(Math.random()-.5)*jitter));
+  const cy=Math.max(0,Math.min(state.targetH,wy+(Math.random()-.5)*jitter));
+  const size=8+Math.random()*Math.min(state.targetW,state.targetH)*.15;
+  replacement.pts=[];
+  const sides=3+Math.floor(Math.random()*3);
+  for(let i=0;i<sides;i++){const a=(i/sides)*Math.PI*2+Math.random()*.8,rr=size*(.4+Math.random()*.9);replacement.pts.push([cx+Math.cos(a)*rr,cy+Math.sin(a)*rr]);}
+  // Test if replacement improves fitness — only keep if it does
+  state.polygons[minIdx]=replacement;
+  const newFit=calcFitness(state.polygons);
+  if(newFit>=state.fitness){
+    state.fitness=newFit;
+    if(newFit>state.bestFitness){state.bestFitness=newFit;state.bestPolygons=state.polygons.map(clone);}
+    toast(`♻️ Culled weak polygon — +${(newFit-state.fitness+0.001).toFixed(3)}%`);
+  } else {
+    state.polygons[minIdx]=old; // revert
+  }
+}
+
 // ── MUTATION OPERATORS (expanded) ────────────
-function applyMutation(op, poly){
+function applyMutation(op, poly, polysRef){
+  // polysRef: the current working polygon array (used by merge to avoid stale state.polygons reads)
+  const polys = polysRef || state.polygons;
   const p=clone(poly); const mr=state.mutRate;
   if(op.key==='translate'){const dx=(Math.random()-.5)*30*mr,dy=(Math.random()-.5)*30*mr;p.pts.forEach(pt=>{pt[0]+=dx;pt[1]+=dy;});}
   else if(op.key==='color'){const ch=['r','g','b'][Math.random()*3|0];p[ch]=Math.max(0,Math.min(255,p[ch]+(Math.random()-.5)*80*mr));}
@@ -758,9 +823,13 @@ function applyMutation(op, poly){
   }
   else if(op.key==='spawn'){
     // Replace with a brand new polygon near the worst error zone
-    const wx=state.worstCell.x/4*state.targetW,wy=state.worstCell.y/4*state.targetH;
-    const jitter=state.targetW*.2;
-    const cx=wx+(Math.random()-.5)*jitter,cy=wy+(Math.random()-.5)*jitter;
+    // worstCell is 0-4 grid index — convert to pixel space correctly
+    const cellW=state.targetW/5, cellH=state.targetH/5;
+    const wx=(state.worstCell.x + 0.5) * cellW;   // centre of the worst grid cell
+    const wy=(state.worstCell.y + 0.5) * cellH;
+    const jitter=cellW * 1.2;  // spread within ~1 cell either side
+    const cx=Math.max(0,Math.min(state.targetW, wx+(Math.random()-.5)*jitter));
+    const cy=Math.max(0,Math.min(state.targetH, wy+(Math.random()-.5)*jitter));
     const size=6+Math.random()*Math.min(state.targetW,state.targetH)*.2;
     const sides=3+Math.floor(Math.random()*3);
     p.pts=[];
@@ -778,16 +847,16 @@ function applyMutation(op, poly){
     }
   }
   else if(op.key==='merge'){
-    // Average this poly's colour toward a random neighbour
-    if(state.polygons.length>1){
-      const other=state.polygons[Math.floor(Math.random()*state.polygons.length)];
+    // Average this poly's colour toward a random neighbour (uses passed-in polysRef — no stale global read)
+    if(polys.length>1){
+      const other=polys[Math.floor(Math.random()*polys.length)];
       p.r=((p.r+other.r)/2)|0; p.g=((p.g+other.g)/2)|0; p.b=((p.b+other.b)/2)|0;
     }
   }
   else if(op.key==='intelligent'){
     // Pick operator with best recent success rate
     const best=OPS.filter(o=>o.key!=='intelligent').reduce((b,o)=>(o.attempts>5&&(o.successes/o.attempts)>(b.successes/b.attempts+.001))?o:b, OPS[0]);
-    return applyMutation(best, poly);
+    return applyMutation(best, poly, polys);
   }
   return p;
 }
@@ -802,9 +871,11 @@ function pickStrategy(){
   else           state.phase='polish';
 
   // Stagnation detection: no improvement in N generations
+  // Threshold scales with fitness: more patient at high fitness, more aggressive early
+  const adaptiveThreshold = state.fitness < 30 ? 250 : state.fitness < 60 ? 400 : state.fitness < 80 ? 600 : 900;
   const gensSinceLast=state.generation-state.lastImprovementGen;
   const wasStagnant=state.inStagnation;
-  state.inStagnation=gensSinceLast>state.stagnationThreshold;
+  state.inStagnation=gensSinceLast>adaptiveThreshold;
 
   if(state.inStagnation!==wasStagnant){
     $('stag-alert').classList.toggle('show', state.inStagnation);
@@ -880,7 +951,7 @@ function evolveStep(){
   const op=selectOperator();
   const idx=Math.random()*state.polygons.length|0;
   const old=state.polygons[idx];
-  state.polygons[idx]=applyMutation(op,old);
+  state.polygons[idx]=applyMutation(op, old, state.polygons);
   const newFit=calcFitness(state.polygons);
   const improved=newFit>=state.fitness;
 
@@ -911,6 +982,17 @@ function evolveStep(){
   state.generation++;
   state.mutThisSecond++;
   if(state.generation%100===0)state.fitnessHistory.push({gen:state.generation,fitness:state.fitness,ts:Date.now()});
+  // Auto-save genome to localStorage every 500 gens — survives tab close
+  if(state.generation%500===0 && state.hasTarget){
+    try{
+      localStorage.setItem('pigment_autosave', JSON.stringify({
+        genome: exportCurrentGenome(),
+        gen: state.generation,
+        fitness: state.fitness,
+        ts: Date.now()
+      }));
+    }catch(e){}
+  }
 }
 
 // ── MAIN LOOP ─────────────────────────────────
@@ -933,6 +1015,8 @@ function loop(){
   }
   updateHUD();
   if(state.generation%250===0){updateErrorGrid();updateHudOps();}
+  // Cull weakest polygon every 1000 gens to recycle dead weight
+  if(state.generation%1000===0 && state.generation>0) cullWeakPolygons();
   state.rafId=requestAnimationFrame(loop);
 }
 
@@ -1000,6 +1084,8 @@ function updateHUD(){
   const strat=STRATEGY_TABLE.find(s=>s.id===state.currentStrategyId)||STRATEGY_TABLE[0];
   $('hud-strat-name').textContent=strat.name;
   $('hud-strat-desc').textContent=strat.desc;
+  // sparkline — redraw every 10 frames (cheap enough)
+  if(state.generation%10===0) drawSparkline();
 }
 
 function updateHudOps(){
@@ -1009,6 +1095,31 @@ function updateHudOps(){
     const rate=op.attempts>0?(op.successes/op.attempts*100).toFixed(0):0;
     grid.innerHTML+=`<div class="hud-op-row"><span class="hud-op-name">${op.key}</span><div class="hud-op-bar"><div class="hud-op-fill" style="width:${rate}%;background:${op.color}"></div></div><span class="hud-op-pct">${rate}%</span></div>`;
   });
+}
+
+function drawSparkline(){
+  const cv=$('hud-sparkline'); if(!cv)return;
+  const ctx=cv.getContext('2d'); const W=cv.width, H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const hist=state.fitnessHistory;
+  if(hist.length<2)return;
+  const minF=0, maxF=100;
+  ctx.strokeStyle='rgba(200,255,0,0.7)'; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  hist.forEach((pt,i)=>{
+    const x=(i/(hist.length-1))*W;
+    const y=H - ((pt.fitness-minF)/(maxF-minF))*(H-4)-2;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // fill under line
+  ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+  ctx.fillStyle='rgba(200,255,0,0.06)'; ctx.fill();
+  // current fitness dot
+  const last=hist[hist.length-1];
+  const dx=W-1, dy=H-((last.fitness-minF)/(maxF-minF))*(H-4)-2;
+  ctx.beginPath(); ctx.arc(dx,dy,2.5,0,Math.PI*2);
+  ctx.fillStyle='#c8ff00'; ctx.fill();
 }
 
 function updateHudHeatmap(){
@@ -1116,7 +1227,15 @@ function loadViewerFile(file){
 }
 function exportCurrentGenome(){
   if(!state.hasTarget)return null;
-  let g=`-- @version 1.0\n-- Generated: ${new Date().toISOString().split('T')[0]}\n-- Fitness: ${state.fitness.toFixed(1)}%\n-- Generations: ${state.generation}\n\ncanvas {\n  width: ${state.targetW}\n  height: ${state.targetH}\n}\n\npalette {\n`;
+  let g=`-- @version 1.1\n-- Generated: ${new Date().toISOString().split('T')[0]}\n-- Fitness: ${state.fitness.toFixed(1)}%\n-- Generations: ${state.generation}\n`;
+  // Embed target image as base64 so .pg files are self-contained
+  if(cvT){
+    try{
+      const targetB64=cvT.toDataURL('image/png');
+      g+=`-- @target_image ${targetB64}\n`;
+    }catch(e){}
+  }
+  g+=`\ncanvas {\n  width: ${state.targetW}\n  height: ${state.targetH}\n}\n\npalette {\n`;
   const uc=[];state.polygons.forEach(p=>{const h='#'+[p.r,p.g,p.b].map(c=>c.toString(16).padStart(2,'0')).join('');if(!uc.includes(h))uc.push(h);});
   uc.slice(0,8).forEach((h,i)=>{g+=`  c${i}: ${h}\n`;});g+=`}\n\nlayer evolved {\n`;
   state.polygons.forEach((p,i)=>{const h='#'+[p.r,p.g,p.b].map(c=>c.toString(16).padStart(2,'0')).join('');const ci=uc.indexOf(h);g+=`  zone poly_${i} {\n    color: palette.c${ci}\n    opacity: ${(p.a/255).toFixed(2)}\n    points: ${p.pts.map(pt=>`${Math.round(pt[0])},${Math.round(pt[1])}`).join(' ')}\n  }\n`;});
@@ -1299,6 +1418,21 @@ updateHUD();
 $('btn-hud').classList.add('active');
 setTimeout(()=>API.connect(),800);
 setInterval(()=>{if(API.connected)API.fetchStats();},60000);
+
+// Check for auto-saved session
+try{
+  const saved=localStorage.getItem('pigment_autosave');
+  if(saved){
+    const d=JSON.parse(saved);
+    const ageMin=Math.round((Date.now()-d.ts)/60000);
+    if(d.genome && ageMin<240){ // only offer if < 4 hours old
+      // Show restore banner in genome editor
+      $('genome-editor').value=d.genome;
+      $('genome-editor').style.borderColor='var(--accent)';
+      toast(`💾 Auto-save found — gen ${d.gen} @ ${d.fitness.toFixed(1)}% (${ageMin}m ago). Load image then Apply to restore.`, 6000);
+    }
+  }
+}catch(e){}
 </script>
 </body>
 </html>
