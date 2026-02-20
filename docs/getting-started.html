@@ -1,134 +1,1201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Getting Started - PIGMENT v6 API</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="/css/docs.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Getting Started - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --ink: #0a0a0a;
+            --paper: #f0ede6;
+            --dim: #b8b4ac;
+            --accent: #c8ff00;
+            --red: #ff3b2f;
+            --blue: #0051ff;
+            --mono: 'DM Mono', monospace;
+            --display: 'Unbounded', sans-serif;
+        }
+
+        body {
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--mono);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header - Sticky */
+        .docs-header {
+            background: rgba(10,10,10,0.98);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .logo a {
+            font-family: var(--display);
+            font-weight: 900;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            color: var(--accent);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .logo span {
+            color: var(--dim);
+        }
+
+        .header-nav {
+            display: flex;
+            gap: clamp(1rem, 3vw, 2rem);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-nav a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            white-space: nowrap;
+            padding: 0.5rem 0;
+        }
+
+        .header-nav a:hover,
+        .header-nav a.active {
+            color: var(--accent);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: 1px solid #333;
+            color: var(--paper);
+            font-size: 1.8rem;
+            padding: 0.25rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            min-width: 50px;
+            min-height: 44px;
+            line-height: 1;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border: 1px solid transparent;
+            display: inline-block;
+            min-height: 44px;
+            line-height: 1.8;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--ink);
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover,
+        .btn-primary:active {
+            background: #d4ff26;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200,255,0,0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--paper);
+            border-color: #333;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Main Layout */
+        .docs-layout {
+            display: flex;
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Sidebar - Scrollable */
+        .docs-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: #0d0d0d;
+            border-right: 1px solid #1a1a1a;
+            height: calc(100vh - 73px);
+            position: sticky;
+            top: 73px;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: #333 #0d0d0d;
+        }
+
+        .docs-sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .docs-sidebar::-webkit-scrollbar-track {
+            background: #0d0d0d;
+        }
+        .docs-sidebar::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .sidebar-section {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .sidebar-section:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-title {
+            font-family: var(--display);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.4rem 0;
+            transition: color 0.2s;
+            word-break: break-word;
+            border-left: 2px solid transparent;
+            padding-left: 0.5rem;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+
+        /* Main Content */
+        .docs-content {
+            flex: 1;
+            min-width: 0;
+            padding: 2.5rem 3rem;
+            overflow-x: auto;
+        }
+
+        .content-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: var(--display);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-family: var(--display);
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin: 2.5rem 0 1rem;
+            color: var(--accent);
+        }
+
+        h3 {
+            font-family: var(--display);
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            margin: 2rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: #ccc;
+            font-size: 1rem;
+        }
+
+        .lead {
+            font-size: 1.2rem;
+            color: var(--paper);
+            margin-bottom: 2rem;
+        }
+
+        ul, ol {
+            margin: 1.5rem 0 1.5rem 1.5rem;
+            color: #ccc;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: #1a1a1a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-family: var(--mono);
+        }
+
+        pre {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--paper);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1a;
+            padding: 0.5rem 1rem;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid #2a2a2a;
+            font-size: 0.8rem;
+            color: var(--dim);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: var(--dim);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            min-height: 32px;
+        }
+
+        .copy-btn:hover,
+        .copy-btn:active {
+            background: var(--accent);
+            color: var(--ink);
+            border-color: var(--accent);
+        }
+
+        .info-box {
+            background: #1a1a1a;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .warning-box {
+            background: #1a1a1a;
+            border-left: 4px solid var(--red);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .step-container {
+            margin: 2rem 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background: var(--accent);
+            color: var(--ink);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h3 {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #1a1a1a;
+            font-size: 0.9rem;
+        }
+
+        th {
+            color: var(--accent);
+            font-weight: 600;
+            background: #0d0d0d;
+        }
+
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: var(--dim);
+            padding: 0.5rem 1rem;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            min-height: 40px;
+        }
+
+        .tab-btn:hover,
+        .tab-btn.active {
+            background: var(--accent);
+            color: var(--ink);
+            border-color: var(--accent);
+        }
+
+        .tab-panel {
+            display: none;
+            padding: 1.5rem 0;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .pagination a {
+            color: var(--dim);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #1a1a1a;
+            border-radius: 4px;
+            transition: all 0.2s;
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .pagination a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .pagination .prev:before {
+            content: '← ';
+        }
+
+        .pagination .next:after {
+            content: ' →';
+        }
+
+        /* Footer */
+        .docs-footer {
+            background: #0d0d0d;
+            border-top: 1px solid #1a1a1a;
+            padding: 2rem 1.5rem 1rem;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h4 {
+            font-family: var(--display);
+            color: var(--paper);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            margin: 0;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1a1a1a;
+            color: #333;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .docs-layout {
+                flex-direction: column;
+            }
+
+            .docs-sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid #1a1a1a;
+                padding: 1rem;
+            }
+
+            .docs-content {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0.75rem 1rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .header-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #0a0a0a;
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid #1a1a1a;
+                gap: 0.5rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            }
+
+            .header-nav.show {
+                display: flex;
+            }
+
+            .header-nav a {
+                width: 100%;
+                text-align: center;
+                padding: 0.75rem;
+                border-bottom: 1px solid #1a1a1a;
+            }
+
+            .header-nav a:last-child {
+                border-bottom: none;
+            }
+
+            .header-actions {
+                display: none;
+            }
+
+            .docs-content {
+                padding: 1.5rem;
+            }
+
+            .step {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .tab-buttons {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .docs-content {
+                padding: 1rem;
+            }
+
+            pre {
+                padding: 1rem;
+                font-size: 0.8rem;
+            }
+
+            .step-number {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Print */
+        @media print {
+            .docs-header,
+            .docs-sidebar,
+            .docs-footer,
+            .copy-btn,
+            .tab-buttons {
+                display: none;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+
+            .docs-content {
+                padding: 1rem;
+            }
+
+            pre {
+                border: 1px solid #ccc;
+                background: #f5f5f5;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>...</header>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn" id="menuBtn">☰</button>
+            <nav class="header-nav" id="navLinks">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="../blog/index.html">Blog</a>
+                <a href="../showcase/index.html">Showcase</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </nav>
+            <div class="header-actions">
+                <a href="getting-started.html" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </header>
 
-  <div class="docs-layout">
-    <div class="docs-sidebar">...</div>
+    <div class="docs-layout">
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html">Introduction</a></li>
+                    <li><a href="getting-started.html" class="active">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                    <li><a href="errors.html">Error Handling</a></li>
+                </ul>
+            </div>
 
-    <div class="docs-content">
-      <h1>Getting Started <span class="accent">in 5 Minutes</span></h1>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="endpoints/works.html">/v1/works</a></li>
+                    <li><a href="endpoints/evolve.html">/v1/evolve</a></li>
+                    <li><a href="endpoints/kinship.html">/v1/kinship</a></li>
+                    <li><a href="endpoints/prompt.html">/v1/prompt</a></li>
+                    <li><a href="endpoints/gallery.html">/v1/gallery</a></li>
+                </ul>
+            </div>
 
-      <h2>1. Get Your API Key</h2>
-      <p>Every request needs an API key. Create one with your email:</p>
-      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/users \
-  -H "Content-Type: application/json" \
-  -d '{"email": "your@email.com"}'</code></pre>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Examples</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="examples/javascript.html">JavaScript</a></li>
+                    <li><a href="examples/python.html">Python</a></li>
+                    <li><a href="examples/curl.html">cURL</a></li>
+                </ul>
+            </div>
 
-      <p>Response:</p>
-      <pre><code>{
-  "id": "user_abc123",
-  "email": "your@email.com",
-  "api_key": "pigment_xyz789...",
-  "plan": "free"
-}</code></pre>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Resources</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../blog/index.html">Blog</a></li>
+                    <li><a href="../showcase/index.html">Showcase</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                    <li><a href="changelog.html">Changelog</a></li>
+                </ul>
+            </div>
+        </aside>
 
-      <h2>2. Create Your First Artwork</h2>
-      <p>Artworks are stored as .pg genome files. Here's a minimal example:</p>
-      <pre><code>-- @fitness 0.0
--- @generation 0
+        <main class="docs-content">
+            <div class="content-container">
+                <h1>Quick Start Guide</h1>
+                <p class="lead">Get up and running with PIGMENT in less than 5 minutes. Follow these steps to make your first API call.</p>
 
-canvas {
-  width: 400
-  height: 400
+                <div class="info-box">
+                    <strong>✨ New to PIGMENT?</strong> This guide will walk you through everything you need to know to start using our API.
+                </div>
+
+                <div class="step-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Get Your API Key</h3>
+                            <p>First, you'll need an API key to authenticate your requests. Sign up for a free account and generate your first API key.</p>
+                            
+                            <div class="code-header">
+                                <span>Generate API Key</span>
+                            </div>
+                            <pre><code># Sign up at https://pigment.dev
+# Navigate to Dashboard → API Keys
+# Click "Generate New Key"
+# Copy your key (starts with pk_live_ or pk_test_)</code></pre>
+
+                            <p>You'll get a key that looks like: <code>pk_live_abc123def456ghi789jkl0mno</code></p>
+                            
+                            <div class="warning-box">
+                                <strong>⚠️ Important:</strong> Never share your API key or commit it to version control. Use environment variables instead.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Install the Client</h3>
+                            <p>Choose your preferred programming language and install the official PIGMENT client.</p>
+
+                            <div class="tab-container">
+                                <div class="tab-buttons">
+                                    <button class="tab-btn active" data-tab="npm">npm</button>
+                                    <button class="tab-btn" data-tab="pip">pip</button>
+                                    <button class="tab-btn" data-tab="yarn">yarn</button>
+                                </div>
+
+                                <div class="tab-panel active" id="tab-npm">
+                                    <div class="code-header">
+                                        <span>Install with npm</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                                    </div>
+                                    <pre><code>npm install pigment-api</code></pre>
+                                </div>
+
+                                <div class="tab-panel" id="tab-pip">
+                                    <div class="code-header">
+                                        <span>Install with pip</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                                    </div>
+                                    <pre><code>pip install pigment-api</code></pre>
+                                </div>
+
+                                <div class="tab-panel" id="tab-yarn">
+                                    <div class="code-header">
+                                        <span>Install with yarn</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                                    </div>
+                                    <pre><code>yarn add pigment-api</code></pre>
+                                </div>
+                            </div>
+
+                            <p>If you prefer to use the REST API directly, you can skip this step and use cURL or any HTTP client.</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Set Up Environment Variables</h3>
+                            <p>Store your API key securely using environment variables.</p>
+
+                            <div class="code-header">
+                                <span>.env file</span>
+                                <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                            </div>
+                            <pre><code>PIGMENT_API_KEY=pk_live_abc123def456ghi789jkl0mno
+PIGMENT_API_URL=https://api.pigment.dev/v1</code></pre>
+
+                            <p>Make sure to add <code>.env</code> to your <code>.gitignore</code> file to keep your keys secure.</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Make Your First Request</h3>
+                            <p>Now let's evolve an image! Here's a complete example in multiple languages:</p>
+
+                            <div class="tab-container">
+                                <div class="tab-buttons">
+                                    <button class="tab-btn active" data-tab="js">JavaScript</button>
+                                    <button class="tab-btn" data-tab="python">Python</button>
+                                    <button class="tab-btn" data-tab="curl">cURL</button>
+                                </div>
+
+                                <div class="tab-panel active" id="tab-js">
+                                    <div class="code-header">
+                                        <span>JavaScript (Node.js)</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                                    </div>
+                                    <pre><code>import { PigmentClient } from 'pigment-api';
+
+// Initialize the client
+const client = new PigmentClient({
+    apiKey: process.env.PIGMENT_API_KEY
+});
+
+async function evolveImage() {
+    try {
+        // Start evolution
+        const job = await client.evolve({
+            target_url: 'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d',
+            generations: 1000,
+            polygons: 100,
+            mutation_rate: 0.1,
+            webhook_url: 'https://your-server.com/webhook' // optional
+        });
+
+        console.log('Evolution started:', job.id);
+        console.log('Estimated time:', job.estimated_seconds, 'seconds');
+
+        // Poll for results
+        let status;
+        do {
+            await new Promise(r => setTimeout(r, 1000));
+            status = await client.getJobStatus(job.id);
+            console.log(`Progress: ${status.progress}% | Fitness: ${status.fitness}%`);
+        } while (status.status === 'processing');
+
+        if (status.status === 'completed') {
+            console.log('Evolution complete!');
+            console.log('Result URL:', status.result.image_url);
+            console.log('Final fitness:', status.result.fitness, '%');
+        }
+
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
 }
 
-palette {
-  color_0: #ff3366
-}
+evolveImage();</code></pre>
+                                </div>
 
-layer base {
-  zone poly_0 {
-    color: palette.color_0
-    opacity: 0.8
-    points: 120,140 180,120 160,200
-  }
-}</code></pre>
+                                <div class="tab-panel" id="tab-python">
+                                    <div class="code-header">
+                                        <span>Python</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                                    </div>
+                                    <pre><code>import os
+import time
+from pigment import PigmentClient
 
-      <p>Upload it:</p>
-      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/works \
-  -H "X-API-Key: pigment_xyz789..." \
+# Initialize the client
+client = PigmentClient(
+    api_key=os.environ.get('PIGMENT_API_KEY')
+)
+
+def evolve_image():
+    try:
+        # Start evolution
+        job = client.evolve(
+            target_url='https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d',
+            generations=1000,
+            polygons=100,
+            mutation_rate=0.1
+        )
+
+        print(f'Evolution started: {job.id}')
+        print(f'Estimated time: {job.estimated_seconds} seconds')
+
+        # Poll for results
+        while True:
+            time.sleep(1)
+            status = client.get_job_status(job.id)
+            print(f'Progress: {status.progress}% | Fitness: {status.fitness}%')
+            
+            if status.status != 'processing':
+                break
+
+        if status.status == 'completed':
+            print('Evolution complete!')
+            print(f'Result URL: {status.result.image_url}')
+            print(f'Final fitness: {status.result.fitness}%')
+
+    except Exception as e:
+        print(f'Error: {e}')
+
+if __name__ == '__main__':
+    evolve_image()</code></pre>
+                                </div>
+
+                                <div class="tab-panel" id="tab-curl">
+                                    <div class="code-header">
+                                        <span>cURL</span>
+                                        <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                                    </div>
+                                    <pre><code># Start evolution job
+curl -X POST https://api.pigment.dev/v1/evolve \
+  -H "Authorization: Bearer $PIGMENT_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "My First Triangle",
-    "content": "-- @fitness 0.0...",
-    "tags": ["demo", "triangle"]
-  }'</code></pre>
+    "target_url": "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d",
+    "generations": 1000,
+    "polygons": 100,
+    "mutation_rate": 0.1
+  }'
 
-      <h2>3. Evolve It</h2>
-      <p>Run 500 generations of evolution:</p>
-      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/evolve \
-  -H "X-API-Key: pigment_xyz789..." \
-  -H "Content-Type: application/json" \
-  -d '{
-    "work_id": "abc123",
-    "steps": 500
-  }'</code></pre>
+# Response:
+# {
+#   "job_id": "job_123456",
+#   "estimated_seconds": 45,
+#   "status": "processing"
+# }
 
-      <p>Response includes the new child work:</p>
-      <pre><code>{
-  "parent_id": "abc123",
-  "child_id": "def456",
-  "fitness_before": 12.4,
-  "fitness_after": 38.7,
-  "improvement": 26.3,
-  "operator": "scale"
-}</code></pre>
+# Check status
+curl -X GET https://api.pigment.dev/v1/jobs/job_123456 \
+  -H "Authorization: Bearer $PIGMENT_API_KEY"
 
-      <h2>4. Check Kinship</h2>
-      <p>See how your works are related:</p>
-      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/kinship \
-  -H "X-API-Key: pigment_xyz789..." \
-  -H "Content-Type: application/json" \
-  -d '{"work_id": "def456"}'</code></pre>
+# Response when complete:
+# {
+#   "status": "completed",
+#   "progress": 100,
+#   "result": {
+#     "image_url": "https://storage.pigment.dev/result_123456.png",
+#     "fitness": 98.5,
+#     "generations": 1000
+#   }
+# }</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-      <div class="endpoint">
-        <div class="endpoint-header">
-          <span class="endpoint-method">POST</span>
-          <span class="endpoint-path">/v1/kinship</span>
-        </div>
-        <div class="endpoint-body">
-          <p>Returns parents, children, siblings, and similar works with similarity scores.</p>
-        </div>
-      </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Understanding the Response</h3>
+                            <p>When your evolution completes, you'll receive a response with these fields:</p>
 
-      <h2>5. Try the AI Prompt</h2>
-      <p>Use natural language to guide evolution:</p>
-      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/prompt \
-  -H "X-API-Key: pigment_xyz789..." \
-  -H "Content-Type: application/json" \
-  -d '{
-    "work_id": "def456",
-    "prompt": "make it glitchy, more contrast"
-  }'</code></pre>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>image_url</code></td>
+                                        <td>string</td>
+                                        <td>URL to download the generated image</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>fitness</code></td>
+                                        <td>float</td>
+                                        <td>Final fitness score (0-100%)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>generations</code></td>
+                                        <td>integer</td>
+                                        <td>Number of generations completed</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>polygons</code></td>
+                                        <td>integer</td>
+                                        <td>Number of polygons used</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>duration_ms</code></td>
+                                        <td>integer</td>
+                                        <td>Total processing time in milliseconds</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-      <p>Claude (or local fallback) returns a mutation plan:</p>
-      <pre><code>{
-  "intent": "Apply digital glitch aesthetic",
-  "operations_applied": ["glitch_colors", "chaos", "boost_contrast"],
-  "used_claude": true
-}</code></pre>
+                <h2>Next Steps</h2>
+                <p>Now that you've made your first request, here's what you can explore next:</p>
 
-      <h2>Next Steps</h2>
-      <div class="grid grid-2" style="margin-top: 24px;">
-        <a href="/docs/authentication.html" class="card">
-          <h3>🔐 Authentication</h3>
-          <p>API keys, tokens, and security best practices.</p>
-        </a>
-        <a href="/docs/examples/javascript.html" class="card">
-          <h3>📝 Code Examples</h3>
-          <p>JavaScript, Python, and cURL examples.</p>
-        </a>
-      </div>
+                <ul>
+                    <li><strong><a href="authentication.html">Authentication →</a></strong> Learn more about API keys and security</li>
+                    <li><strong><a href="endpoints/evolve.html">Evolve Endpoint →</a></strong> Dive deeper into evolution parameters</li>
+                    <li><strong><a href="endpoints/kinship.html">Kinship System →</a></strong> Track relationships between artworks</li>
+                    <li><strong><a href="endpoints/prompt.html">AI Prompts →</a></strong> Guide evolution with natural language</li>
+                    <li><strong><a href="examples/javascript.html">More Examples →</a></strong> See complete code examples</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>💡 Pro Tip:</strong> Use our WebSocket connection for real-time evolution updates. Check the <a href="endpoints/evolve.html#websocket">WebSocket guide</a> for details.
+                </div>
+
+                <h2>Common Issues</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>Solution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>401 Unauthorized</code></td>
+                            <td>Check that your API key is correct and properly formatted in the Authorization header</td>
+                        </tr>
+                        <tr>
+                            <td><code>429 Too Many Requests</code></td>
+                            <td>You've hit the rate limit. Implement exponential backoff or upgrade your plan</td>
+                        </tr>
+                        <tr>
+                            <td><code>400 Invalid Image</code></td>
+                            <td>Ensure your image URL is publicly accessible and in a supported format (JPEG, PNG, WebP)</td>
+                        </tr>
+                        <tr>
+                            <td>Job stuck at 0%</td>
+                            <td>Check that your image URL is accessible. Some URLs expire or require authentication</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <a href="index.html" class="prev">Introduction</a>
+                    <a href="authentication.html" class="next">Authentication</a>
+                </div>
+            </div>
+        </main>
     </div>
-  </div>
+
+    <footer class="docs-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="index.html">Documentation</a></li>
+                    <li><a href="../blog/index.html">Blog</a></li>
+                    <li><a href="../showcase/index.html">Showcase</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                    <li><a href="changelog.html">Changelog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+                    <li><a href="../blog/kinship-explained.html">Kinship System</a></li>
+                    <li><a href="../blog/ai-prompts.html">AI Prompts</a></li>
+                    <li><a href="../blog/feature-vectors.html">Feature Vectors</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <ul>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                    <li><a href="https://twitter.com/pigment">Twitter</a></li>
+                    <li><a href="https://discord.gg/pigment">Discord</a></li>
+                    <li><a href="mailto:support@pigment.dev">Email</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved. v6.0.0</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu
+        const menuBtn = document.getElementById('menuBtn');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuBtn && navLinks) {
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navLinks.classList.toggle('show');
+                menuBtn.textContent = navLinks.classList.contains('show') ? '✕' : '☰';
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.docs-header') && navLinks.classList.contains('show')) {
+                    navLinks.classList.remove('show');
+                    menuBtn.textContent = '☰';
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768 && navLinks.classList.contains('show')) {
+                    navLinks.classList.remove('show');
+                    menuBtn.textContent = '☰';
+                }
+            });
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                
+                // Update buttons in the same tab container
+                const container = btn.closest('.tab-container');
+                container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update panels in the same container
+                container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                container.querySelector(`#tab-${tabId}`).classList.add('active');
+            });
+        });
+
+        // Copy function
+        window.copyCode = function(btn) {
+            const codeBlock = btn.closest('.code-header').nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            }).catch(() => {
+                alert('Failed to copy code');
+            });
+        };
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Highlight current section in sidebar
+        const sections = document.querySelectorAll('h2');
+        const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
