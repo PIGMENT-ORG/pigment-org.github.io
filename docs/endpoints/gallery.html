@@ -2,104 +2,288 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>/v1/gallery - PIGMENT API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Gallery API - PIGMENT v6 Docs</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../../css/docs.css">
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+            <nav class="header-nav">
+                <a href="../../index.html">Home</a>
+                <a href="../index.html" class="active">Docs</a>
+                <a href="../../blog/index.html">Blog</a>
+                <a href="../../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="../getting-started.html" class="btn btn-primary">Quick Start</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../index.html">Introduction</a></li>
+                    <li><a href="../getting-started.html">Quick Start</a></li>
+                    <li><a href="../authentication.html">Authentication</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="works.html">/v1/works</a></li>
+                    <li><a href="evolve.html">/v1/evolve</a></li>
+                    <li><a href="kinship.html">/v1/kinship</a></li>
+                    <li><a href="prompt.html">/v1/prompt</a></li>
+                    <li><a href="gallery.html" class="active">/v1/gallery</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Examples</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../examples/javascript.html">JavaScript</a></li>
+                    <li><a href="../examples/python.html">Python</a></li>
+                    <li><a href="../examples/curl.html">cURL</a></li>
+                </ul>
+            </div>
+        </aside>
+
         <main class="docs-content">
             <div class="content-container">
-                <h1><code>/v1/gallery</code></h1>
-                <p class="lead">Public gallery of generated artwork from the PIGMENT community.</p>
+                <div class="endpoint-header">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-path">/v1/gallery</span>
+                </div>
+
+                <h1>Gallery API</h1>
+                <p class="lead">Browse public artworks from the PIGMENT community. The gallery shows all works ordered by fitness score, with pagination and style statistics.</p>
+
+                <div class="info-box">
+                    <strong>📌 Note:</strong> The gallery shows <strong>all public works</strong> across all users. Each work includes its fitness score, generation count, style classification, and tags — not images, since PIGMENT stores genome data rather than rendered images.
+                </div>
 
                 <h2>List Gallery</h2>
-                <p><code>GET /v1/gallery</code></p>
+                <p>Retrieve a paginated list of public artworks, sorted by fitness (highest first).</p>
 
-                <h3>Parameters</h3>
-                <table>
-                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                    <tr><td>limit</td><td>integer</td><td>Items per page (1-50)</td></tr>
-                    <tr><td>offset</td><td>integer</td><td>Pagination offset</td></tr>
-                    <tr><td>sort</td><td>string</td><td>Sort by: latest, popular, fitness</td></tr>
-                    <tr><td>tags</td><td>string</td><td>Comma-separated tags to filter</td></tr>
+                <div class="endpoint-card">
+                    <div class="endpoint-card-header">
+                        <span class="method">GET</span>
+                        <span class="path">/v1/gallery</span>
+                    </div>
+
+                    <h3>Query Parameters</h3>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>limit</code></td>
+                                <td>integer</td>
+                                <td>Number of items to return (1-100, default 24)</td>
+                            </tr>
+                            <tr>
+                                <td><code>offset</code></td>
+                                <td>integer</td>
+                                <td>Number of items to skip (default 0)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Example Request</h3>
+                    <div class="code-block">
+                        <pre><code>curl "https://pigment-api.onrender.com/v1/gallery?limit=10&offset=0" \
+  -H "X-API-Key: your-api-key"</code></pre>
+                    </div>
+
+                    <h3>Response</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "total": 1523,
+  "limit": 10,
+  "offset": 0,
+  "works": [
+    {
+      "id": "work_2a7f8c3e1b9d4f6",
+      "title": "Neon Dreams",
+      "style": "glitch",
+      "fitness": 98.5,
+      "generation": 1542,
+      "tags": ["abstract", "featured", "cyberpunk"],
+      "created_at": "2026-02-21T12:00:00Z"
+    },
+    {
+      "id": "work_3b8g9d4f2e1a5c7",
+      "title": "Organic Growth",
+      "style": "organic",
+      "fitness": 97.2,
+      "generation": 2310,
+      "tags": ["nature", "abstract"],
+      "created_at": "2026-02-21T11:30:00Z"
+    },
+    {
+      "id": "work_4c9h0e5g3f2b6d8",
+      "title": "Dark Void",
+      "style": "void",
+      "fitness": 94.8,
+      "generation": 876,
+      "tags": ["dark", "minimal"],
+      "created_at": "2026-02-21T10:45:00Z"
+    }
+  ],
+  "stats": {
+    "glitch": { "count": 423, "avg_fitness": 82.3 },
+    "organic": { "count": 512, "avg_fitness": 79.8 },
+    "void": { "count": 298, "avg_fitness": 76.2 },
+    "custom": { "count": 290, "avg_fitness": 71.5 }
+  }
+}</code></pre>
+                    </div>
+                </div>
+
+                <h2>Get Gallery Stats</h2>
+                <p>The gallery response includes aggregated statistics about all public works:</p>
+
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Stat</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>total</code></td>
+                            <td>Total number of public works in the gallery</td>
+                        </tr>
+                        <tr>
+                            <td><code>stats.{style}.count</code></td>
+                            <td>Number of works with this style classification</td>
+                        </tr>
+                        <tr>
+                            <td><code>stats.{style}.avg_fitness</code></td>
+                            <td>Average fitness score for works of this style</td>
+                        </tr>
+                    </tbody>
                 </table>
 
-                <h3>Response</h3>
-                <pre><code>{
-    "data": [
-        {
-            "id": "work_123",
-            "thumbnail": "https://storage.pigment.dev/thumb_123.jpg",
-            "title": "Neon Dreams",
-            "author": "user_456",
-            "fitness": 98.5,
-            "likes": 42,
-            "created_at": "2026-03-15T10:30:00Z",
-            "tags": ["abstract", "featured"]
-        }
-    ],
-    "total": 1523,
-    "limit": 20,
-    "offset": 0
+                <h2>Get Single Gallery Item</h2>
+                <p>Retrieve detailed information about a specific public artwork.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-card-header">
+                        <span class="method">GET</span>
+                        <span class="path">/v1/works/{id}</span>
+                    </div>
+                    <p class="note">Gallery items are just works — use the same <code>/v1/works/{id}</code> endpoint with your API key.</p>
+
+                    <h3>Example Request</h3>
+                    <div class="code-block">
+                        <pre><code>curl https://pigment-api.onrender.com/v1/works/work_2a7f8c3e1b9d4f6 \
+  -H "X-API-Key: your-api-key"</code></pre>
+                    </div>
+
+                    <h3>Response (abbreviated)</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "id": "work_2a7f8c3e1b9d4f6",
+  "title": "Neon Dreams",
+  "style": "glitch",
+  "fitness": 98.5,
+  "generation": 1542,
+  "tags": ["abstract", "featured", "cyberpunk"],
+  "features": [0.8, 0.3, 0.9, ...],
+  "created_at": "2026-02-21T12:00:00Z",
+  "parent_id": "work_1a2b3c4d5e6f7g8"
 }</code></pre>
+                    </div>
+                </div>
 
-                <h2>Get Gallery Item</h2>
-                <p><code>GET /v1/gallery/{id}</code></p>
+                <h2>Style Statistics</h2>
+                <p>The gallery provides insights into how different styles perform:</p>
 
-                <h3>Response</h3>
-                <pre><code>{
-    "id": "work_123",
-    "image_url": "https://storage.pigment.dev/full_123.jpg",
-    "title": "Neon Dreams",
-    "author": {
-        "id": "user_456",
-        "username": "artist123"
-    },
-    "fitness": 98.5,
-    "likes": 42,
-    "views": 1234,
-    "created_at": "2026-03-15T10:30:00Z",
-    "generations": 1000,
-    "polygons": 150,
-    "prompt": "cyberpunk cityscape",
-    "tags": ["abstract", "featured", "cyberpunk"],
-    "kinship": {
-        "similar_works": ["work_124", "work_125"],
-        "inspiration": "work_100"
-    }
-}</code></pre>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Style</th>
+                            <th>Description</th>
+                            <th>Typical Fitness Range</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>glitch</code></td>
+                            <td>High channel imbalance, chaotic colors</td>
+                            <td>75-95%</td>
+                        </tr>
+                        <tr>
+                            <td><code>organic</code></td>
+                            <td>Green bias, smooth transitions</td>
+                            <td>70-90%</td>
+                        </tr>
+                        <tr>
+                            <td><code>void</code></td>
+                            <td>Dark, high opacity, low complexity</td>
+                            <td>65-85%</td>
+                        </tr>
+                        <tr>
+                            <td><code>custom</code></td>
+                            <td>Mixed or undefined style</td>
+                            <td>60-80%</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                <h2>Upload to Gallery</h2>
-                <p><code>POST /v1/gallery</code></p>
+                <h2>Integration with Other Endpoints</h2>
+                <p>Once you find an interesting work in the gallery, you can:</p>
+                <ul>
+                    <li>Get its full details with <code>GET /v1/works/{id}</code></li>
+                    <li>Find similar works with <code>POST /v1/search/similar</code></li>
+                    <li>Explore its family tree with <code>POST /v1/kinship</code></li>
+                    <li>Trace its ancestry with <code>GET /v1/ancestry/{id}</code></li>
+                </ul>
 
-                <h3>Request Body</h3>
-                <pre><code>{
-    "work_id": "work_123",
-    "title": "My Masterpiece",
-    "description": "Generated with PIGMENT v6",
-    "tags": ["abstract", "portrait"],
-    "public": true
-}</code></pre>
+                <h3>Example: Find Similar to Gallery Work</h3>
+                <div class="code-block">
+                    <pre><code># First, get a work ID from the gallery
+curl "https://pigment-api.onrender.com/v1/gallery?limit=1"
 
-                <h3>Response</h3>
-                <pre><code>{
-    "id": "gallery_123",
-    "url": "https://pigment.dev/gallery/123",
-    "status": "published"
-}</code></pre>
+# Then search for similar works
+curl -X POST https://pigment-api.onrender.com/v1/search/similar \
+  -H "X-API-Key: your-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "work_id": "work_2a7f8c3e1b9d4f6",
+    "limit": 5
+  }'</code></pre>
+                </div>
 
-                <h2>Like/Unlike</h2>
-                <p><code>POST /v1/gallery/{id}/like</code></p>
-                <p><code>DELETE /v1/gallery/{id}/like</code></p>
-
-                <h2>Featured Gallery</h2>
-                <p><code>GET /v1/gallery/featured</code></p>
-                <p>Returns curated selection of high-quality artwork.</p>
+                <h2>Error Responses</h2>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>401</td><td>Missing or invalid API key</td></tr>
+                        <tr><td>400</td><td>Invalid pagination parameters (limit > 100)</td></tr>
+                    </tbody>
+                </table>
 
                 <div class="pagination">
                     <a href="prompt.html" class="prev">← /v1/prompt</a>
@@ -108,6 +292,41 @@
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+
+    <footer class="docs-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="../../index.html">Home</a></li>
+                    <li><a href="../index.html">Documentation</a></li>
+                    <li><a href="../../blog/index.html">Blog</a></li>
+                    <li><a href="../../showcase/index.html">Showcase</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="../getting-started.html">Quick Start</a></li>
+                    <li><a href="../authentication.html">Authentication</a></li>
+                    <li><a href="works.html">Works</a></li>
+                    <li><a href="gallery.html">Gallery</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="../../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+                    <li><a href="../../blog/kinship-explained.html">Kinship System</a></li>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved. · v6.0.0</p>
+        </div>
+    </footer>
+
+    <script src="../../js/docs.js"></script>
 </body>
 </html>
