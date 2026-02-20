@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started - PIGMENT v6 API</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/docs.css">
+</head>
+<body>
+  <header>...</header>
+
+  <div class="docs-layout">
+    <div class="docs-sidebar">...</div>
+
+    <div class="docs-content">
+      <h1>Getting Started <span class="accent">in 5 Minutes</span></h1>
+
+      <h2>1. Get Your API Key</h2>
+      <p>Every request needs an API key. Create one with your email:</p>
+      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{"email": "your@email.com"}'</code></pre>
+
+      <p>Response:</p>
+      <pre><code>{
+  "id": "user_abc123",
+  "email": "your@email.com",
+  "api_key": "pigment_xyz789...",
+  "plan": "free"
+}</code></pre>
+
+      <h2>2. Create Your First Artwork</h2>
+      <p>Artworks are stored as .pg genome files. Here's a minimal example:</p>
+      <pre><code>-- @fitness 0.0
+-- @generation 0
+
+canvas {
+  width: 400
+  height: 400
+}
+
+palette {
+  color_0: #ff3366
+}
+
+layer base {
+  zone poly_0 {
+    color: palette.color_0
+    opacity: 0.8
+    points: 120,140 180,120 160,200
+  }
+}</code></pre>
+
+      <p>Upload it:</p>
+      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/works \
+  -H "X-API-Key: pigment_xyz789..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My First Triangle",
+    "content": "-- @fitness 0.0...",
+    "tags": ["demo", "triangle"]
+  }'</code></pre>
+
+      <h2>3. Evolve It</h2>
+      <p>Run 500 generations of evolution:</p>
+      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/evolve \
+  -H "X-API-Key: pigment_xyz789..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "work_id": "abc123",
+    "steps": 500
+  }'</code></pre>
+
+      <p>Response includes the new child work:</p>
+      <pre><code>{
+  "parent_id": "abc123",
+  "child_id": "def456",
+  "fitness_before": 12.4,
+  "fitness_after": 38.7,
+  "improvement": 26.3,
+  "operator": "scale"
+}</code></pre>
+
+      <h2>4. Check Kinship</h2>
+      <p>See how your works are related:</p>
+      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/kinship \
+  -H "X-API-Key: pigment_xyz789..." \
+  -H "Content-Type: application/json" \
+  -d '{"work_id": "def456"}'</code></pre>
+
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="endpoint-method">POST</span>
+          <span class="endpoint-path">/v1/kinship</span>
+        </div>
+        <div class="endpoint-body">
+          <p>Returns parents, children, siblings, and similar works with similarity scores.</p>
+        </div>
+      </div>
+
+      <h2>5. Try the AI Prompt</h2>
+      <p>Use natural language to guide evolution:</p>
+      <pre><code>curl -X POST https://pigment-api.onrender.com/v1/prompt \
+  -H "X-API-Key: pigment_xyz789..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "work_id": "def456",
+    "prompt": "make it glitchy, more contrast"
+  }'</code></pre>
+
+      <p>Claude (or local fallback) returns a mutation plan:</p>
+      <pre><code>{
+  "intent": "Apply digital glitch aesthetic",
+  "operations_applied": ["glitch_colors", "chaos", "boost_contrast"],
+  "used_claude": true
+}</code></pre>
+
+      <h2>Next Steps</h2>
+      <div class="grid grid-2" style="margin-top: 24px;">
+        <a href="/docs/authentication.html" class="card">
+          <h3>🔐 Authentication</h3>
+          <p>API keys, tokens, and security best practices.</p>
+        </a>
+        <a href="/docs/examples/javascript.html" class="card">
+          <h3>📝 Code Examples</h3>
+          <p>JavaScript, Python, and cURL examples.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
