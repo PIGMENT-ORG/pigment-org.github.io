@@ -2,62 +2,327 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQ - PIGMENT API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>FAQ - PIGMENT v6 API</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../css/docs.css">
+    <style>
+        .faq-section {
+            margin: 3rem 0;
+        }
+        .faq-item {
+            border-bottom: 1px solid #1a1a1a;
+            padding: 1.5rem 0;
+        }
+        .faq-question {
+            font-family: var(--display);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-question::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: var(--dim);
+        }
+        .faq-item.expanded .faq-question::after {
+            content: '−';
+        }
+        .faq-answer {
+            color: #ccc;
+            line-height: 1.8;
+            display: none;
+            padding-right: 2rem;
+        }
+        .faq-item.expanded .faq-answer {
+            display: block;
+        }
+        .tag-free {
+            display: inline-block;
+            background: #1a3a1a;
+            color: #2dce89;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+    </style>
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../index.html">PIGMENT <span>FAQ</span></a>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+            <nav class="header-nav">
+                <a href="../index.html">Home</a>
+                <a href="index.html" class="active">Docs</a>
+                <a href="../blog/index.html">Blog</a>
+                <a href="../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="getting-started.html" class="btn btn-primary">Quick Start</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Documentation</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="index.html">Introduction</a></li>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                    <li><a href="errors.html">Error Handling</a></li>
+                    <li><a href="faq.html" class="active">FAQ</a></li>
+                    <li><a href="changelog.html">Changelog</a></li>
+                </ul>
+            </div>
+        </aside>
+
         <main class="docs-content">
             <div class="content-container">
                 <h1>Frequently Asked Questions</h1>
+                <p class="lead">Everything you need to know about the PIGMENT v6 API.</p>
 
-                <h2>General</h2>
-                <div class="faq-item">
-                    <h3>What is PIGMENT?</h3>
-                    <p>PIGMENT is an API that uses genetic algorithms to generate artwork. Images evolve through generations of mutation and selection.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>How does it work?</h3>
-                    <p>We represent images as collections of colored polygons. Through genetic algorithms, these polygons evolve to match target images or create new artwork based on prompts.</p>
+                <div class="faq-section">
+                    <h2>General</h2>
+
+                    <div class="faq-item">
+                        <div class="faq-question">What is PIGMENT?</div>
+                        <div class="faq-answer">
+                            <p>PIGMENT is an open-source API that uses genetic algorithms to evolve artwork. Each artwork is represented as a <strong>.pg genome file</strong> — a collection of colored polygons with opacity and position data. Through mutation and selection, these genomes evolve to match target images or create new styles based on AI prompts.</p>
+                            <p>Unlike traditional image generation APIs, PIGMENT focuses on the <strong>evolution process itself</strong>, storing the genome rather than rendered images. This allows for kinship tracking, ancestry analysis, and infinite variations.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">How does the evolution work?</div>
+                        <div class="faq-answer">
+                            <p>The system uses 7 mutation operators:</p>
+                            <ul>
+                                <li><code>scale</code> — Resize polygons</li>
+                                <li><code>translate</code> — Move polygons</li>
+                                <li><code>color</code> — Shift RGB values</li>
+                                <li><code>opacity</code> — Change transparency</li>
+                                <li><code>rotate</code> — Rotate polygons</li>
+                                <li><code>addpoint</code> — Increase polygon complexity</li>
+                                <li><code>intelligent</code> — Use best-performing operator</li>
+                            </ul>
+                            <p>Each mutation's success is tracked, and operator probabilities adapt in real-time based on what works best for the current context (sky/face/ground) and phase (explore/refine/polish).</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">What's a .pg genome file?</div>
+                        <div class="faq-answer">
+                            <p>A PIGMENT Genome file (.pg) is a human-readable text format that completely describes an artwork:</p>
+                            <pre style="margin: 1rem 0;"><code>-- PIGMENT Genome v6.0.0
+-- @fitness 87.3
+-- @generation 1542
+
+canvas { width: 400 height: 400 }
+
+palette {
+  c0: #ff3366
+  c1: #33ff99
+}
+
+layer evolved {
+  zone poly_0 {
+    color: palette.c0
+    opacity: 0.8
+    points: 120,140 180,120 160,200
+  }
+}</code></pre>
+                            <p>This format stores everything needed to reconstruct and continue evolving the artwork.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <h2>Pricing</h2>
-                <div class="faq-item">
-                    <h3>Is there a free tier?</h3>
-                    <p>Yes! Free tier includes 60 requests/minute and 2 concurrent jobs.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>What payment methods do you accept?</h3>
-                    <p>We accept all major credit cards, PayPal, and cryptocurrency.</p>
+                <div class="faq-section">
+                    <h2>Pricing & Limits <span class="tag-free">Always Free</span></h2>
+
+                    <div class="faq-item">
+                        <div class="faq-question">Is PIGMENT free?</div>
+                        <div class="faq-answer">
+                            <p><strong>Yes! PIGMENT is completely free and open-source.</strong> There are no paid tiers, no credit cards required, and no hidden costs. The entire platform is designed to be accessible to everyone — artists, researchers, students, and hobbyists.</p>
+                            <p>If you need higher rate limits or dedicated support, please contact us for enterprise options.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">What are the rate limits?</div>
+                        <div class="faq-answer">
+                            <p>Current rate limits are generous and designed for fair usage:</p>
+                            <ul>
+                                <li><strong>60 requests per minute</strong> (free tier)</li>
+                                <li><strong>Concurrent evolution jobs:</strong> Limited by your deployment (Layer 2 = sync, Layer 3/4 = configurable)</li>
+                                <li><strong>Maximum steps per evolution:</strong> 2000 (configurable in code)</li>
+                            </ul>
+                            <p>Rate limit status is included in response headers: <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code>.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">How long is data stored?</div>
+                        <div class="faq-answer">
+                            <p>Your artworks are stored in your own database (SQLite or PostgreSQL) and persist indefinitely. There's no automatic deletion — you control your data.</p>
+                            <p>The public gallery shows all works from all users, but you can delete your works anytime via the <code>DELETE /v1/works/{id}</code> endpoint.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <h2>Technical</h2>
-                <div class="faq-item">
-                    <h3>What image formats are supported?</h3>
-                    <p>JPEG, PNG, WebP, and SVG output.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>How long do jobs take?</h3>
-                    <p>Typically 30-60 seconds for 1000 generations, depending on image size.</p>
-                </div>
-                <div class="faq-item">
-                    <h3>Can I use my own images?</h3>
-                    <p>Yes! Provide a publicly accessible URL or base64 encoded image.</p>
+                <div class="faq-section">
+                    <h2>Technical</h2>
+
+                    <div class="faq-item">
+                        <div class="faq-question">How do I get an API key?</div>
+                        <div class="faq-answer">
+                            <p>Simply make a POST request to the <code>/v1/users</code> endpoint with your email:</p>
+                            <pre><code>curl -X POST https://pigment-api.onrender.com/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{"email": "your@email.com"}'</code></pre>
+                            <p>The response includes your API key starting with <code>pigment_</code>. No signup form, no approval process — instant access!</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">What image formats are supported?</div>
+                        <div class="faq-answer">
+                            <p>For <strong>input</strong> (when loading images into the frontend):</p>
+                            <ul>
+                                <li>JPEG/JPG</li>
+                                <li>PNG</li>
+                                <li>GIF (first frame)</li>
+                                <li>WebP</li>
+                                <li>BMP</li>
+                            </ul>
+                            <p>For <strong>output</strong> (what the API stores):</p>
+                            <ul>
+                                <li><strong>.pg genome files</strong> (native format)</li>
+                                <li>PNG exports available via frontend</li>
+                                <li>SVG exports available via Genome Viewer</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">What are the size limits?</div>
+                        <div class="faq-answer">
+                            <p>Your frontend enforces reasonable limits:</p>
+                            <ul>
+                                <li><strong>Image dimensions:</strong> Scaled to fit within ~400px (configurable)</li>
+                                <li><strong>Polygon count:</strong> 10-300 (default 50)</li>
+                                <li><strong>Genome file size:</strong> Proportional to polygon count — a 50-polygon genome is ~2KB</li>
+                            </ul>
+                            <p>There's no hard file size limit — performance will degrade gracefully with very large genomes.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">How fast is evolution?</div>
+                        <div class="faq-answer">
+                            <p>Performance depends on your setup:</p>
+                            <ul>
+                                <li><strong>Browser (Layer 1):</strong> 500-1000 steps/second</li>
+                                <li><strong>Layer 2 (server.py):</strong> 1000-2000 steps/second (pure Python)</li>
+                                <li><strong>Layer 3/4 (FastAPI):</strong> 2000-5000 steps/second (async + workers)</li>
+                            </ul>
+                            <p>A typical evolution of 500 steps takes 1-2 seconds on the server.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <h2>Limits</h2>
-                <div class="faq-item">
-                    <h3>What's the maximum image size?</h3>
-                    <p>10MB per image, maximum dimensions 2048×2048 pixels.</p>
+                <div class="faq-section">
+                    <h2>Kinship System</h2>
+
+                    <div class="faq-item">
+                        <div class="faq-question">How does kinship work?</div>
+                        <div class="faq-answer">
+                            <p>Each artwork has a 16-dimensional feature vector extracted from its genome. Kinship calculates similarity using a weighted combination:</p>
+                            <ul>
+                                <li><strong>40% Visual features</strong> — RGB means, standard deviations, entropy</li>
+                                <li><strong>30% Generational distance</strong> — How many generations apart</li>
+                                <li><strong>30% Structural features</strong> — Polygon count, opacity, point counts</li>
+                            </ul>
+                            <p>Relationships are classified as parent/child, sibling (≥82% similarity), cousin (65-81%), or similar (45-64%).</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">Can I visualize kinship trees?</div>
+                        <div class="faq-answer">
+                            <p>Yes! Use our official <a href="https://pigment-org.github.io/js/kinship-viz.js">kinship visualization library</a>:</p>
+                            <pre><code>&lt;script src="https://pigment-org.github.io/js/kinship-viz.js"&gt;&lt;/script&gt;
+&lt;div id="kinship-tree"&gt;&lt;/div&gt;
+
+const data = await fetch('https://pigment-api.onrender.com/v1/kinship', {
+    method: 'POST',
+    headers: { 'X-API-Key': 'your-key' },
+    body: JSON.stringify({ work_id: 'work_123' })
+});
+
+KinshipViz.render('kinship-tree', data);</code></pre>
+                        </div>
+                    </div>
                 </div>
-                <div class="faq-item">
-                    <h3>How long are images stored?</h3>
-                    <p>Generated images are stored for 30 days on our CDN.</p>
+
+                <div class="faq-section">
+                    <h2>AI Prompts</h2>
+
+                    <div class="faq-item">
+                        <div class="faq-question">How do AI prompts work?</div>
+                        <div class="faq-answer">
+                            <p>The <code>/v1/prompt</code> endpoint uses Claude API (with local fallback) to translate natural language into structured mutation plans:</p>
+                            <ul>
+                                <li><strong>"make it glitchy"</strong> → glitch_colors + chaos + boost_contrast</li>
+                                <li><strong>"organic feel"</strong> → organic_spread + smooth + saturate</li>
+                                <li><strong>"darker, more void"</strong> → void_crush + darken + remove_polygons</li>
+                            </ul>
+                            <p>If Claude is unavailable, intelligent keyword matching provides reasonable fallback behavior.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">Do I need an Anthropic API key?</div>
+                        <div class="faq-answer">
+                            <p>No! The system works perfectly with local keyword matching. Claude integration is optional — if you add <code>ANTHROPIC_API_KEY</code> to your environment, prompts will be processed by Claude; otherwise, the built-in fallback handles everything locally.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-section">
+                    <h2>Deployment</h2>
+
+                    <div class="faq-item">
+                        <div class="faq-question">Can I host PIGMENT myself?</div>
+                        <div class="faq-answer">
+                            <p>Absolutely! PIGMENT is open-source and designed for self-hosting:</p>
+                            <ul>
+                                <li><strong>Layer 2:</strong> Pure Python, no dependencies — run with <code>python3 server.py</code></li>
+                                <li><strong>Layer 3:</strong> FastAPI + PostgreSQL + Redis — Docker Compose included</li>
+                                <li><strong>Layer 4:</strong> Add Claude API, FAISS, and WebSockets</li>
+                            </ul>
+                            <p>Clone from <a href="https://github.com/pigment-org">GitHub</a> and deploy anywhere — Render, DigitalOcean, or your own server.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">Will my Render deployment sleep?</div>
+                        <div class="faq-answer">
+                            <p>On the free tier, Render spins down after 15 minutes of inactivity. To keep your API awake 24/7, use a monitoring service like UptimeRobot to ping your <code>/health</code> endpoint every 5-10 minutes. This uses your free 750 hours/month without incurring charges.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pagination">
@@ -67,6 +332,52 @@
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+
+    <footer class="docs-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="index.html">Documentation</a></li>
+                    <li><a href="../blog/index.html">Blog</a></li>
+                    <li><a href="../showcase/index.html">Showcase</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="getting-started.html">Quick Start</a></li>
+                    <li><a href="authentication.html">Authentication</a></li>
+                    <li><a href="rate-limits.html">Rate Limits</a></li>
+                    <li><a href="faq.html">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+                    <li><a href="../blog/kinship-explained.html">Kinship System</a></li>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved. · v6.0.0 · <strong>100% Free & Open Source</strong></p>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ accordion
+        document.querySelectorAll('.faq-item').forEach(item => {
+            const question = item.querySelector('.faq-question');
+            question.addEventListener('click', () => {
+                item.classList.toggle('expanded');
+            });
+        });
+
+        // Open first item by default
+        document.querySelector('.faq-item')?.classList.add('expanded');
+    </script>
 </body>
 </html>
