@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>/v1/evolve - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>/* Same CSS */</style>
+</head>
+<body>
+    <header class="docs-header">...</header>
+    <div class="docs-layout">
+        <button class="sidebar-toggle">📚 Menu ▼</button>
+        <aside class="docs-sidebar">...</aside>
+        <main class="docs-content">
+            <div class="content-container">
+                <h1><code>/v1/evolve</code></h1>
+                <p class="lead">Start an evolution job to generate artwork from a target image.</p>
+
+                <h2>Start Evolution</h2>
+                <p><code>POST /v1/evolve</code></p>
+
+                <h3>Request Body</h3>
+                <table>
+                    <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                    <tr><td>target_url</td><td>string</td><td>Yes*</td><td>Publicly accessible image URL</td></tr>
+                    <tr><td>target_image</td><td>string</td><td>Yes*</td><td>Base64 encoded image</td></tr>
+                    <tr><td>generations</td><td>integer</td><td>No</td><td>Number of generations (100-10000, default 1000)</td></tr>
+                    <tr><td>polygons</td><td>integer</td><td>No</td><td>Number of polygons (10-500, default 100)</td></tr>
+                    <tr><td>mutation_rate</td><td>float</td><td>No</td><td>Mutation rate (0.01-1.0, default 0.1)</td></tr>
+                    <tr><td>strategy</td><td>string</td><td>No</td><td>Evolution strategy</td></tr>
+                    <tr><td>webhook_url</td><td>string</td><td>No</td><td>URL to notify when complete</td></tr>
+                </table>
+                <p>* Either target_url or target_image is required.</p>
+
+                <h3>Example Request</h3>
+                <pre><code>curl -X POST https://api.pigment.dev/v1/evolve \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target_url": "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d",
+    "generations": 1000,
+    "polygons": 150,
+    "mutation_rate": 0.15
+  }'</code></pre>
+
+                <h3>Response</h3>
+                <pre><code>{
+    "job_id": "job_abc123",
+    "estimated_seconds": 45,
+    "status": "processing"
+}</code></pre>
+
+                <h2>Check Job Status</h2>
+                <p><code>GET /v1/jobs/{job_id}</code></p>
+
+                <h3>Response (Processing)</h3>
+                <pre><code>{
+    "status": "processing",
+    "progress": 42,
+    "current_fitness": 67.3,
+    "best_fitness": 67.3,
+    "generation": 420
+}</code></pre>
+
+                <h3>Response (Completed)</h3>
+                <pre><code>{
+    "status": "completed",
+    "progress": 100,
+    "result": {
+        "work_id": "work_123",
+        "image_url": "https://storage.pigment.dev/result_123.png",
+        "fitness": 98.5,
+        "generations": 1000,
+        "duration_ms": 45678
+    }
+}</code></pre>
+
+                <h2>WebSocket Real-time Updates</h2>
+                <p>Connect to <code>wss://api.pigment.dev/v1/ws</code> with your API key:</p>
+                <pre><code>const ws = new WebSocket('wss://api.pigment.dev/v1/ws?token=YOUR_API_KEY');
+
+ws.onmessage = (event) => {
+    const update = JSON.parse(event.data);
+    console.log(`Progress: ${update.progress}%`);
+    console.log(`Current fitness: ${update.fitness}%`);
+};</code></pre>
+
+                <div class="pagination">
+                    <a href="works.html" class="prev">← /v1/works</a>
+                    <a href="kinship.html" class="next">/v1/kinship →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="docs-footer">...</footer>
+</body>
+</html>
