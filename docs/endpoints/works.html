@@ -2,85 +2,372 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>/v1/works - PIGMENT API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Works API - PIGMENT v6 Docs</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>/* Same CSS */</style>
+    <link rel="stylesheet" href="../../css/docs.css">
+    <style>
+        .feature-badge {
+            display: inline-block;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+        }
+    </style>
 </head>
 <body>
-    <header class="docs-header">...</header>
+    <header class="docs-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="../../index.html">PIGMENT <span>docs</span></a>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+            <nav class="header-nav">
+                <a href="../../index.html">Home</a>
+                <a href="../index.html" class="active">Docs</a>
+                <a href="../../blog/index.html">Blog</a>
+                <a href="../../showcase/index.html">Showcase</a>
+            </nav>
+            <div class="header-actions">
+                <a href="../getting-started.html" class="btn btn-primary">Quick Start</a>
+                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
+            </div>
+        </div>
+    </header>
+
     <div class="docs-layout">
-        <button class="sidebar-toggle">📚 Menu ▼</button>
-        <aside class="docs-sidebar">...</aside>
+        <aside class="docs-sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Getting Started</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../index.html">Introduction</a></li>
+                    <li><a href="../getting-started.html">Quick Start</a></li>
+                    <li><a href="../authentication.html">Authentication</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Endpoints</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="works.html" class="active">/v1/works</a></li>
+                    <li><a href="evolve.html">/v1/evolve</a></li>
+                    <li><a href="kinship.html">/v1/kinship</a></li>
+                    <li><a href="prompt.html">/v1/prompt</a></li>
+                    <li><a href="gallery.html">/v1/gallery</a></li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Examples</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="../examples/javascript.html">JavaScript</a></li>
+                    <li><a href="../examples/python.html">Python</a></li>
+                    <li><a href="../examples/curl.html">cURL</a></li>
+                </ul>
+            </div>
+        </aside>
+
         <main class="docs-content">
             <div class="content-container">
-                <h1><code>/v1/works</code></h1>
-                <p class="lead">List, retrieve, and manage your generated artworks.</p>
+                <div class="endpoint-header">
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-path">/v1/works</span>
+                    <span class="endpoint-method" style="margin-left: 1rem;">GET</span>
+                    <span class="endpoint-path">/v1/works/{id}</span>
+                    <span class="endpoint-method" style="margin-left: 1rem;">DELETE</span>
+                </div>
+
+                <h1>Works API</h1>
+                <p class="lead">Create, retrieve, and manage your generated artworks. Each work is stored as a .pg genome file with associated metadata and 16-dimensional feature vectors.</p>
+
+                <div class="info-box">
+                    <strong>🧬 What is a .pg file?</strong> A PIGMENT Genome file contains the complete description of an artwork: polygons, colors, opacities, and evolution metadata. It's the source code of your art.
+                </div>
+
+                <h2>Create Work</h2>
+                <p>Create a new artwork by submitting a .pg genome.</p>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-card-header">
+                        <span class="method">POST</span>
+                        <span class="path">/v1/works</span>
+                    </div>
+
+                    <h3>Request Body</h3>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>title</code></td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>Title of the artwork (default: "Untitled")</td>
+                            </tr>
+                            <tr>
+                                <td><code>content</code></td>
+                                <td>string</td>
+                                <td>Yes</td>
+                                <td>The .pg genome content</td>
+                            </tr>
+                            <tr>
+                                <td><code>type</code></td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>Always "pg" for now</td>
+                            </tr>
+                            <tr>
+                                <td><code>parent_id</code></td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>ID of parent work (if this is an evolution child)</td>
+                            </tr>
+                            <tr>
+                                <td><code>tags</code></td>
+                                <td>array</td>
+                                <td>No</td>
+                                <td>List of tags for categorization</td>
+                            </tr>
+                            <tr>
+                                <td><code>generation</code></td>
+                                <td>integer</td>
+                                <td>No</td>
+                                <td>Generation number (default: 0)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Example Request</h3>
+                    <div class="code-block">
+                        <pre><code>curl -X POST https://pigment-api.onrender.com/v1/works \
+  -H "X-API-Key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My First Artwork",
+    "content": "-- PIGMENT Genome v6.0.0\n-- @fitness 0.0\n\ncanvas { width: 400 height: 400 }\n\npalette { color_0: #ff3366 }\n\nlayer base {\n  zone poly_0 {\n    color: palette.color_0\n    opacity: 0.8\n    points: 120,140 180,120 160,200\n  }\n}",
+    "tags": ["triangle", "demo"]
+  }'</code></pre>
+                    </div>
+
+                    <h3>Response</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "id": "work_2a7f8c3e1b9d4f6",
+  "title": "My First Artwork",
+  "style": "custom",
+  "fitness": 0.0,
+  "features": [
+    0.5, 0.3, 0.7,  # RGB means
+    0.2, 0.1, 0.3,  # RGB stds
+    0.4,            # Luminance contrast
+    0.6,            # Color entropy
+    0.02,           # Polygon count (normalized)
+    0.8,            # Avg opacity
+    0.3,            # Avg points per polygon
+    0.5,            # Hue spread
+    0.1,            # Glitch factor
+    0.2,            # Organic factor
+    0.1,            # Void factor
+    0.0             # Fitness proxy
+  ],
+  "tags": ["triangle", "demo"],
+  "created_at": "2026-02-21T12:00:00Z"
+}</code></pre>
+                    </div>
+                </div>
 
                 <h2>List Works</h2>
-                <p><code>GET /v1/works</code></p>
+                <p>Retrieve a paginated list of your artworks.</p>
 
-                <h3>Parameters</h3>
-                <table>
-                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                    <tr><td>limit</td><td>integer</td><td>Max items (1-100, default 20)</td></tr>
-                    <tr><td>offset</td><td>integer</td><td>Pagination offset</td></tr>
-                    <tr><td>sort</td><td>string</td><td>Sort by: created_at, fitness</td></tr>
-                </table>
+                <div class="endpoint-card">
+                    <div class="endpoint-card-header">
+                        <span class="method">GET</span>
+                        <span class="path">/v1/works</span>
+                    </div>
 
-                <h3>Response</h3>
-                <pre><code>{
-    "data": [
-        {
-            "id": "work_123",
-            "url": "https://storage.pigment.dev/work_123.png",
-            "fitness": 98.5,
-            "created_at": "2026-03-15T10:30:00Z",
-            "generations": 1000,
-            "polygons": 150,
-            "tags": ["abstract", "portrait"]
-        }
-    ],
-    "total": 42,
-    "limit": 20,
-    "offset": 0
+                    <h3>Query Parameters</h3>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>limit</code></td>
+                                <td>integer</td>
+                                <td>Number of items to return (1-100, default 20)</td>
+                            </tr>
+                            <tr>
+                                <td><code>offset</code></td>
+                                <td>integer</td>
+                                <td>Number of items to skip (default 0)</td>
+                            </tr>
+                            <tr>
+                                <td><code>style</code></td>
+                                <td>string</td>
+                                <td>Filter by style: "glitch", "organic", "void", "custom"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Example Request</h3>
+                    <div class="code-block">
+                        <pre><code>curl "https://pigment-api.onrender.com/v1/works?limit=10&offset=0&style=glitch" \
+  -H "X-API-Key: your-api-key"</code></pre>
+                    </div>
+
+                    <h3>Response</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "total": 42,
+  "limit": 10,
+  "offset": 0,
+  "works": [
+    {
+      "id": "work_2a7f8c3e1b9d4f6",
+      "title": "My First Artwork",
+      "style": "custom",
+      "fitness": 0.0,
+      "generation": 0,
+      "tags": ["triangle", "demo"],
+      "created_at": "2026-02-21T12:00:00Z"
+    },
+    {
+      "id": "work_3b8g9d4f2e1a5c7",
+      "title": "Glitch Study #1",
+      "style": "glitch",
+      "fitness": 78.3,
+      "generation": 1542,
+      "tags": ["glitch", "abstract"],
+      "created_at": "2026-02-21T13:30:00Z"
+    }
+  ]
 }</code></pre>
+                    </div>
+                    <p class="note">Note: The <code>content</code> field is omitted in list views for performance. Use <code>GET /v1/works/{id}</code> to retrieve the full genome.</p>
+                </div>
 
                 <h2>Get Single Work</h2>
-                <p><code>GET /v1/works/{id}</code></p>
+                <p>Retrieve a specific artwork by ID, including its full genome content.</p>
 
-                <h3>Response</h3>
-                <pre><code>{
-    "id": "work_123",
-    "url": "https://storage.pigment.dev/work_123.png",
-    "fitness": 98.5,
-    "created_at": "2026-03-15T10:30:00Z",
-    "generations": 1000,
-    "polygons": 150,
-    "metadata": {
-        "target_url": "https://example.com/original.jpg",
-        "mutation_rate": 0.1,
-        "strategy": "refine.face"
-    },
-    "kinship": {
-        "parent": "work_122",
-        "children": ["work_124", "work_125"],
-        "similarity": 0.85
-    }
+                <div class="endpoint-card">
+                    <div class="endpoint-card-header">
+                        <span class="method">GET</span>
+                        <span class="path">/v1/works/{id}</span>
+                    </div>
+
+                    <h3>Path Parameters</h3>
+                    <table class="params-table">
+                        <tr>
+                            <td><code>id</code></td>
+                            <td>string</td>
+                            <td>Required</td>
+                            <td>Work ID (UUID format)</td>
+                        </tr>
+                    </table>
+
+                    <h3>Example Request</h3>
+                    <div class="code-block">
+                        <pre><code>curl https://pigment-api.onrender.com/v1/works/work_2a7f8c3e1b9d4f6 \
+  -H "X-API-Key: your-api-key"</code></pre>
+                    </div>
+
+                    <h3>Response</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "id": "work_2a7f8c3e1b9d4f6",
+  "user_id": "user_1b2c3d4e5f6g7h8",
+  "title": "My First Artwork",
+  "type": "pg",
+  "content": "-- PIGMENT Genome v6.0.0\n-- @fitness 0.0\n-- @generation 0\n\ncanvas { width: 400 height: 400 }\n\npalette { color_0: #ff3366 }\n\nlayer base {\n  zone poly_0 {\n    color: palette.color_0\n    opacity: 0.8\n    points: 120,140 180,120 160,200\n  }\n}",
+  "features": [0.5, 0.3, 0.7, 0.2, 0.1, 0.3, 0.4, 0.6, 0.02, 0.8, 0.3, 0.5, 0.1, 0.2, 0.1, 0.0],
+  "style": "custom",
+  "fitness": 0.0,
+  "generation": 0,
+  "parent_id": null,
+  "tags": ["triangle", "demo"],
+  "created_at": "2026-02-21T12:00:00Z",
+  "updated_at": "2026-02-21T12:00:00Z"
 }</code></pre>
+                    </div>
+                </div>
 
                 <h2>Delete Work</h2>
-                <p><code>DELETE /v1/works/{id}</code></p>
-                <p>Returns <code>204 No Content</code> on success.</p>
+                <p>Delete an artwork permanently.</p>
 
-                <h2>Update Work</h2>
-                <p><code>PATCH /v1/works/{id}</code></p>
+                <div class="endpoint-card">
+                    <div class="endpoint-card-header">
+                        <span class="method">DELETE</span>
+                        <span class="path">/v1/works/{id}</span>
+                    </div>
 
-                <h3>Request Body</h3>
-                <pre><code>{
-    "tags": ["abstract", "featured"],
-    "title": "My Masterpiece"
+                    <h3>Example Request</h3>
+                    <div class="code-block">
+                        <pre><code>curl -X DELETE https://pigment-api.onrender.com/v1/works/work_2a7f8c3e1b9d4f6 \
+  -H "X-API-Key: your-api-key"</code></pre>
+                    </div>
+
+                    <h3>Response</h3>
+                    <div class="code-block">
+                        <pre><code>{
+  "message": "Deleted",
+  "id": "work_2a7f8c3e1b9d4f6"
 }</code></pre>
+                    </div>
+                </div>
+
+                <h2>Feature Vector Details</h2>
+                <p>Each work includes a 16-dimensional feature vector used for kinship calculations:</p>
+
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0-2</td><td>RGB means</td><td>Average red, green, blue values (0-1)</td></tr>
+                        <tr><td>3-5</td><td>RGB stds</td><td>Standard deviation of each channel</td></tr>
+                        <tr><td>6</td><td>Luminance contrast</td><td>Spread of brightness values</td></tr>
+                        <tr><td>7</td><td>Color entropy</td><td>Complexity/randomness of colors</td></tr>
+                        <tr><td>8</td><td>Polygon count</td><td>Normalized (0-1) polygon count</td></tr>
+                        <tr><td>9</td><td>Avg opacity</td><td>Average opacity across polygons</td></tr>
+                        <tr><td>10</td><td>Avg points</td><td>Average points per polygon</td></tr>
+                        <tr><td>11</td><td>Hue spread</td><td>Diversity of hues</td></tr>
+                        <tr><td>12</td><td>Glitch factor</td><td>Channel imbalance (0-1)</td></tr>
+                        <tr><td>13</td><td>Organic factor</td><td>Green bias + smoothness</td></tr>
+                        <tr><td>14</td><td>Void factor</td><td>Darkness + low complexity</td></tr>
+                        <tr><td>15</td><td>Fitness proxy</td><td>Normalized fitness from genome</td></tr>
+                    </tbody>
+                </table>
+
+                <h2>Error Responses</h2>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>400</td><td>Invalid parameters or malformed genome</td></tr>
+                        <tr><td>401</td><td>Missing or invalid API key</td></tr>
+                        <tr><td>403</td><td>Not authorized to access this work</td></tr>
+                        <tr><td>404</td><td>Work not found</td></tr>
+                    </tbody>
+                </table>
 
                 <div class="pagination">
                     <a href="../getting-started.html" class="prev">← Getting Started</a>
@@ -89,6 +376,41 @@
             </div>
         </main>
     </div>
-    <footer class="docs-footer">...</footer>
+
+    <footer class="docs-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="../../index.html">Home</a></li>
+                    <li><a href="../index.html">Documentation</a></li>
+                    <li><a href="../../blog/index.html">Blog</a></li>
+                    <li><a href="../../showcase/index.html">Showcase</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="../getting-started.html">Quick Start</a></li>
+                    <li><a href="../authentication.html">Authentication</a></li>
+                    <li><a href="works.html">Works</a></li>
+                    <li><a href="evolve.html">Evolve</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="../../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+                    <li><a href="../../blog/kinship-explained.html">Kinship System</a></li>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved. · v6.0.0</p>
+        </div>
+    </footer>
+
+    <script src="../../js/docs.js"></script>
 </body>
 </html>
