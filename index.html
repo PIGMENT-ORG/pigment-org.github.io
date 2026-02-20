@@ -1,232 +1,561 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PIGMENT v6 - AI Art Evolution Platform</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/main.css">
-  <style>
-    .hero {
-      padding: 80px 24px;
-      text-align: center;
-      background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
-      border-bottom: 1px solid #2a2a2a;
-    }
-    .hero h1 {
-      font-family: 'Unbounded', sans-serif;
-      font-size: 64px;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      margin-bottom: 24px;
-    }
-    .hero .accent {
-      color: #c8ff00;
-    }
-    .hero p {
-      font-size: 20px;
-      color: #b8b4ac;
-      max-width: 600px;
-      margin: 0 auto 32px;
-    }
-    .cta-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      margin-bottom: 48px;
-    }
-    .cta-primary {
-      background: #c8ff00;
-      color: #0a0a0a;
-      padding: 16px 32px;
-      border-radius: 8px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .cta-primary:hover {
-      background: #d4ff26;
-      transform: translateY(-2px);
-    }
-    .cta-secondary {
-      background: transparent;
-      color: #f0ede6;
-      padding: 16px 32px;
-      border-radius: 8px;
-      border: 1px solid #2a2a2a;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .cta-secondary:hover {
-      border-color: #c8ff00;
-      color: #c8ff00;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 48px 0;
-    }
-    .stat-card {
-      background: #1a1a1a;
-      padding: 24px;
-      border-radius: 12px;
-      border: 1px solid #2a2a2a;
-      text-align: center;
-    }
-    .stat-number {
-      font-family: 'Unbounded', sans-serif;
-      font-size: 36px;
-      font-weight: 700;
-      color: #c8ff00;
-      margin-bottom: 8px;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 48px 24px;
-    }
-    .feature-card {
-      background: #1a1a1a;
-      padding: 32px;
-      border-radius: 16px;
-      border: 1px solid #2a2a2a;
-    }
-    .feature-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-    .feature-title {
-      font-family: 'Unbounded', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #c8ff00;
-    }
-    .code-block {
-      background: #0a0a0a;
-      padding: 16px;
-      border-radius: 8px;
-      font-family: 'DM Mono', monospace;
-      font-size: 14px;
-      margin: 24px 0;
-      border: 1px solid #2a2a2a;
-    }
-    footer {
-      border-top: 1px solid #2a2a2a;
-      padding: 48px 24px;
-      text-align: center;
-      color: #666;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>PIGMENT - Evolutionary Art API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --ink: #0a0a0a;
+            --paper: #f0ede6;
+            --dim: #b8b4ac;
+            --accent: #c8ff00;
+            --mono: 'DM Mono', monospace;
+            --display: 'Unbounded', sans-serif;
+        }
+
+        body {
+            background: var(--ink);
+            color: var(--paper);
+            font-family: var(--mono);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .nav {
+            position: sticky;
+            top: 0;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1a1a1a;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--display);
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: 1px solid #333;
+            color: var(--paper);
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 4rem 1rem;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: var(--display);
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero .accent {
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 4vw, 1.25rem);
+            color: var(--dim);
+            margin-bottom: 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 1rem;
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--ink);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: #d4ff26;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--paper);
+            border: 1px solid #333;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Features */
+        .features {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 1rem;
+        }
+
+        .features h2 {
+            font-family: var(--display);
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 2rem 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-family: var(--display);
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .feature-card p {
+            color: var(--dim);
+            font-size: 0.9rem;
+        }
+
+        /* Stats */
+        .stats {
+            background: #0d0d0d;
+            border-top: 1px solid #1a1a1a;
+            border-bottom: 1px solid #1a1a1a;
+            padding: 3rem 1rem;
+        }
+
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: var(--display);
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 900;
+            color: var(--accent);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--dim);
+            font-size: 0.9rem;
+        }
+
+        /* Showcase */
+        .showcase {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 1rem;
+        }
+
+        .showcase h2 {
+            font-family: var(--display);
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .showcase-item {
+            aspect-ratio: 1;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .showcase-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .showcase-item:hover img {
+            transform: scale(1.05);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+            padding: 4rem 1rem;
+            text-align: center;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .cta-section h2 {
+            font-family: var(--display);
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            color: var(--dim);
+            margin-bottom: 2rem;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+        }
+
+        /* Footer */
+        .footer {
+            background: #0a0a0a;
+            padding: 3rem 1rem 1rem;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h4 {
+            font-family: var(--display);
+            color: var(--paper);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid #1a1a1a;
+            color: #333;
+            font-size: 0.8rem;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #0a0a0a;
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid #1a1a1a;
+                gap: 1rem;
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .nav-links a {
+                width: 100%;
+                text-align: center;
+                padding: 0.75rem;
+            }
+
+            .nav-links .btn {
+                width: 100%;
+                margin: 0;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .feature-grid {
+                gap: 1rem;
+            }
+
+            .stats-container {
+                gap: 1.5rem;
+            }
+
+            .showcase-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .feature-card {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        /* Touch-friendly */
+        @media (hover: none) {
+            .btn, 
+            .feature-card,
+            .nav-links a {
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .btn:active {
+                transform: scale(0.98);
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Header -->
-  <header style="background: #0a0a0a; border-bottom: 1px solid #2a2a2a; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
-    <div style="font-family: 'Unbounded', sans-serif; font-weight: 900; color: #c8ff00;">PIGMENT <span style="color: #666; font-weight: 300;">v6</span></div>
-    <nav style="display: flex; gap: 24px;">
-      <a href="/docs" style="color: #f0ede6; text-decoration: none;">Docs</a>
-      <a href="/blog" style="color: #f0ede6; text-decoration: none;">Blog</a>
-      <a href="/showcase" style="color: #f0ede6; text-decoration: none;">Showcase</a>
-      <a href="/pigment-engine.html" style="color: #c8ff00; text-decoration: none;">Launch App →</a>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="logo">PIGMENT</a>
+            <button class="mobile-menu-btn" id="menuBtn">☰</button>
+            <div class="nav-links" id="navLinks">
+                <a href="docs/">Docs</a>
+                <a href="blog/">Blog</a>
+                <a href="showcase/">Showcase</a>
+                <a href="https://github.com/pigment-org">GitHub</a>
+                <a href="docs/getting-started.html" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
     </nav>
-  </header>
 
-  <!-- Hero Section -->
-  <div class="hero">
-    <h1>Evolve Art with <span class="accent">AI</span></h1>
-    <p>PIGMENT is a genetic algorithm platform that transforms images through evolution. Watch your art come alive.</p>
-    <div class="cta-buttons">
-      <a href="/pigment-engine.html" class="cta-primary">Launch Live Demo</a>
-      <a href="/docs/getting-started.html" class="cta-secondary">API Documentation</a>
-    </div>
-  </div>
+    <section class="hero">
+        <h1>Evolutionary Art <span class="accent">API</span></h1>
+        <p>Generate unique artwork using genetic algorithms. Watch images evolve in real-time.</p>
+        <div class="cta-buttons">
+            <a href="docs/getting-started.html" class="btn btn-primary">Start Building</a>
+            <a href="pigment-engine.html" class="btn btn-outline">Try Demo</a>
+        </div>
+    </section>
 
-  <!-- Stats -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-number">171k+</div>
-      <div>Training Samples</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number">14</div>
-      <div>Q-States</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number">15+</div>
-      <div>API Endpoints</div>
-    </div>
-  </div>
+    <section class="features">
+        <h2>Why PIGMENT?</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🧬</div>
+                <h3>Genetic Evolution</h3>
+                <p>Watch your images evolve through generations of mutation and selection.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔗</div>
+                <h3>Kinship System</h3>
+                <p>Track family trees of artwork and measure artistic influence.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI-Powered</h3>
+                <p>Integrated with Claude for intelligent prompt-based evolution.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Real-time</h3>
+                <p>WebSocket support for live evolution progress.</p>
+            </div>
+        </div>
+    </section>
 
-  <!-- Features -->
-  <div style="text-align: center; padding: 48px 24px 0;">
-    <h2 style="font-family: 'Unbounded', sans-serif; font-size: 36px; margin-bottom: 16px;">Built for <span style="color: #c8ff00;">Creators</span></h2>
-    <p style="color: #b8b4ac; max-width: 600px; margin: 0 auto;">Everything you need to build AI-powered art applications</p>
-  </div>
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number">171K</span>
+                <span class="stat-label">Training Samples</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">14</span>
+                <span class="stat-label">Q-States</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">12</span>
+                <span class="stat-label">Strategies</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">99%</span>
+                <span class="stat-label">Uptime</span>
+            </div>
+        </div>
+    </section>
 
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🧬</div>
-      <div class="feature-title">Genetic Algorithm Engine</div>
-      <p>6 mutation operators with adaptive probabilities based on success rates. Real-time evolution at 1000+ steps/second.</p>
-      <div class="code-block">
-        POST /v1/evolve<br>
-        { "steps": 500, "mutation_rate": 1.0 }
-      </div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔗</div>
-      <div class="feature-title">Kinship Tracking</div>
-      <p>FAISS-powered similarity search finds family relationships between artworks in 50ms.</p>
-      <div class="code-block">
-        POST /v1/kinship<br>
-        { "work_id": "abc-123" }
-      </div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🤖</div>
-      <div class="feature-title">AI Prompts</div>
-      <p>Natural language control with Claude API. "Make it glitchy" → structured mutation plan.</p>
-      <div class="code-block">
-        POST /v1/prompt<br>
-        { "prompt": "make it glitchy" }
-      </div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <div class="feature-title">16D Feature Vectors</div>
-      <p>Perceptual features extracted from every artwork: RGB means, entropy, hue spread, glitch factor, and more.</p>
-      <div class="code-block">
-        GET /v1/works/abc-123<br>
-        // Returns features array
-      </div>
-    </div>
-  </div>
+    <section class="showcase">
+        <h2>Generated with PIGMENT</h2>
+        <div class="showcase-grid">
+            <div class="showcase-item"><img src="https://via.placeholder.com/300/c8ff00/000000?text=Art+1" alt="Artwork 1"></div>
+            <div class="showcase-item"><img src="https://via.placeholder.com/300/0051ff/ffffff?text=Art+2" alt="Artwork 2"></div>
+            <div class="showcase-item"><img src="https://via.placeholder.com/300/ff3b2f/ffffff?text=Art+3" alt="Artwork 3"></div>
+            <div class="showcase-item"><img src="https://via.placeholder.com/300/bf5af2/ffffff?text=Art+4" alt="Artwork 4"></div>
+        </div>
+    </section>
 
-  <!-- Code Example -->
-  <div style="max-width: 800px; margin: 48px auto; background: #1a1a1a; border-radius: 16px; padding: 32px;">
-    <h3 style="font-family: 'Unbounded', sans-serif; margin-bottom: 16px;">Quick Start in 3 Lines</h3>
-    <div style="background: #0a0a0a; padding: 24px; border-radius: 8px; font-family: 'DM Mono', monospace;">
-      <div style="color: #c8ff00;">$</div> curl -X POST https://pigment-api.onrender.com/v1/users \<br>
-      &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
-      &nbsp;&nbsp;-d '{"email": "your@email.com"}'
-      <div style="margin-top: 16px; color: #888;">// Returns your API key</div>
-    </div>
-  </div>
+    <section class="cta-section">
+        <h2>Ready to create?</h2>
+        <p>Get your API key and start generating in minutes.</p>
+        <a href="docs/getting-started.html" class="btn btn-primary">Get Started Now</a>
+    </section>
 
-  <!-- Footer -->
-  <footer>
-    <p>PIGMENT v6 - Open Source AI Art Evolution Platform</p>
-    <p style="margin-top: 16px;">
-      <a href="https://github.com/PIGMENT-ORG" style="color: #666; text-decoration: none; margin: 0 8px;">GitHub</a> •
-      <a href="/docs" style="color: #666; text-decoration: none; margin: 0 8px;">Documentation</a> •
-      <a href="/blog" style="color: #666; text-decoration: none; margin: 0 8px;">Blog</a>
-    </p>
-  </footer>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>PIGMENT</h4>
+                <ul>
+                    <li><a href="docs/">Documentation</a></li>
+                    <li><a href="blog/">Blog</a></li>
+                    <li><a href="showcase/">Showcase</a></li>
+                    <li><a href="pigment-engine.html">Live Demo</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>API</h4>
+                <ul>
+                    <li><a href="docs/getting-started.html">Quick Start</a></li>
+                    <li><a href="docs/authentication.html">Authentication</a></li>
+                    <li><a href="docs/endpoints/evolve.html">Evolve Endpoint</a></li>
+                    <li><a href="docs/rate-limits.html">Rate Limits</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+                    <li><a href="blog/kinship-explained.html">Kinship System</a></li>
+                    <li><a href="blog/ai-prompts.html">AI Prompts</a></li>
+                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 PIGMENT. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('menuBtn').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('show');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav')) {
+                document.getElementById('navLinks').classList.remove('show');
+            }
+        });
+    </script>
 </body>
 </html>
