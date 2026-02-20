@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PIGMENT v6 API Documentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/docs.css">
+</head>
+<body>
+  <!-- Header -->
+  <header style="background: #0a0a0a; border-bottom: 1px solid #2a2a2a; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="font-family: 'Unbounded', sans-serif; font-weight: 900; color: #c8ff00;">PIGMENT <span style="color: #666; font-weight: 300;">v6</span></div>
+    <nav style="display: flex; gap: 24px;">
+      <a href="/" style="color: #f0ede6; text-decoration: none;">Home</a>
+      <a href="/docs" style="color: #c8ff00; text-decoration: none;">Docs</a>
+      <a href="/blog" style="color: #f0ede6; text-decoration: none;">Blog</a>
+      <a href="/showcase" style="color: #f0ede6; text-decoration: none;">Showcase</a>
+      <a href="/pigment-engine.html" style="color: #f0ede6; text-decoration: none;">Launch App →</a>
+    </nav>
+  </header>
+
+  <!-- Docs Layout -->
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <div class="docs-sidebar">
+      <h3>Getting Started</h3>
+      <ul>
+        <li><a href="/docs/getting-started.html" class="active">Quick Start</a></li>
+        <li><a href="/docs/authentication.html">Authentication</a></li>
+      </ul>
+
+      <h3>Endpoints</h3>
+      <ul>
+        <li><a href="/docs/endpoints/works.html">/v1/works</a></li>
+        <li><a href="/docs/endpoints/evolve.html">/v1/evolve</a></li>
+        <li><a href="/docs/endpoints/kinship.html">/v1/kinship</a></li>
+        <li><a href="/docs/endpoints/prompt.html">/v1/prompt</a></li>
+        <li><a href="/docs/endpoints/gallery.html">/v1/gallery</a></li>
+      </ul>
+
+      <h3>Examples</h3>
+      <ul>
+        <li><a href="/docs/examples/javascript.html">JavaScript</a></li>
+        <li><a href="/docs/examples/python.html">Python</a></li>
+        <li><a href="/docs/examples/curl.html">cURL</a></li>
+      </ul>
+
+      <h3>Resources</h3>
+      <ul>
+        <li><a href="https://github.com/PIGMENT-ORG/PIGMENT-V6">GitHub</a></li>
+        <li><a href="https://pigment-api.onrender.com/docs">OpenAPI</a></li>
+      </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="docs-content">
+      <h1>PIGMENT v6 API <span class="accent">Documentation</span></h1>
+      <p style="font-size: 18px; color: var(--dim);">Build AI-powered art applications with genetic algorithms.</p>
+
+      <div style="background: #1a1a1a; padding: 24px; border-radius: 12px; margin: 32px 0;">
+        <h3>Base URL</h3>
+        <pre style="margin: 16px 0 0;">https://pigment-api.onrender.com</pre>
+      </div>
+
+      <h2>Overview</h2>
+      <p>PIGMENT is a genetic algorithm platform that evolves images through mutations. Every artwork is represented as a genome — a collection of colored polygons with opacity and position data.</p>
+
+      <p>The API provides endpoints for:</p>
+      <ul style="margin: 16px 0 16px 24px;">
+        <li>Creating and managing artworks</li>
+        <li>Evolving works through genetic algorithms</li>
+        <li>Tracking kinship relationships between works</li>
+        <li>Applying AI prompts via Claude</li>
+        <li>Searching similar works by feature vectors</li>
+      </ul>
+
+      <h2>Feature Vectors</h2>
+      <p>Each artwork has a 16-dimensional perceptual feature vector:</p>
+      <pre>[
+  r_mean, g_mean, b_mean,      # 0-2: Average RGB
+  r_std, g_std, b_std,          # 3-5: RGB standard deviations
+  lum_contrast,                 # 6: Luminance spread
+  color_entropy,                # 7: Color complexity
+  poly_count,                   # 8: Normalized polygon count
+  avg_opacity,                  # 9: Average opacity
+  avg_points,                   # 10: Average points per polygon
+  hue_spread,                   # 11: Color diversity
+  glitch_factor,                # 12: Channel imbalance
+  organic_factor,               # 13: Green bias + smoothness
+  void_factor,                  # 14: Darkness + low complexity
+  fitness_proxy                  # 15: Normalized fitness
+]</pre>
+
+      <h2>Quick Example</h2>
+      <div class="code-example">
+        <div class="tab-bar">
+          <span class="tab active">JavaScript</span>
+          <span class="tab">Python</span>
+          <span class="tab">cURL</span>
+        </div>
+        <pre><code>// Create a user (get API key)
+const user = await fetch('https://pigment-api.onrender.com/v1/users', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: 'me@example.com' })
+}).then(r => r.json());
+
+// Your API key is in user.api_key
+
+// Create an artwork
+const work = await fetch('https://pigment-api.onrender.com/v1/works', {
+  method: 'POST',
+  headers: { 
+    'Content-Type': 'application/json',
+    'X-API-Key': user.api_key
+  },
+  body: JSON.stringify({
+    title: 'My First Art',
+    content: '-- PIGMENT Genome...',
+    tags: ['demo']
+  })
+}).then(r => r.json());
+
+// Evolve it
+const evolved = await fetch('https://pigment-api.onrender.com/v1/evolve', {
+  method: 'POST',
+  headers: { 'X-API-Key': user.api_key },
+  body: JSON.stringify({ work_id: work.id, steps: 500 })
+}).then(r => r.json());</code></pre>
+      </div>
+
+      <h2>Next Steps</h2>
+      <div class="grid grid-2" style="margin-top: 24px;">
+        <a href="/docs/getting-started.html" class="card" style="text-decoration: none;">
+          <h3 style="margin-top: 0;">🚀 Quick Start</h3>
+          <p style="color: var(--dim);">Get your API key and make your first request in 5 minutes.</p>
+        </a>
+        <a href="/docs/endpoints/works.html" class="card" style="text-decoration: none;">
+          <h3 style="margin-top: 0;">📁 Works API</h3>
+          <p style="color: var(--dim);">Create, read, update, and delete artworks.</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="border-top: 1px solid #2a2a2a; padding: 48px 24px; text-align: center;">
+    <p>PIGMENT v6 API Documentation</p>
+  </footer>
+</body>
+</html>
