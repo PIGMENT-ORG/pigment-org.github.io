@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Limits - PIGMENT API</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>/* Same CSS */</style>
+</head>
+<body>
+    <header class="docs-header">...</header>
+    <div class="docs-layout">
+        <button class="sidebar-toggle">📚 Menu ▼</button>
+        <aside class="docs-sidebar">...</aside>
+        <main class="docs-content">
+            <div class="content-container">
+                <h1>Rate Limits</h1>
+                <p class="lead">Understand our rate limiting policy to build reliable applications.</p>
+
+                <h2>Rate Limit Tiers</h2>
+                <table>
+                    <tr><th>Plan</th><th>Requests/minute</th><th>Concurrent jobs</th></tr>
+                    <tr><td>Free</td><td>60</td><td>2</td></tr>
+                    <tr><td>Pro</td><td>600</td><td>10</td></tr>
+                    <tr><td>Enterprise</td><td>Custom</td><td>Unlimited</td></tr>
+                </table>
+
+                <h2>Headers</h2>
+                <p>Each response includes rate limit headers:</p>
+                <pre><code>X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 58
+X-RateLimit-Reset: 1640995200</code></pre>
+
+                <h2>Handling Rate Limits</h2>
+                <div class="warning-box">
+                    <strong>Implement exponential backoff</strong> when you receive a 429 response.
+                </div>
+
+                <h3>Example: Exponential Backoff</h3>
+                <pre><code>async function makeRequestWithRetry() {
+    const maxRetries = 5;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await api.request();
+        } catch (error) {
+            if (error.status !== 429) throw error;
+            const waitTime = Math.pow(2, i) * 1000;
+            await new Promise(r => setTimeout(r, waitTime));
+        }
+    }
+}</code></pre>
+
+                <h2>Concurrent Jobs</h2>
+                <p>You can run multiple evolution jobs simultaneously based on your plan. Check status with:</p>
+                <pre><code>GET /v1/jobs</code></pre>
+
+                <div class="pagination">
+                    <a href="authentication.html" class="prev">← Authentication</a>
+                    <a href="errors.html" class="next">Error Handling →</a>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="docs-footer">...</footer>
+</body>
+</html>
