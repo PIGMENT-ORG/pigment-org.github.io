@@ -1,111 +1,104 @@
-# PIGMENT v6
+---
+#PIGMENT v6 — Developer Hub
 
-**Evolutionary Art API \u00b7 Genetic Algorithms \u00b7 AI-Powered \u00b7 Self-Learning**
+Evolutionary Art Engine · Genetic Algorithms · Self-Learning API
 
-[Live Demo](https://pigment-org.github.io) \u00b7 [Documentation](https://pigment-org.github.io/docs) \u00b7 [Blog](https://pigment-org.github.io/blog) \u00b7 [Backend Repo](https://github.com/PIGMENT-ORG/PIGMENT-V6)
+https://img.shields.io/badge/GitHub%20Pages-Live-222222?style=for-the-badge&logo=github
+https://img.shields.io/badge/Render-API-46E3B7?style=for-the-badge&logo=render
+https://img.shields.io/badge/License-MIT-green?style=for-the-badge
+https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-222222?style=for-the-badge&logo=github)](https://pigment-org.github.io)
-[![Render](https://img.shields.io/badge/Render-API-46E3B7?style=for-the-badge&logo=render)](https://pigment-api.onrender.com)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](https://github.com/PIGMENT-ORG/pigment-org.github.io/pulls)
+Quick Links: Live Demo · Documentation · API Reference · Backend Repo
 
 ---
 
-## Overview
+👋 For Developers
 
-PIGMENT transforms any image into evolving artwork through genetic algorithms. Drop a target image, and the system iteratively mutates a population of polygons \u2014 scoring each generation against the original \u2014 until the evolved canvas converges toward a visual match.
+This repository hosts the frontend and documentation for PIGMENT. If you're looking for the backend API service, visit the PIGMENT-V6 repository.
 
-The system is **self-learning**: every mutation outcome is recorded, and ML-optimized operator weights are derived from 171k+ training samples, producing an 8.1% measurable improvement over uniform random selection.
+Who is this for?
 
-The frontend is pure HTML/CSS/JavaScript (no frameworks). The backend is a Python/FastAPI service deployed on Render. This repository contains the frontend and documentation site, which is hosted on GitHub Pages.
-
----
-
-## Features
-
-### Evolution Engine
-
-- **9 mutation operators**: `scale`, `rotate`, `color`, `opacity`, `translate`, `reshape`, `spawn`, `merge`, `intelligent`
-- **Edge-aware fitness**: 70% Sobel edge similarity + 30% RGB color similarity
-- **Diff-aware mutation**: targets highest-error regions in each generation
-- **Adaptive probabilities**: operator weights adjust based on tracked success rates
-- **Self-healing**: weak polygon culling every 1,000 generations; hotspot spawning in error zones
-
-### Self-Learning
-
-- 8.1% improvement proven from initial 510-sample training run
-- 171,381+ samples collected and growing
-- Per-operator success rates updated after every mutation attempt
-- `/v1/learning/weights` endpoint exposes ML-derived weights to the frontend in real time
-
-### Kinship System
-
-- Tracks parent \u2192 child \u2192 sibling \u2192 cousin relationships across artworks
-- 16-dimensional perceptual feature vector per artwork (RGB means, entropy, hue spread, edge density, glitch factor, saturation variance, and more)
-- Cosine similarity matching via FAISS vector search
-- Thresholds: \u2265 0.82 \u2192 sibling \u00b7 \u2265 0.65 \u2192 cousin \u00b7 \u2265 0.45 \u2192 similar
-- Full ancestry chain with per-generation fitness history
-
-### AI Prompt Layer
-
-- Translates natural language into structured mutation plans via Claude API
-- Example: `"make it glitchy and neon"` \u2192 weighted operator selection with specific parameter targets
-- 16 high-level mutation operations exposed to the prompt system
-- Keyword fallback when the API is unavailable
-- Mobile: double-tap canvas to open the prompt interface
-
-### Real-Time Streaming
-
-- WebSocket connection at `/ws/{user_id}`
-- Live events: fitness milestones, generation count, operator stats, kinship updates
-- Progress bar and fitness sparkline update per frame
-- Error heatmap rendered on a second canvas overlay
-
-### Interactive UI
-
-| Feature | Description |
-|---|---|
-| Side-by-side canvas | Target vs evolved, synchronized zoom |
-| Diff mode | Pixel-level difference visualization |
-| Snapshot history | Save and restore any generation |
-| Genome editor | View and edit `.pg` files in-browser |
-| Live HUD | Fitness, generation, operator stats overlay |
-| Keyboard shortcuts | Space, R, D, H, S, E, G (see below) |
-| Mobile gestures | Swipeable drawer, double-tap prompt |
+· API Consumers: Integrate evolutionary art into your own apps
+· Frontend Contributors: Improve the UI/UX or documentation
+· Self-Hosters: Run your own instance of the PIGMENT ecosystem
 
 ---
 
-## Quick Start
+✨ What is PIGMENT?
 
-### Use the Web App
+PIGMENT transforms any image into evolving artwork through genetic algorithms. Drop a target image, and the system iteratively mutates a population of polygons — scoring each generation against the original — until the evolved canvas converges toward a visual match.
 
-```
-https://pigment-org.github.io
+The system is self-learning: every mutation outcome is recorded, and ML-optimized operator weights are derived from 171k+ training samples, producing an 8.1% measurable improvement over uniform random selection.
+
+💡 See it in action: Visit the live demo for a visual introduction and interactive playground.
+
+---
+
+🚀 Quick Start (API)
+
+Get started with the PIGMENT API in under 60 seconds.
+
+1. Create an Account
+
+```bash
+curl -X POST https://pigment-api.onrender.com/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{"email": "your.email@example.com"}'
 ```
 
-1. Drag and drop any image onto the canvas (or paste with \u2318V / Ctrl+V)
-2. Press **Space** to start evolving
-3. Click **\u2197 Connect** in the API panel to enable cloud save and ML-optimized weights (optional)
+Response:
 
-### Keyboard Shortcuts
+```json
+{
+  "id": "usr_abc123",
+  "api_key": "pig_live_xyz456",
+  "plan": "free"
+}
+```
 
-| Key | Action |
-|---|---|
-| `Space` | Play / Pause |
-| `R` | Reset to random polygons |
-| `D` | Toggle diff overlay |
-| `H` | Toggle HUD |
-| `S` | Save snapshot |
-| `E` | Export as PNG |
-| `G` | Open genome viewer |
+2. Upload a Genome
+
+```javascript
+import { PIGMENTClient } from 'https://pigment-org.github.io/js/api-client.js';
+
+const client = new PIGMENTClient('https://pigment-api.onrender.com', 'your_api_key');
+
+// Upload a .pg file
+const work = await client.createWork('My First Artwork', genomeContent);
+console.log(work.id); // → "wrk_789def"
+```
+
+3. Start Evolving
+
+```javascript
+// Queue an evolution job
+const job = await client.evolve(work.id, {
+  generations: 1000,
+  prompt: 'make it glitchy and neon'
+});
+
+// Poll for completion
+const result = await client.waitForJob(job.job_id);
+console.log(`Final fitness: ${result.fitness}%`);
+```
+
+4. Find Related Artworks
+
+```javascript
+const kinship = await client.getKinship(work.id);
+console.log(kinship.siblings);  // → [ ... ]
+console.log(kinship.cousins);   // → [ ... ]
+```
+
+📚 Full documentation: pigment-org.github.io/docs
 
 ---
 
-## How It Works
+🧠 Core Concepts
 
-### Genome Format (`.pg`)
+Genome Format (.pg)
 
-Artwork is stored as plain-text `.pg` (PIGMENT Genome) files. Each file describes a canvas, a color palette, and one or more polygon layers:
+Artwork is stored as plain-text .pg (PIGMENT Genome) files. Each file describes a canvas, a color palette, and polygon layers:
 
 ```
 -- PIGMENT Genome v6.0.0
@@ -128,182 +121,125 @@ layer evolved {
 }
 ```
 
-Genomes can be downloaded, edited by hand, and re-uploaded to resume or fork an evolution run.
+Features:
 
-### Fitness Calculation
+· Human-readable and editable
+· Supports multiple layers
+· Stores evolution metadata (fitness, generation count)
+· Can be downloaded, edited, and re-uploaded
+
+Evolution Loop
+
+Each frame:
+
+1. Generate error heatmap (per-pixel diff between target and evolved)
+2. Select operator using ML-optimized weights (phase-dependent)
+3. Identify worst-performing polygons in high-error zones
+4. Apply mutation with parameters sampled from operator distribution
+5. Calculate new fitness
+6. Accept or reject (hill-climbing)
+7. Record success/failure for operator
+8. Every 1,000 generations: cull weak polygons, spawn new ones in error hotspots
+
+Fitness Calculation
 
 ```javascript
 fitness = (edgeScore * 0.70) + (colorScore * 0.30);
 ```
 
-Edge similarity is computed using Sobel operators on both the target and evolved canvas. Color similarity compares per-channel RGB histograms. Weighting edges more heavily prevents the optimizer from converging on blurry color-correct approximations.
+Edge similarity uses Sobel operators; color similarity compares per-channel RGB histograms. Weighting edges more heavily prevents convergence on blurry color-correct approximations.
 
-### Evolution Loop
+ML-Optimized Weights
 
-Each frame:
+Derived from 171k+ recorded mutation outcomes:
 
-1. Generate error heatmap (per-pixel diff between target and evolved)
-2. Select operator using ML-optimized weights (phase-dependent: explore / refine / polish)
-3. Identify the worst-performing polygons in high-error zones
-4. Apply the selected mutation with parameters sampled from the operator's distribution
-5. Calculate new fitness
-6. Accept or reject the mutation (hill-climbing)
-7. Record success/failure for the operator
-8. Every 1,000 generations: cull weak polygons, spawn new ones in error hotspots
+Phase Top Operators Strategy
+Explore scale (0.25), color (0.20), intelligent (0.18) Broad search
+Refine color (0.25), scale (0.20), opacity (0.18) Fine-tuning
+Polish color (0.25), opacity (0.20), scale (0.15) Final touches
 
-### ML-Optimized Operator Weights
-
-Derived from 171k+ recorded mutation outcomes across three evolution phases:
-
-```javascript
-const WEIGHTS = {
-  explore: { scale: 0.25, translate: 0.15, color: 0.20,
-             opacity: 0.12, rotate: 0.10, intelligent: 0.18 },
-  refine:  { scale: 0.20, translate: 0.10, color: 0.25,
-             opacity: 0.18, rotate: 0.10, intelligent: 0.17 },
-  polish:  { scale: 0.15, translate: 0.05, color: 0.25,
-             opacity: 0.20, rotate: 0.08, intelligent: 0.12 }
-};
-```
-
-Operator success rates from the initial 510-sample training run:
-
-| Operator | Success Rate |
-|---|---|
-| intelligent | 59% |
-| color | 54% |
-| scale | 51% |
-| opacity | 46% |
-| rotate | 41% |
-| translate | 30% |
-
-### Kinship Scoring
-
-```
-combined_similarity = visual_similarity (40%)
-                    + generational_distance (30%)
-                    + structural_similarity (30%)
-```
-
----
-
-## API Reference
-
-The backend API is available at `https://pigment-api.onrender.com`.
-
-> **Note:** The server is on Render's free tier and cold-starts after inactivity. The first request after a quiet period may take up to 60 seconds.
-
-All endpoints require an `X-API-Key` header except `POST /v1/users`.
-
-### Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/v1/users` | Create account and receive API key |
-| `POST` | `/v1/auth` | Exchange API key for session token |
-| `POST` | `/v1/works` | Upload a genome and create an artwork |
-| `GET` | `/v1/works` | List the authenticated user's artworks |
-| `GET` | `/v1/works/{id}` | Get a single artwork |
-| `DELETE` | `/v1/works/{id}` | Delete an artwork |
-| `POST` | `/v1/evolve` | Queue an evolution job |
-| `GET` | `/v1/evolve/{job_id}` | Poll job status and current fitness |
-| `POST` | `/v1/kinship` | Get kinship relationships for an artwork |
-| `POST` | `/v1/search/similar` | Find visually similar artworks |
-| `GET` | `/v1/ancestry/{id}` | Get full ancestry chain |
-| `POST` | `/v1/prompt` | Translate a text prompt into a mutation plan |
-| `POST` | `/v1/training` | Submit a mutation outcome as training data |
-| `GET` | `/v1/training/stats` | Operator statistics and success rates |
-| `GET` | `/v1/export/training` | Export training data as CSV |
-| `GET` | `/v1/learning/weights` | Get current ML-derived operator weights |
-| `GET` | `/v1/gallery` | Browse public artworks |
-| `WebSocket` | `/ws/{user_id}` | Real-time evolution and kinship events |
-
-### JavaScript Client
-
-```javascript
-import { PIGMENTClient } from 'https://pigment-org.github.io/js/api-client.js';
-
-const client = new PIGMENTClient('https://pigment-api.onrender.com');
-
-// Create an account (one-time)
-const user = await client.createUser('you@example.com');
-// \u2192 { id, api_key, plan }
-
-// Upload a genome and start evolving
-const work = await client.createWork('My First Artwork', genomeContent);
-const job  = await client.evolve(work.id, { generations: 1000, prompt: 'make it glitchy' });
-
-// Poll until complete
-const result = await client.waitForJob(job.job_id);
-
-// Find related artworks
-const kinship = await client.getKinship(work.id);
-
-// Retrieve ML-optimized weights
-const weights = await client.getLearningWeights();
-```
-
-### Export Training Data
+Access current weights:
 
 ```bash
 curl -H "X-API-Key: your_api_key" \
-     https://pigment-api.onrender.com/v1/export/training \
-     --output pigment_training_data.csv
+     https://pigment-api.onrender.com/v1/learning/weights
 ```
 
 ---
 
-## Project Structure
+🔧 Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Frontend      │────▶│    Backend      │────▶│   ML Pipeline   │
+│  GitHub Pages   │     │   Render/FastAPI│     │   Training Data │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                        │
+        ▼                       ▼                        ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Live Demo      │     │  Evolution API  │     │  FAISS Vector   │
+│  Documentation  │     │  WebSockets     │     │  Search (Kinship)│
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+Tech Stack
+
+Component Technology Deployment
+Frontend HTML/CSS/JavaScript (no frameworks) GitHub Pages
+Backend Python/FastAPI Render
+ML/Vector FAISS, scikit-learn Render (integrated)
+Database PostgreSQL Render Managed
+Real-time WebSockets FastAPI + Redis
+
+---
+
+📁 Repository Structure
 
 ```
 pigment-org.github.io/
-\u251c\u2500\u2500 index.html                     # Main app (pigment engine)
-\u251c\u2500\u2500 pigment-engine.html            # Standalone demo
-\u251c\u2500\u2500 css/
-\u2502   \u251c\u2500\u2500 main.css                   # Shared design system and layout
-\u2502   \u251c\u2500\u2500 docs.css                   # Documentation-specific styles
-\u2502   \u2514\u2500\u2500 blog.css                   # Blog article styles
-\u251c\u2500\u2500 js/
-\u2502   \u251c\u2500\u2500 api-client.js              # Official JS API client
-\u2502   \u251c\u2500\u2500 kinship-viz.js             # Family tree visualization
-\u2502   \u2514\u2500\u2500 ui.js                      # Shared UI utilities
-\u251c\u2500\u2500 docs/
-\u2502   \u251c\u2500\u2500 index.html                 # Documentation hub
-\u2502   \u251c\u2500\u2500 getting-started.html       # Quick start guide
-\u2502   \u251c\u2500\u2500 authentication.html        # API key reference
-\u2502   \u251c\u2500\u2500 rate-limits.html           # Rate limit tiers
-\u2502   \u251c\u2500\u2500 errors.html                # Error code reference
-\u2502   \u251c\u2500\u2500 faq.html                   # Frequently asked questions
-\u2502   \u251c\u2500\u2500 catalog.html               # Genome catalog
-\u2502   \u251c\u2500\u2500 endpoints/                 # Per-endpoint reference pages
-\u2502   \u2502   \u251c\u2500\u2500 works.html
-\u2502   \u2502   \u251c\u2500\u2500 evolve.html
-\u2502   \u2502   \u251c\u2500\u2500 kinship.html
-\u2502   \u2502   \u251c\u2500\u2500 prompt.html
-\u2502   \u2502   \u2514\u2500\u2500 gallery.html
-\u2502   \u2514\u2500\u2500 example/                   # Full integration examples
-\u2502       \u251c\u2500\u2500 curl.html
-\u2502       \u251c\u2500\u2500 javascript.html
-\u2502       \u2514\u2500\u2500 python.html
-\u251c\u2500\u2500 blog/
-\u2502   \u251c\u2500\u2500 index.html                 # Blog index
-\u2502   \u251c\u2500\u2500 genetic-algorithms.html    # How genetic algorithms create art
-\u2502   \u251c\u2500\u2500 kinship-explained.html     # The kinship system in depth
-\u2502   \u2514\u2500\u2500 ai-prompts.html            # AI prompts and mutation plans
-\u2514\u2500\u2500 showcase/
-    \u2514\u2500\u2500 index.html                 # Community gallery
+├── index.html                 # Main app (pigment engine)
+├── pigment-engine.html         # Standalone demo
+├── css/
+│   ├── main.css               # Shared design system
+│   ├── docs.css               # Documentation styles
+│   └── blog.css               # Blog article styles
+├── js/
+│   ├── api-client.js          # Official JS API client
+│   ├── kinship-viz.js         # Family tree visualization
+│   └── ui.js                  # Shared UI utilities
+├── docs/
+│   ├── index.html             # Documentation hub
+│   ├── getting-started.html   # Quick start guide
+│   ├── authentication.html    # API key reference
+│   ├── rate-limits.html       # Rate limit tiers
+│   ├── errors.html            # Error code reference
+│   ├── faq.html               # Frequently asked questions
+│   ├── catalog.html           # Genome catalog
+│   └── endpoints/              # Per-endpoint reference
+│       ├── works.html
+│       ├── evolve.html
+│       ├── kinship.html
+│       ├── prompt.html
+│       └── gallery.html
+├── blog/
+│   ├── index.html
+│   ├── genetic-algorithms.html
+│   ├── kinship-explained.html
+│   └── ai-prompts.html
+└── showcase/
+    └── index.html             # Community gallery
 ```
 
 ---
 
-## Development
+🛠️ Local Development
 
-### Prerequisites
+Prerequisites
 
-- Any modern browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
-- A static file server for local development
+· Any modern browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
+· Python 3.x or Node.js for local server
 
-### Local Setup
+Setup
 
 ```bash
 git clone https://github.com/PIGMENT-ORG/pigment-org.github.io.git
@@ -316,6 +252,98 @@ python3 -m http.server 8080
 # Open http://localhost:8080
 ```
 
-No build step is required. The site is plain HTML, CSS, and JavaScript.
+No build step required. The site is pure HTML/CSS/JavaScript.
 
-### Deployment
+Making Changes
+
+1. CSS: Edit files in /css — changes apply immediately
+2. JavaScript: Edit files in /js — refresh to see updates
+3. Documentation: HTML files in /docs are fully static
+
+Testing API Integration Locally
+
+If you're also running the backend locally:
+
+```javascript
+const client = new PIGMENTClient('http://localhost:5000', 'test_api_key');
+```
+
+---
+
+📊 API Reference Summary
+
+Base URL: https://pigment-api.onrender.com
+
+Key Endpoints
+
+Method Endpoint Description
+POST /v1/users Create account + get API key
+POST /v1/works Upload a genome
+GET /v1/works List your artworks
+POST /v1/evolve Queue evolution job
+GET /v1/evolve/{job_id} Poll job status
+POST /v1/kinship Get artwork relationships
+POST /v1/prompt Translate text → mutation plan
+GET /v1/learning/weights Get ML-optimized weights
+WebSocket /ws/{user_id} Real-time updates
+
+Rate Limits
+
+Plan Requests/min Concurrent Jobs
+Free 30 1
+Pro 120 5
+Enterprise Custom Custom
+
+📖 Full API docs: pigment-org.github.io/docs/endpoints
+
+---
+
+🤝 Contributing
+
+We welcome contributions! Whether it's bug fixes, documentation improvements, or new features.
+
+Ways to Contribute
+
+1. Report bugs: Open an issue with detailed reproduction steps
+2. Improve docs: Fix typos, clarify explanations, add examples
+3. Enhance UI: Improve accessibility, mobile responsiveness, or visual design
+4. Add features: Implement new visualization tools or API clients
+
+Pull Request Process
+
+1. Fork the repository
+2. Create a feature branch (git checkout -b feature/amazing-idea)
+3. Make your changes
+4. Test locally (run the server and check all affected pages)
+5. Commit with clear messages (git commit -m 'Add amazing feature')
+6. Push to your fork (git push origin feature/amazing-idea)
+7. Open a Pull Request
+
+Guidelines
+
+· Keep JavaScript framework-free (no React, Vue, etc.)
+· Maintain backward compatibility with existing APIs
+· Update documentation for any user-facing changes
+· Follow existing code style (2-space indentation, descriptive names)
+
+---
+
+📝 License
+
+MIT © PIGMENT-ORG. See LICENSE for details.
+
+---
+
+🙋 Support
+
+Channel Purpose
+GitHub Issues Bug reports, feature requests
+Documentation API reference, guides
+Live Demo Interactive playground
+Backend Repo Core engine issues
+
+---
+
+Ready to evolve? Get your API key → Read the docs → Start building
+
+---
