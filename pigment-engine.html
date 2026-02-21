@@ -1063,13 +1063,23 @@
       <span id="api-status-dot" style="color:#555;">○ offline</span>
     </div>
     <div style="display:flex; gap:6px; margin:10px 0;">
-      <input type="text" id="api-key-manual" placeholder="pigment_… key (blank = auto)" style="flex:1;">
-      <button class="btn-ghost" id="btn-api-connect" style="padding:8px 12px;">↗</button>
+      <input type="text" id="api-key-manual" placeholder="pigment_… key (blank = auto)" style="flex:1;" autocomplete="off" spellcheck="false">
+      <button class="btn-ghost" id="btn-api-connect" style="padding:8px 12px;" title="Connect to PIGMENT API server">↗</button>
+    </div>
+    <div style="font-size:10px; color:#444; margin-bottom:8px; line-height:1.5;">
+      Save stores locally when offline. Connect for cloud sync, server evolution &amp; kinship.
     </div>
     <div class="btn-row">
-      <button class="btn-ghost" id="btn-api-save">💾 Save</button>
-      <button class="btn-ghost" id="btn-api-evolve">🧬 Evolve+</button>
-      <button class="btn-ghost" id="btn-api-kinship">🔗 Kin</button>
+      <button class="btn-ghost" id="btn-api-save" title="Save genome to server (local fallback if offline)">💾 Save</button>
+      <button class="btn-ghost" id="btn-local-save" title="Save to local storage (IndexedDB, always works)">📂 Local</button>
+      <button class="btn-ghost" id="btn-api-evolve" title="Server-side evolution (requires connection)">🧬 Evolve+</button>
+      <button class="btn-ghost" id="btn-api-kinship" title="Find related works (requires connection)">🔗 Kin</button>
+    </div>
+    <div id="api-save-status" style="font-size:10px; margin-top:6px; min-height:14px; line-height:1.4; color:#555;"></div>
+    <!-- Local saves list -->
+    <div id="local-saves-section" style="margin-top:10px; display:none;">
+      <div style="font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:6px;">Local Saves</div>
+      <div id="local-saves-list" style="display:flex; flex-direction:column; gap:4px; max-height:200px; overflow-y:auto;"></div>
     </div>
   </div>
 
@@ -1139,214 +1149,427 @@ function toast(msg, dur = 2500) {
 }
 
 // ============================================
-// API CLIENT (REAL)
+// INDEXED DB HELPERS
 // ============================================
+let _idb = null;
+function openIDB() {
+  if (_idb) return Promise.resolve(_idb);
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('pigment_v6', 1);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('works')) {
+        db.createObjectStore('works', { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => { _idb = e.target.result; res(_idb); };
+    req.onerror = () => rej(req.error);
+  });
+}
+async function idbSet(store, record) {
+  const db = await openIDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store === 'pigment_local_works' ? 'works' : store, 'readwrite');
+    const s = tx.objectStore(tx.objectStoreNames[0]);
+    const req = s.put(record);
+    req.onsuccess = () => res(record);
+    req.onerror = () => rej(req.error);
+  });
+}
+async function idbList(store) {
+  const db = await openIDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('works', 'readonly');
+    const req = tx.objectStore('works').getAll();
+    req.onsuccess = () => res((req.result || []).sort((a,b) => b.saved_at?.localeCompare(a.saved_at) || 0));
+    req.onerror = () => rej(req.error);
+  });
+}
+async function idbDelete(store, id) {
+  const db = await openIDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('works', 'readwrite');
+    const req = tx.objectStore('works').delete(id);
+    req.onsuccess = () => res();
+    req.onerror = () => rej(req.error);
+  });
+}
+
+// ============================================
+// SAVE STATUS LINE (#api-save-status)
+// ============================================
+function setSaveStatus(type, msg) {
+  const el = $('api-save-status');
+  if (!el) return;
+  const colors = { ok: '#c8ff00', error: '#ff3b2f', saving: '#ffa400', connecting: '#ffa400', idle: '#555' };
+  const icons = { ok: '✓', error: '✗', saving: '⏳', connecting: '◌', idle: '' };
+  el.textContent = msg ? `${icons[type] || ''} ${msg}`.trim() : '';
+  el.style.color = colors[type] || '#555';
+}
+
+
 const API = {
   base: 'https://pigment-api.onrender.com',
   key: null,
   currentWorkId: null,
   connected: false,
-  
+  _connectAttempted: false,
+
   headers() {
     return { 'Content-Type': 'application/json', 'X-API-Key': this.key || '' };
   },
-  
+
+  // ── Local save/load (IndexedDB with localStorage fallback) ────────
+  async _localSave(title, content, tags) {
+    const id = 'local_' + Date.now();
+    const record = { id, title: title || 'Untitled', content, tags: tags || [],
+                     fitness: state?.fitness || 0,
+                     saved_at: new Date().toISOString(), local: true };
+    try {
+      await idbSet('pigment_local_works', record);
+    } catch(e) {
+      // IndexedDB failed, fall back to localStorage
+      try {
+        const existing = JSON.parse(localStorage.getItem('pigment_local_works') || '[]');
+        existing.unshift(record);
+        localStorage.setItem('pigment_local_works', JSON.stringify(existing.slice(0, 20)));
+      } catch(e2) {
+        console.warn('Local save failed (storage full?):', e2);
+        return null;
+      }
+    }
+    this.currentWorkId = id;
+    return record;
+  },
+
+  async _localList() {
+    try {
+      return await idbList('pigment_local_works');
+    } catch(e) {
+      try {
+        return JSON.parse(localStorage.getItem('pigment_local_works') || '[]');
+      } catch { return []; }
+    }
+  },
+
+  async _localDelete(id) {
+    try {
+      await idbDelete('pigment_local_works', id);
+    } catch(e) {
+      try {
+        const existing = JSON.parse(localStorage.getItem('pigment_local_works') || '[]');
+        localStorage.setItem('pigment_local_works', JSON.stringify(existing.filter(r => r.id !== id)));
+      } catch(e2) {}
+    }
+  },
+
+  // ── Auto key provisioning ────────────────────────────────────────
   async ensureUser() {
     if (this.key) return true;
+    // Try saved key first
+    const saved = localStorage.getItem('pigment_api_key');
+    if (saved) { this.key = saved; return true; }
+    // Try to auto-create account
     try {
       const r = await fetch(`${this.base}/v1/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: `auto_${Date.now()}@pigment.local` })
+        body: JSON.stringify({ email: `auto_${Date.now()}@pigment.local` }),
+        signal: AbortSignal.timeout(6000)
       });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const d = await r.json();
       if (d.api_key) {
         this.key = d.api_key;
         localStorage.setItem('pigment_api_key', this.key);
+        // Update the input field so user can see their key
+        const inp = document.getElementById('api-key-manual');
+        if (inp) inp.placeholder = this.key.slice(0, 20) + '…';
         return true;
       }
     } catch(e) {
-      console.warn('Failed to create user:', e);
+      console.warn('Auto account creation failed:', e.message);
     }
     return false;
   },
-  
+
+  // ── Connect to server (with deduplication) ──────────────────────
+  _connectingPromise: null,
+
   async connect(keyOverride) {
-    if (keyOverride) this.key = keyOverride;
-    else {
+    // Deduplication: don't fire concurrent connect requests
+    if (this._connectingPromise) return this._connectingPromise;
+    this._connectingPromise = this._doConnect(keyOverride);
+    try {
+      return await this._connectingPromise;
+    } finally {
+      this._connectingPromise = null;
+    }
+  },
+
+  async _doConnect(keyOverride) {
+    this._connectAttempted = true;
+    if (keyOverride) {
+      this.key = keyOverride;
+      localStorage.setItem('pigment_api_key', this.key);
+    } else if (!this.key) {
       const saved = localStorage.getItem('pigment_api_key');
       if (saved) this.key = saved;
     }
+
+    updateApiDot('connecting', 'connecting…');
+    setSaveStatus('connecting', 'Connecting…');
+
+    // 12-second connect timeout using AbortController (broad browser support)
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 12000);
     try {
-      const r = await fetch(`${this.base}/health`, { signal: AbortSignal.timeout(4000) });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const r = await fetch(`${this.base}/health`, { signal: ac.signal });
+      clearTimeout(timer);
+      if (!r.ok) {
+        const body = await r.text().catch(() => '');
+        throw new Error(`HTTP ${r.status}${body ? ': ' + body.slice(0, 120) : ''}`);
+      }
       const h = await r.json();
       this.connected = true;
-      this._label = `v${h.version} · ${h.database?.works ?? '?'} works`;
-      updateApiDot(true, this._label);
-      if (!this.key) await this.ensureUser();
-      if (this.key) {
+      const worksCount = h.database?.works ?? h.works ?? '?';
+      const version = h.version || '6';
+      this._label = `v${version} · ${worksCount} works`;
+      updateApiDot('online', this._label);
+      setSaveStatus('idle', '');
+
+      // Get or create API key in background
+      if (!this.key) {
+        this.ensureUser().then(() => {
+          if (this.key) { this.fetchTrainingStats(); this.fetchWeights(); }
+        });
+      } else {
         this.fetchTrainingStats();
         this.fetchWeights();
       }
       return true;
     } catch(e) {
-      console.warn('Connection failed:', e);
+      clearTimeout(timer);
+      console.warn('API connect failed:', e.message);
       this.connected = false;
-      updateApiDot(false, 'offline');
+      let reason, saveMsg;
+      if (e.name === 'AbortError') {
+        reason = 'timeout';
+        saveMsg = 'Server timed out — cold start, try again in 30s';
+      } else if (e.message.startsWith('HTTP')) {
+        reason = e.message;
+        saveMsg = e.message;
+      } else {
+        reason = 'unreachable';
+        saveMsg = 'Server unreachable — saves local only';
+      }
+      updateApiDot('offline', reason);
+      setSaveStatus('error', saveMsg);
       return false;
     }
   },
-  
+
+  // ── Training stats ───────────────────────────────────────────────
   async fetchTrainingStats() {
     if (!this.connected || !this.key) return;
     try {
       const r = await fetch(`${this.base}/v1/training/stats`, {
-        headers: this.headers(),
-        signal: AbortSignal.timeout(4000)
+        headers: this.headers(), signal: AbortSignal.timeout(5000)
       });
-      if (r.ok) {
-        const stats = await r.json();
-        if (stats.operator_stats) {
-          stats.operator_stats.forEach(stat => {
-            const op = OPS.find(o => o.key === stat.operator);
-            if (op) {
-              op.attempts = stat.attempts;
-              op.successes = stat.successes;
-            }
-          });
-          renderOperatorStats();
-        }
-        if (stats.total_samples) {
-          const samplesEl = $('live-samples');
-          if (samplesEl) samplesEl.textContent = fmtNum(stats.total_samples);
-        }
+      if (!r.ok) return;
+      const stats = await r.json();
+      if (stats.operator_stats) {
+        stats.operator_stats.forEach(stat => {
+          const op = OPS.find(o => o.key === stat.operator);
+          if (op) { op.attempts = stat.attempts; op.successes = stat.successes; }
+        });
+        renderOperatorStats();
       }
-    } catch(e) {
-      console.warn('Failed to fetch training stats:', e);
-    }
+      if (stats.total_samples) {
+        const el = document.getElementById('live-samples');
+        if (el) el.textContent = fmtNum(stats.total_samples);
+      }
+    } catch(e) { console.warn('Training stats fetch failed:', e.message); }
   },
-  
+
+  // ── ML weights ───────────────────────────────────────────────────
   async fetchWeights() {
     if (!this.connected || !this.key) return null;
     try {
       const r = await fetch(`${this.base}/v1/learning/weights`, {
-        headers: this.headers(),
-        signal: AbortSignal.timeout(4000)
+        headers: this.headers(), signal: AbortSignal.timeout(5000)
       });
-      if (r.ok) {
-        const data = await r.json();
-        if (data.weights && data.weights.length) {
-          // Update IMPROVED_WEIGHTS based on real data
-          // This is a simplified mapping - you could make it more sophisticated
-          const successMap = {};
-          data.weights.forEach(w => { successMap[w.operator] = w.success_rate / 100; });
-          
-          // Adjust weights based on success rates
-          if (successMap.scale) {
-            IMPROVED_WEIGHTS.explore.scale = Math.min(0.4, successMap.scale * 0.8);
-            IMPROVED_WEIGHTS.refine.scale = Math.min(0.3, successMap.scale * 0.6);
-            IMPROVED_WEIGHTS.polish.scale = Math.min(0.2, successMap.scale * 0.4);
-          }
-          if (successMap.intelligent) {
-            IMPROVED_WEIGHTS.explore.intelligent = Math.min(0.3, successMap.intelligent * 0.8);
-            IMPROVED_WEIGHTS.refine.intelligent = Math.min(0.3, successMap.intelligent * 0.8);
-            IMPROVED_WEIGHTS.polish.intelligent = Math.min(0.25, successMap.intelligent * 0.8);
-          }
-          renderWeights();
+      if (!r.ok) return null;
+      const data = await r.json();
+      if (data.weights && data.weights.length) {
+        const successMap = {};
+        data.weights.forEach(w => { successMap[w.operator] = w.success_rate / 100; });
+        if (successMap.scale !== undefined) {
+          IMPROVED_WEIGHTS.explore.scale = Math.min(0.4, successMap.scale * 0.8);
+          IMPROVED_WEIGHTS.refine.scale  = Math.min(0.3, successMap.scale * 0.6);
+          IMPROVED_WEIGHTS.polish.scale  = Math.min(0.2, successMap.scale * 0.4);
         }
-        return data;
+        if (successMap.intelligent !== undefined) {
+          IMPROVED_WEIGHTS.explore.intelligent = Math.min(0.3, successMap.intelligent * 0.8);
+          IMPROVED_WEIGHTS.refine.intelligent  = Math.min(0.3, successMap.intelligent * 0.8);
+          IMPROVED_WEIGHTS.polish.intelligent  = Math.min(0.25, successMap.intelligent * 0.8);
+        }
+        renderWeights();
       }
-    } catch(e) {
-      console.warn('Failed to fetch weights:', e);
-    }
-    return null;
+      return data;
+    } catch(e) { console.warn('Weights fetch failed:', e.message); return null; }
   },
-  
+
+  // ── Save work (API first, local fallback) ────────────────────────
   async saveWork(title, content, tags) {
-    if (!this.connected) { await this.connect(); if (!this.connected) return null; }
-    if (!this.key) await this.ensureUser();
-    try {
-      const r = await fetch(`${this.base}/v1/works`, {
-        method: 'POST',
-        headers: this.headers(),
-        body: JSON.stringify({ title: title || 'Untitled', content, tags: tags || ['pigment-v6'] })
-      });
-      const d = await r.json();
-      if (d.id) { 
-        this.currentWorkId = d.id; 
-        toast(`✅ Saved: ${d.title} (${d.style})`);
-        return d; 
-      }
-    } catch(e) {
-      console.warn('Save failed:', e);
+    if (!content) { toast('❌ Nothing to save'); return null; }
+
+    // Try API if connected or connectable
+    if (!this.connected && !this._connectAttempted) {
+      await this.connect();
     }
-    toast('❌ Save failed');
+
+    if (this.connected) {
+      if (!this.key) await this.ensureUser();
+      if (this.key) {
+        setSaveStatus('saving', 'Creating account…');
+        // 15-second save timeout using AbortController (broader browser support)
+        const ac = new AbortController();
+        const timer = setTimeout(() => ac.abort(), 15000);
+        try {
+          setSaveStatus('saving', 'Saving to server…');
+          const r = await fetch(`${this.base}/v1/works`, {
+            method: 'POST',
+            headers: this.headers(),
+            body: JSON.stringify({ title: title || 'Untitled', content, tags: tags || ['pigment-v6'] }),
+            signal: ac.signal
+          });
+          clearTimeout(timer);
+          if (!r.ok) {
+            const body = await r.text().catch(() => '');
+            throw new Error(`HTTP ${r.status}${body ? ': ' + body.slice(0, 120) : ''}`);
+          }
+          const d = await r.json();
+          if (d.id) {
+            this.currentWorkId = d.id;
+            const msg = `Saved ✓ ${d.id}`;
+            setSaveStatus('ok', msg);
+            toast(`✅ Saved to API: ${d.title}`);
+            return d;
+          }
+          throw new Error('No ID in response');
+        } catch(e) {
+          clearTimeout(timer);
+          const errMsg = e.name === 'AbortError'
+            ? 'Save timed out — falling back to local'
+            : `API error: ${e.message}`;
+          console.warn('API save failed, falling back to local:', e.message);
+          setSaveStatus('error', errMsg);
+          // Fall through to local save
+        }
+      }
+    }
+
+    // Local save fallback
+    const record = await this._localSave(title, content, tags);
+    if (record) {
+      const count = (await this._localList()).length;
+      const msg = `Saved locally (${count} saved)`;
+      setSaveStatus('ok', msg);
+      toast(`💾 ${msg}`);
+      renderLocalSaves();
+      return record;
+    }
+    setSaveStatus('error', 'Save failed — storage may be full');
+    toast('❌ Save failed — storage may be full');
     return null;
   },
-  
+
+  // ── Evolve via API ────────────────────────────────────────────────
   async evolveWork(workId, steps = 500) {
-    if (!this.connected || !workId) return null;
+    if (!this.connected) { toast('❌ Not connected to API'); return null; }
+    if (!workId || workId.startsWith('local_')) {
+      toast('ℹ️ Connect to API first to use server-side evolution');
+      return null;
+    }
     try {
       const r = await fetch(`${this.base}/v1/evolve`, {
         method: 'POST',
         headers: this.headers(),
-        body: JSON.stringify({ work_id: workId, steps })
+        body: JSON.stringify({ work_id: workId, steps }),
+        signal: AbortSignal.timeout(30000)
       });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const d = await r.json();
       if (d.child_id) {
         this.currentWorkId = d.child_id;
-        toast(`✅ Evolved: ${d.fitness_before}% → ${d.fitness_after}% (${d.operator})`);
+        toast(`✅ Evolved: ${d.fitness_before?.toFixed(1)}% → ${d.fitness_after?.toFixed(1)}% (${d.operator})`);
         return d;
       }
+      throw new Error('No child_id in response');
     } catch(e) {
-      console.warn('Evolve failed:', e);
+      console.warn('Evolve API failed:', e.message);
+      toast('❌ Server evolve failed — use local evolution');
+      return null;
     }
-    toast('❌ Evolve failed');
-    return null;
   },
-  
+
+  // ── Kinship ───────────────────────────────────────────────────────
   async getKinship(workId) {
-    if (!this.connected || !workId) return null;
+    if (!this.connected) { toast('❌ Not connected to API'); return null; }
+    if (!workId || workId.startsWith('local_')) {
+      toast('ℹ️ Save to API first for kinship data');
+      return null;
+    }
     try {
       const r = await fetch(`${this.base}/v1/kinship`, {
         method: 'POST',
         headers: this.headers(),
-        body: JSON.stringify({ work_id: workId })
+        body: JSON.stringify({ work_id: workId }),
+        signal: AbortSignal.timeout(8000)
       });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return await r.json();
     } catch(e) {
-      console.warn('Kinship failed:', e);
+      console.warn('Kinship fetch failed:', e.message);
+      toast('❌ Kinship fetch failed');
       return null;
     }
   },
-  
+
+  // ── Training data ─────────────────────────────────────────────────
   async postTraining(records) {
-    if (!this.connected || !records.length) return;
+    if (!this.connected || !this.key || !records.length) return;
     try {
       await fetch(`${this.base}/v1/training`, {
         method: 'POST',
         headers: this.headers(),
-        body: JSON.stringify(records)
+        body: JSON.stringify(records),
+        signal: AbortSignal.timeout(6000)
       });
-    } catch(e) {
-      console.warn('Failed to post training:', e);
-    }
+    } catch(e) { console.warn('Training post failed:', e.message); }
   }
 };
 
 // ============================================
 // UPDATE API STATUS DOT
 // ============================================
-function updateApiDot(on, label) {
+function updateApiDot(state, label) {
+  // state: 'online' | 'offline' | 'connecting'
   const el = $('api-status-dot');
+  const serverEl = $('stat-server');
+  const colors = { online: '#c8ff00', connecting: '#ffa400', offline: '#555' };
+  const dots   = { online: '●', connecting: '◌', offline: '○' };
+  const color  = colors[state] || '#555';
+  const dot    = dots[state]   || '○';
   if (el) {
-    el.textContent = on ? `● ${label}` : `○ ${label}`;
-    el.style.color = on ? '#c8ff00' : '#555';
+    el.textContent = `${dot} ${label}`;
+    el.style.color = color;
   }
-  $('stat-server').textContent = label || 'offline';
-  if (on) $('stat-server').style.color = 'var(--accent)';
-  else $('stat-server').style.color = 'var(--dim)';
+  if (serverEl) {
+    serverEl.textContent = label || 'offline';
+    serverEl.style.color = color;
+  }
 }
 
 // ============================================
@@ -1378,9 +1601,9 @@ const OPS = [
 // IMPROVED WEIGHTS (ML-optimized)
 // ============================================
 let IMPROVED_WEIGHTS = {
-  explore: { scale: 0.25, translate: 0.15, color: 0.20, opacity: 0.12, rotate: 0.10, intelligent: 0.18 },
-  refine:  { scale: 0.20, translate: 0.10, color: 0.25, opacity: 0.18, rotate: 0.10, intelligent: 0.17 },
-  polish:  { scale: 0.15, translate: 0.05, color: 0.25, opacity: 0.20, rotate: 0.08, intelligent: 0.12 }
+  explore: { scale: 0.20, translate: 0.12, color: 0.15, opacity: 0.08, rotate: 0.08, reshape: 0.10, spawn: 0.12, merge: 0.05, intelligent: 0.10 },
+  refine:  { scale: 0.15, translate: 0.08, color: 0.20, opacity: 0.12, rotate: 0.08, reshape: 0.12, spawn: 0.08, merge: 0.06, intelligent: 0.11 },
+  polish:  { scale: 0.12, translate: 0.05, color: 0.22, opacity: 0.16, rotate: 0.06, reshape: 0.14, spawn: 0.04, merge: 0.08, intelligent: 0.13 }
 };
 
 // ============================================
@@ -2626,23 +2849,93 @@ function renderSnapshots() {
 }
 
 // ============================================
+// RENDER LOCAL SAVES LIST
+// ============================================
+async function renderLocalSaves() {
+  const section = $('local-saves-section');
+  const list = $('local-saves-list');
+  if (!section || !list) return;
+  
+  const saves = await API._localList();
+  
+  if (!saves.length) {
+    section.style.display = 'none';
+    return;
+  }
+  
+  section.style.display = 'block';
+  list.innerHTML = '';
+  
+  saves.slice(0, 10).forEach(s => {
+    const date = s.saved_at ? new Date(s.saved_at).toLocaleString(undefined, { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '?';
+    const fitPct = s.fitness ? s.fitness.toFixed(1) + '%' : '—';
+    
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; align-items:center; gap:6px; padding:5px 8px; background:#111; border-radius:6px; font-size:10px; border:1px solid #1a1a1a;';
+    row.innerHTML = `
+      <span style="flex:1; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${s.title}">${s.title}</span>
+      <span style="color:#555;">${fitPct}</span>
+      <span style="color:#444;">${date}</span>
+      <button title="Load this save" style="background:none;border:none;cursor:pointer;color:#c8ff00;font-size:12px;padding:0 2px;" data-load-id="${s.id}">↩</button>
+      <button title="Delete this save" style="background:none;border:none;cursor:pointer;color:#ff3b2f;font-size:12px;padding:0 2px;" data-del-id="${s.id}">✕</button>
+    `;
+    
+    row.querySelector('[data-load-id]').addEventListener('click', async () => {
+      if (!s.content) { toast('No content in this save'); return; }
+      try {
+        const parsed = parseGenome(s.content);
+        const newPolys = [];
+        for (const poly of parsed.polygons) {
+          if (!poly.points || poly.points.length < 3) continue;
+          const pts = poly.points.map(p => [p.x, p.y]);
+          let r = 255, g = 255, b = 255;
+          if (poly.color) { r = parseInt(poly.color.slice(1,3),16); g = parseInt(poly.color.slice(3,5),16); b = parseInt(poly.color.slice(5,7),16); }
+          newPolys.push({ pts, r, g, b, a: Math.round((poly.opacity || 1) * 255) });
+        }
+        if (newPolys.length > 0) {
+          state.polygons = newPolys;
+          state.fitness = calcFitness(state.polygons);
+          renderPolygons(ctxE, state.polygons);
+          updateUI();
+          toast(`↩ Loaded: ${s.title}`);
+        } else { toast('No polygons in save'); }
+      } catch(e) { toast('Error loading save'); }
+    });
+    
+    row.querySelector('[data-del-id]').addEventListener('click', async () => {
+      await API._localDelete(s.id);
+      toast('🗑 Deleted');
+      renderLocalSaves();
+    });
+    
+    list.appendChild(row);
+  });
+}
+
+// ============================================
 // EXPORT GENOME
 // ============================================
 function exportCurrentGenome() {
   if (!state.hasTarget) return null;
   
-  let genome = `-- @version 1.1\n`;
+  let genome = `-- PIGMENT Genome v6.1.0\n`;
+  genome += `-- @version 1.1\n`;
   genome += `-- Generated: ${new Date().toISOString().split('T')[0]}\n`;
-  genome += `-- Fitness: ${state.fitness.toFixed(1)}%\n`;
+  genome += `-- Fitness: ${state.fitness.toFixed(2)}%\n`;
   genome += `-- Generations: ${state.generation}\n\n`;
   genome += `canvas {\n  width: ${state.targetW}\n  height: ${state.targetH}\n}\n\n`;
   genome += `palette {\n`;
   
   const usedColors = [];
-  state.polygons.forEach(p => {
-    const hex = '#' + [p.r, p.g, p.b].map(c => c.toString(16).padStart(2, '0')).join('');
-    if (!usedColors.includes(hex)) usedColors.push(hex);
-  });
+  if (state.polygons && state.polygons.length > 0) {
+    state.polygons.forEach(p => {
+      const hex = '#' + [p.r, p.g, p.b].map(c => c.toString(16).padStart(2, '0')).join('');
+      if (!usedColors.includes(hex)) usedColors.push(hex);
+    });
+  }
+  
+  // Ensure at least a default color
+  if (usedColors.length === 0) usedColors.push('#888888');
   
   usedColors.slice(0, 8).forEach((hex, i) => {
     genome += `  c${i}: ${hex}\n`;
@@ -2650,15 +2943,17 @@ function exportCurrentGenome() {
   
   genome += `}\n\nlayer evolved {\n`;
   
-  state.polygons.forEach((p, i) => {
-    const hex = '#' + [p.r, p.g, p.b].map(c => c.toString(16).padStart(2, '0')).join('');
-    const ci = usedColors.indexOf(hex);
-    genome += `  zone poly_${i} {\n`;
-    genome += `    color: palette.c${ci}\n`;
-    genome += `    opacity: ${(p.a / 255).toFixed(2)}\n`;
-    genome += `    points: ${p.pts.map(pt => `${Math.round(pt[0])},${Math.round(pt[1])}`).join(' ')}\n`;
-    genome += `  }\n`;
-  });
+  if (state.polygons && state.polygons.length > 0) {
+    state.polygons.forEach((p, i) => {
+      const hex = '#' + [p.r, p.g, p.b].map(c => c.toString(16).padStart(2, '0')).join('');
+      const ci = usedColors.indexOf(hex);
+      genome += `  zone poly_${i} {\n`;
+      genome += `    color: palette.c${ci}\n`;
+      genome += `    opacity: ${(p.a / 255).toFixed(2)}\n`;
+      genome += `    points: ${p.pts.map(pt => `${Math.round(pt[0])},${Math.round(pt[1])}`).join(' ')}\n`;
+      genome += `  }\n`;
+    });
+  }
   
   genome += `}\n`;
   return genome;
@@ -3028,50 +3323,87 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // API connect
   $('btn-api-connect').addEventListener('click', async () => {
-    const key = $('api-key-manual').value.trim() || null;
+    const keyInput = $('api-key-manual');
+    const key = keyInput ? keyInput.value.trim() || null : null;
+    const btn = $('btn-api-connect');
+    btn.textContent = '⏳';
+    btn.disabled = true;
+    setSaveStatus('connecting', 'Connecting…');
     const ok = await API.connect(key);
+    btn.textContent = '↗';
+    btn.disabled = false;
     if (ok) {
       toast('✅ Connected to PIGMENT server');
     } else {
-      toast('❌ Server not found');
+      toast('⚠️ Server unreachable — saves will be stored locally');
     }
   });
   
   $('btn-api-save').addEventListener('click', async () => {
     if (!state.hasTarget) {
-      toast('Load an image first');
+      toast('⚠️ Load an image first');
       return;
     }
     
     const genome = exportCurrentGenome();
     if (!genome) {
-      toast('Failed to generate genome');
+      toast('⚠️ Nothing to save yet — run some evolution first');
       return;
     }
     
-    if (!API.connected) {
-      toast('Connecting…');
-      const ok = await API.connect();
-      if (!ok) {
-        toast('❌ No server');
-        return;
-      }
-    }
-    
+    const btn = $('btn-api-save');
+    const origText = btn.textContent;
+    btn.textContent = '⏳ …';
+    btn.disabled = true;
     await API.saveWork(`Evolution gen ${state.generation}`, genome, ['pigment-v6']);
+    btn.textContent = origText;
+    btn.disabled = false;
+    renderLocalSaves();
+  });
+
+  // Local save button (always works, no server needed)
+  $('btn-local-save').addEventListener('click', async () => {
+    if (!state.hasTarget) {
+      toast('⚠️ Load an image first');
+      return;
+    }
+    const genome = exportCurrentGenome();
+    if (!genome) {
+      toast('⚠️ Nothing to save yet');
+      return;
+    }
+    const btn = $('btn-local-save');
+    const origText = btn.textContent;
+    btn.textContent = '⏳ …';
+    btn.disabled = true;
+    setSaveStatus('saving', 'Saving locally…');
+    const record = await API._localSave(`Evolution gen ${state.generation}`, genome, ['pigment-v6']);
+    btn.textContent = origText;
+    btn.disabled = false;
+    if (record) {
+      const list = await API._localList();
+      setSaveStatus('ok', `Saved locally (${list.length} saved)`);
+      toast(`📂 Saved locally`);
+      renderLocalSaves();
+    } else {
+      setSaveStatus('error', 'Local save failed — storage full?');
+      toast('❌ Local save failed');
+    }
   });
   
   $('btn-api-evolve').addEventListener('click', async () => {
     if (!API.connected) {
-      toast('❌ Not connected');
+      toast('⚠️ Not connected to API — use local evolution controls');
       return;
     }
-    
     if (!API.currentWorkId) {
-      toast('Save a work first');
+      toast('ℹ️ Save a work first');
       return;
     }
-    
+    if (API.currentWorkId.startsWith('local_')) {
+      toast('ℹ️ Connect to API first for server-side evolution');
+      return;
+    }
     await API.evolveWork(API.currentWorkId, 500);
   });
   
@@ -3079,8 +3411,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const panel = $('api-kinship-panel');
     const section = $('kinship-section');
     
-    if (!API.connected || !API.currentWorkId) {
-      toast('Save a work first');
+    if (!API.connected) {
+      toast('⚠️ Connect to API first for kinship data');
+      return;
+    }
+    if (!API.currentWorkId || API.currentWorkId.startsWith('local_')) {
+      toast('ℹ️ Save to API first for kinship data');
       return;
     }
     
@@ -3348,7 +3684,28 @@ document.addEventListener('DOMContentLoaded', () => {
   renderWeights();
   renderOperatorStats();
   drawSparkline();
-  setTimeout(() => API.connect(), 800);
+
+  // Show local saves count on load
+  (async function() {
+    const localWorks = await API._localList();
+    if (localWorks.length > 0) {
+      const statusEl = $('api-status-dot');
+      if (statusEl) {
+        statusEl.textContent = `○ offline · ${localWorks.length} local`;
+      }
+      renderLocalSaves();
+    }
+  })();
+
+  // Attempt server connection with a short delay (non-blocking)
+  setTimeout(async () => {
+    const ok = await API.connect();
+    if (!ok) {
+      // Show local save count in status
+      const localCount = (await API._localList()).length;
+      updateApiDot('offline', localCount > 0 ? `offline · ${localCount} local saves` : 'offline — saves local');
+    }
+  }, 800);
   
   // Periodic API sync (every 30 seconds when connected)
   setInterval(() => {
