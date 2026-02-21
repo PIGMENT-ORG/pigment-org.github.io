@@ -1,150 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Showcase - PIGMENT Gallery</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/main.css">
-    <style>
-        .showcase-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        .showcase-item {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-        .showcase-item:hover {
-            transform: scale(1.02);
-            border-color: var(--accent);
-        }
-        .showcase-preview {
-            width: 100%;
-            aspect-ratio: 1;
-            background: #1a1a1a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-        }
-        .showcase-info {
-            padding: 1rem;
-        }
-        .showcase-title {
-            font-family: var(--display);
-            font-size: 1.1rem;
-            margin-bottom: 0.25rem;
-        }
-        .showcase-meta {
-            color: #666;
-            font-size: 0.8rem;
-            display: flex;
-            justify-content: space-between;
-        }
-        .showcase-fitness {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        .filters {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin: 1.5rem 0;
-        }
-        .filter-btn {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: var(--dim);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-        .filter-btn.active {
-            background: var(--accent);
-            color: var(--ink);
-            border-color: var(--accent);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="PIGMENT Showcase — Community artwork created using the PIGMENT evolutionary art API.">
+  <title>Showcase — PIGMENT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .showcase-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .showcase-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+      flex: 1;
+    }
+    .showcase-header { margin-bottom: 2rem; }
+    .showcase-header h1 { margin-bottom: 0.5rem; }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0 2rem;
+    }
+    .filter-btn {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: var(--dim);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .filter-btn.active {
+      background: var(--accent);
+      color: var(--ink);
+      border-color: var(--accent);
+    }
+
+    /* Grid */
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.25rem;
+    }
+    .showcase-card {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+    .showcase-card:hover {
+      transform: scale(1.025);
+      border-color: rgba(200,255,0,0.4);
+    }
+    .showcase-preview {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      transition: transform 0.3s;
+    }
+    .showcase-card:hover .showcase-preview { transform: scale(1.05); }
+    .showcase-info {
+      padding: 0.875rem 1rem;
+      border-top: 1px solid #1a1a1a;
+    }
+    .showcase-title {
+      font-family: var(--display);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+    .showcase-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #555;
+    }
+    .showcase-fitness {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Sort & count bar */
+    .list-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .result-count {
+      color: var(--dim);
+      font-size: 0.8125rem;
+    }
+    .sort-select {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: var(--paper);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .showcase-main { padding: 1.5rem 1rem; }
+      .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    }
+    @media (max-width: 380px) {
+      .showcase-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-<body>
-    <header class="docs-header">
-        <div class="header-container">
-            <div class="logo"><a href="../index.html">PIGMENT <span>showcase</span></a></div>
-            <nav class="header-nav">
-                <a href="../index.html">Home</a>
-                <a href="../docs/index.html">Docs</a>
-                <a href="../blog/index.html">Blog</a>
-                <a href="index.html" class="active">Showcase</a>
-            </nav>
+<body class="showcase-page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="site-logo">PIGMENT <span>showcase</span></a>
+      <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <nav class="header-nav" role="navigation" aria-label="Main navigation">
+        <a href="../index.html">Home</a>
+        <a href="../docs/index.html">Docs</a>
+        <a href="../blog/index.html">Blog</a>
+        <a href="index.html" class="active">Showcase</a>
+      </nav>
+      <div class="header-actions">
+        <a href="../pigment-engine.html" class="btn btn-outline">Try Demo</a>
+        <a href="../docs/getting-started.html" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="showcase-main">
+    <div class="showcase-header">
+      <h1>Community Showcase</h1>
+      <p class="lead">Artwork evolved using PIGMENT's genetic algorithms and AI prompts.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters" role="group" aria-label="Filter artworks by style">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="glitch">Glitch</button>
+      <button class="filter-btn" data-filter="organic">Organic</button>
+      <button class="filter-btn" data-filter="void">Void</button>
+      <button class="filter-btn" data-filter="abstract">Abstract</button>
+      <button class="filter-btn" data-filter="portrait">Portrait</button>
+    </div>
+
+    <div class="list-controls">
+      <span class="result-count" id="result-count">Showing 12 artworks</span>
+      <select class="sort-select" id="sort-select" aria-label="Sort artworks">
+        <option value="fitness">Sort by Fitness</option>
+        <option value="generations">Sort by Generations</option>
+        <option value="newest">Newest First</option>
+      </select>
+    </div>
+
+    <div class="showcase-grid" id="showcase-grid" role="list" aria-live="polite"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>PIGMENT</h4>
+        <ul>
+          <li><a href="../docs/index.html">Documentation</a></li>
+          <li><a href="../blog/index.html">Blog</a></li>
+          <li><a href="index.html">Showcase</a></li>
+          <li><a href="../pigment-engine.html">Live Demo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>API Reference</h4>
+        <ul>
+          <li><a href="../docs/getting-started.html">Quick Start</a></li>
+          <li><a href="../docs/authentication.html">Authentication</a></li>
+          <li><a href="../docs/endpoints/works.html">/v1/works</a></li>
+          <li><a href="../docs/endpoints/gallery.html">/v1/gallery</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+          <li><a href="../blog/kinship-explained.html">Kinship System</a></li>
+          <li><a href="../docs/faq.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Links</h4>
+        <ul>
+          <li><a href="https://github.com/pigment-org" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="../LICENSE">MIT License</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 PIGMENT. Open source under the <a href="../LICENSE">MIT License</a>.</p>
+    </div>
+  </footer>
+
+  <script src="../js/ui.js"></script>
+  <script>
+    const artworks = [
+      { id: 1,  title: "Neon Genesis",      style: "glitch",    fitness: 98.5, generations: 1542, emoji: "🌀", bg: "radial-gradient(circle, #c8ff00 0%, #0a0a0a 75%)" },
+      { id: 2,  title: "Forest Dreams",     style: "organic",   fitness: 97.2, generations: 2310, emoji: "🌿", bg: "radial-gradient(circle, #003300 0%, #0a0a0a 75%)" },
+      { id: 3,  title: "Dark Void",         style: "void",      fitness: 94.8, generations: 876,  emoji: "⚫", bg: "radial-gradient(circle, #0051ff 0%, #0a0a0a 75%)" },
+      { id: 4,  title: "Abstract Forms",    style: "abstract",  fitness: 92.3, generations: 654,  emoji: "🔷", bg: "radial-gradient(circle, #8a6ae0 0%, #0a0a0a 75%)" },
+      { id: 5,  title: "Glitch Portrait",   style: "portrait",  fitness: 91.7, generations: 1203, emoji: "👤", bg: "radial-gradient(circle, #ff3b2f 0%, #0a0a0a 75%)" },
+      { id: 6,  title: "Organic Growth",    style: "organic",   fitness: 90.2, generations: 892,  emoji: "🌱", bg: "radial-gradient(circle, #004400 0%, #0a0a0a 75%)" },
+      { id: 7,  title: "Void Echo",         style: "void",      fitness: 88.9, generations: 543,  emoji: "🌑", bg: "radial-gradient(circle, #111 0%, #0a0a0a 75%)" },
+      { id: 8,  title: "Geometric Study",   style: "abstract",  fitness: 87.5, generations: 765,  emoji: "🔺", bg: "radial-gradient(circle, #6a00ee 0%, #0a0a0a 75%)" },
+      { id: 9,  title: "Signal Noise",      style: "glitch",    fitness: 86.1, generations: 980,  emoji: "📡", bg: "radial-gradient(circle, #c8ff00 0%, #111 75%)" },
+      { id: 10, title: "Deep Roots",        style: "organic",   fitness: 84.3, generations: 1450, emoji: "🌳", bg: "radial-gradient(circle, #1a4a00 0%, #0a0a0a 75%)" },
+      { id: 11, title: "Unknown Horizon",   style: "portrait",  fitness: 82.7, generations: 607,  emoji: "🌅", bg: "radial-gradient(circle, #ff6600 0%, #0a0a0a 75%)" },
+      { id: 12, title: "Static Dreams",     style: "glitch",    fitness: 81.0, generations: 334,  emoji: "📺", bg: "radial-gradient(circle, #aaffcc 0%, #0a0a0a 75%)" },
+    ];
+
+    const grid = document.getElementById('showcase-grid');
+    const countEl = document.getElementById('result-count');
+    const sortSelect = document.getElementById('sort-select');
+    let activeFilter = 'all';
+
+    function sorted(list) {
+      const s = sortSelect.value;
+      return [...list].sort((a, b) =>
+        s === 'generations' ? b.generations - a.generations :
+        s === 'newest'      ? b.id - a.id :
+                              b.fitness - a.fitness
+      );
+    }
+
+    function render() {
+      const filtered = activeFilter === 'all'
+        ? artworks
+        : artworks.filter(a => a.style === activeFilter);
+      const list = sorted(filtered);
+
+      countEl.textContent = `Showing ${list.length} artwork${list.length !== 1 ? 's' : ''}`;
+
+      grid.innerHTML = list.map(art => `
+        <div class="showcase-card" role="listitem" tabindex="0"
+             aria-label="${art.title}, ${art.style} style, fitness ${art.fitness}%">
+          <div class="showcase-preview" style="background:${art.bg}">${art.emoji}</div>
+          <div class="showcase-info">
+            <div class="showcase-title">${art.title}</div>
+            <div class="showcase-meta">
+              <span>${art.style} · ${art.generations.toLocaleString()} gen</span>
+              <span class="showcase-fitness">${art.fitness}%</span>
+            </div>
+          </div>
         </div>
-    </header>
+      `).join('');
+    }
 
-    <main class="docs-content" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
-        <h1>Community Showcase</h1>
-        <p class="lead">Explore artwork created with PIGMENT's genetic algorithms and AI prompts.</p>
-
-        <div class="filters">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="glitch">Glitch</button>
-            <button class="filter-btn" data-filter="organic">Organic</button>
-            <button class="filter-btn" data-filter="void">Void</button>
-            <button class="filter-btn" data-filter="abstract">Abstract</button>
-        </div>
-
-        <div class="showcase-grid" id="showcase-grid">
-            <!-- Populated by JavaScript -->
-        </div>
-    </main>
-
-    <footer class="docs-footer">[footer]</footer>
-
-    <script>
-        const artworks = [
-            { id: 1, title: "Neon Genesis", style: "glitch", fitness: 98.5, generations: 1542, tags: ["featured", "neon"] },
-            { id: 2, title: "Forest Dreams", style: "organic", fitness: 97.2, generations: 2310, tags: ["nature"] },
-            { id: 3, title: "Dark Void", style: "void", fitness: 94.8, generations: 876, tags: ["dark"] },
-            { id: 4, title: "Abstract Forms", style: "abstract", fitness: 92.3, generations: 654, tags: ["geometric"] },
-            { id: 5, title: "Glitch Portrait", style: "glitch", fitness: 91.7, generations: 1203, tags: ["portrait"] },
-            { id: 6, title: "Organic Growth", style: "organic", fitness: 90.2, generations: 892, tags: ["growth"] },
-            { id: 7, title: "Void Echo", style: "void", fitness: 88.9, generations: 543, tags: ["minimal"] },
-            { id: 8, title: "Geometric Study", style: "abstract", fitness: 87.5, generations: 765, tags: ["pattern"] }
-        ];
-
-        const grid = document.getElementById('showcase-grid');
-        
-        function render(filter = 'all') {
-            const filtered = filter === 'all' ? artworks : artworks.filter(a => a.style === filter);
-            
-            grid.innerHTML = filtered.map(art => `
-                <div class="showcase-item" onclick="window.location.href='../docs/endpoints/works.html?id=${art.id}'">
-                    <div class="showcase-preview">${art.style === 'glitch' ? '🌀' : art.style === 'organic' ? '🌿' : art.style === 'void' ? '⚫' : '🔷'}</div>
-                    <div class="showcase-info">
-                        <div class="showcase-title">${art.title}</div>
-                        <div class="showcase-meta">
-                            <span>${art.style} · ${art.generations} gen</span>
-                            <span class="showcase-fitness">${art.fitness}%</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                render(btn.dataset.filter);
-            });
-        });
-
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
         render();
-    </script>
+      });
+    });
+
+    sortSelect.addEventListener('change', render);
+
+    render();
+  </script>
 </body>
 </html>
