@@ -1,15 +1,30 @@
-#PIGMENT v6 — Developer Hub
+<br>
 
-Evolutionary Art Engine · Genetic Algorithms · Self-Learning API
+<div align="center">
+  <!-- Enhanced Badges with better visual grouping -->
+  <a href="https://pigment-org.github.io"><img src="https://img.shields.io/badge/Live%20Demo-000000?style=for-the-badge&logo=github&logoColor=white" alt="Live Demo"></a>
+  <a href="https://pigment-api.onrender.com"><img src="https://img.shields.io/badge/API%20Endpoint-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render API"></a>
+  <a href="#"><img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="MIT License"></a>
+  <a href="#"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge&logo=git&logoColor=white" alt="PRs Welcome"></a>
 
-https://img.shields.io/badge/GitHub%20Pages-Live-222222?style=for-the-badge&logo=github
-https://img.shields.io/badge/Render-API-46E3B7?style=for-the-badge&logo=render
-https://img.shields.io/badge/License-MIT-green?style=for-the-badge
-https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge
+  <br>
+  <br>
 
-Quick Links: Live Demo · Documentation · API Reference · Backend Repo
+  <h1>🎨 PIGMENT v6 — Developer Hub</h1>
+  <h3>Evolutionary Art Engine · Genetic Algorithms · Self-Learning API</h3>
 
+  <br>
 
+Quick Links:
+Live Demo •
+Documentation •
+API Reference •
+Backend Repo
+
+  <br>
+</div>
+
+---
 
 👋 For Developers
 
@@ -25,7 +40,7 @@ Who is this for?
 
 ✨ What is PIGMENT?
 
-PIGMENT transforms any image into evolving artwork through genetic algorithms. Drop a target image, and the system iteratively mutates a population of polygons — scoring each generation against the original — until the evolved canvas converges toward a visual match.
+PIGMENT transforms any image into evolving artwork through genetic algorithms. Drop a target image, and the system iteratively mutates a population of polygons—scoring each generation against the original—until the evolved canvas converges toward a visual match.
 
 The system is self-learning: every mutation outcome is recorded, and ML-optimized operator weights are derived from 171k+ training samples, producing an 8.1% measurable improvement over uniform random selection.
 
@@ -122,10 +137,10 @@ layer evolved {
 
 Features:
 
-· Human-readable and editable
-· Supports multiple layers
-· Stores evolution metadata (fitness, generation count)
-· Can be downloaded, edited, and re-uploaded
+· ✅ Human-readable and editable
+· ✅ Supports multiple layers
+· ✅ Stores evolution metadata (fitness, generation count)
+· ✅ Can be downloaded, edited, and re-uploaded
 
 Evolution Loop
 
@@ -188,7 +203,7 @@ Frontend HTML/CSS/JavaScript (no frameworks) GitHub Pages
 Backend Python/FastAPI Render
 ML/Vector FAISS, scikit-learn Render (integrated)
 Database PostgreSQL Render Managed
-Real-time WebSockets FastAPI + Redis
+Real-time WebSockets (FastAPI + Redis) Render
 
 ---
 
@@ -197,7 +212,7 @@ Real-time WebSockets FastAPI + Redis
 ```
 pigment-org.github.io/
 ├── index.html                 # Main app (pigment engine)
-├── pigment-engine.html         # Standalone demo
+├── pigment-engine.html        # Standalone demo
 ├── css/
 │   ├── main.css               # Shared design system
 │   ├── docs.css               # Documentation styles
@@ -255,9 +270,9 @@ No build step required. The site is pure HTML/CSS/JavaScript.
 
 Making Changes
 
-1. CSS: Edit files in /css — changes apply immediately
-2. JavaScript: Edit files in /js — refresh to see updates
-3. Documentation: HTML files in /docs are fully static
+· CSS: Edit files in /css — changes apply immediately
+· JavaScript: Edit files in /js — refresh to see updates
+· Documentation: HTML files in /docs are fully static
 
 Testing API Integration Locally
 
@@ -303,10 +318,10 @@ We welcome contributions! Whether it's bug fixes, documentation improvements, or
 
 Ways to Contribute
 
-1. Report bugs: Open an issue with detailed reproduction steps
-2. Improve docs: Fix typos, clarify explanations, add examples
-3. Enhance UI: Improve accessibility, mobile responsiveness, or visual design
-4. Add features: Implement new visualization tools or API clients
+· Report bugs: Open an issue with detailed reproduction steps
+· Improve docs: Fix typos, clarify explanations, add examples
+· Enhance UI: Improve accessibility, mobile responsiveness, or visual design
+· Add features: Implement new visualization tools or API clients
 
 Pull Request Process
 
@@ -343,6 +358,12 @@ Backend Repo Core engine issues
 
 ---
 
-Ready to evolve? Get your API key → Read the docs → Start building
-
----
+<br>
+<div align="center">
+  <b>Ready to evolve?</b><br>
+  <a href="https://pigment-api.onrender.com">Get your API key</a> →
+  <a href="https://pigment-org.github.io/docs">Read the docs</a> →
+  <a href="https://pigment-org.github.io">Start building</a>
+  <br><br>
+  <img src="https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20and%20genetic%20algorithms-ff69b4?style=flat-square" alt="Made with love">
+</div>
