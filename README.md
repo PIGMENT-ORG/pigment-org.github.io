@@ -1,4 +1,3 @@
----
 #PIGMENT v6 — Developer Hub
 
 Evolutionary Art Engine · Genetic Algorithms · Self-Learning API
@@ -10,7 +9,7 @@ https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge
 
 Quick Links: Live Demo · Documentation · API Reference · Backend Repo
 
----
+
 
 👋 For Developers
 
