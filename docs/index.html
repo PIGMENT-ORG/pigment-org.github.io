@@ -1,332 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PIGMENT v6 API Documentation</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/docs.css">
-    <style>
-        .hero {
-            text-align: center;
-            padding: 3rem 1rem;
-            background: linear-gradient(180deg, #0a0a0a 0%, #0d0d0d 100%);
-            border-bottom: 1px solid #1a1a1a;
-            margin-bottom: 2rem;
-        }
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        .hero .accent {
-            color: var(--accent);
-        }
-        .hero p {
-            color: var(--dim);
-            max-width: 600px;
-            margin: 0 auto;
-            font-size: 1.2rem;
-        }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-        .feature-card {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 2rem;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-        }
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        .feature-card h3 {
-            font-family: var(--display);
-            margin-bottom: 0.75rem;
-        }
-        .feature-card p {
-            color: #999;
-            margin-bottom: 1.5rem;
-        }
-        .feature-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .api-box {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        .base-url {
-            background: #1a1a1a;
-            padding: 1rem;
-            border-radius: 8px;
-            font-family: var(--mono);
-            font-size: 1.2rem;
-            margin: 1rem 0;
-            word-break: break-all;
-        }
-        .base-url code {
-            color: var(--accent);
-            background: transparent;
-        }
-        .auth-note {
-            background: #1a1a1a;
-            border-left: 4px solid var(--accent);
-            padding: 1rem 1.5rem;
-            border-radius: 0 8px 8px 0;
-            margin: 1.5rem 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="PIGMENT v6 API Documentation — Complete reference for the evolutionary art API.">
+  <title>Documentation — PIGMENT v6</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/docs.css">
+  <style>
+    .docs-hero {
+      text-align: center;
+      padding: 3rem 1.5rem 2rem;
+      border-bottom: 1px solid #1a1a1a;
+      background: linear-gradient(180deg, #060606 0%, #0a0a0a 100%);
+    }
+    .docs-hero h1 { margin-bottom: 0.75rem; }
+    .docs-hero p { color: var(--dim); font-size: 1.1rem; max-width: 560px; margin: 0 auto 1.5rem; }
+    .hero-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .base-url-box {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .base-url-label {
+      font-size: 0.75rem;
+      color: var(--dim);
+      flex-shrink: 0;
+    }
+    .base-url-val {
+      font-family: var(--mono);
+      font-size: 0.875rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .nav-card {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, border-color 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .nav-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      opacity: 1;
+    }
+    .nav-card-icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+    .nav-card-title {
+      font-family: var(--display);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--paper);
+    }
+    .nav-card-desc {
+      font-size: 0.8125rem;
+      color: var(--dim);
+      line-height: 1.55;
+    }
+    .endpoint-list { list-style: none; }
+    .endpoint-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #111;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .endpoint-list li:last-child { border-bottom: none; }
+    .endpoint-list a { color: var(--paper); text-decoration: none; font-size: 0.875rem; }
+    .endpoint-list a:hover { color: var(--accent); opacity: 1; }
+  </style>
 </head>
-<body>
-    <header class="docs-header">
-        <div class="header-container">
-            <div class="logo">
-                <a href="../index.html">PIGMENT <span>docs</span></a>
-            </div>
-            <button class="mobile-menu-btn" id="menuBtn">☰</button>
-            <nav class="header-nav" id="navLinks">
-                <a href="../index.html">Home</a>
-                <a href="index.html" class="active">Docs</a>
-                <a href="../blog/index.html">Blog</a>
-                <a href="../showcase/index.html">Showcase</a>
-            </nav>
-            <div class="header-actions">
-                <a href="getting-started.html" class="btn btn-primary">Get Started</a>
-                <a href="https://github.com/pigment-org" class="btn btn-outline">GitHub</a>
-            </div>
-        </div>
-    </header>
+<body class="docs-page">
 
-    <div class="hero">
-        <h1>PIGMENT <span class="accent">v6</span> API</h1>
-        <p>Evolutionary art using genetic algorithms. Create, evolve, and track relationships between artworks.</p>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="site-logo">PIGMENT <span>docs</span></a>
+      <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <nav class="header-nav" role="navigation" aria-label="Main navigation">
+        <a href="../index.html">Home</a>
+        <a href="index.html" class="active">Docs</a>
+        <a href="../blog/index.html">Blog</a>
+        <a href="../showcase/index.html">Showcase</a>
+      </nav>
+      <div class="header-actions">
+        <a href="getting-started.html" class="btn btn-primary">Quick Start</a>
+        <a href="https://github.com/pigment-org" class="btn btn-outline" target="_blank" rel="noopener">GitHub</a>
+      </div>
     </div>
+  </header>
 
-    <div class="docs-layout">
-        <aside class="docs-sidebar">
-            <div class="sidebar-section">
-                <h3 class="sidebar-title">Getting Started</h3>
-                <ul class="sidebar-nav">
-                    <li><a href="index.html" class="active">Introduction</a></li>
-                    <li><a href="getting-started.html">Quick Start</a></li>
-                    <li><a href="authentication.html">Authentication</a></li>
-                    <li><a href="rate-limits.html">Rate Limits</a></li>
-                    <li><a href="errors.html">Error Handling</a></li>
-                    <li><a href="faq.html">FAQ</a></li>
-                    <li><a href="changelog.html">Changelog</a></li>
-                </ul>
-            </div>
-            <div class="sidebar-section">
-                <h3 class="sidebar-title">Endpoints</h3>
-                <ul class="sidebar-nav">
-                    <li><a href="endpoints/works.html">/v1/works</a></li>
-                    <li><a href="endpoints/evolve.html">/v1/evolve</a></li>
-                    <li><a href="endpoints/kinship.html">/v1/kinship</a></li>
-                    <li><a href="endpoints/prompt.html">/v1/prompt</a></li>
-                    <li><a href="endpoints/gallery.html">/v1/gallery</a></li>
-                    <li><a href="endpoints/search.html">/v1/search/similar</a></li>
-                    <li><a href="endpoints/ancestry.html">/v1/ancestry/{id}</a></li>
-                </ul>
-            </div>
-            <div class="sidebar-section">
-                <h3 class="sidebar-title">Examples</h3>
-                <ul class="sidebar-nav">
-                    <li><a href="examples/javascript.html">JavaScript</a></li>
-                    <li><a href="examples/python.html">Python</a></li>
-                    <li><a href="examples/curl.html">cURL</a></li>
-                </ul>
-            </div>
-        </aside>
+  <!-- Hero -->
+  <div class="docs-hero">
+    <h1>PIGMENT <span class="accent">v6</span> API</h1>
+    <p>Complete reference for the evolutionary art API. Generate, evolve, and track artwork programmatically.</p>
+    <div class="hero-actions">
+      <a href="getting-started.html" class="btn btn-primary">Quick Start Guide</a>
+      <a href="authentication.html" class="btn btn-outline">Authentication</a>
+    </div>
+  </div>
 
-        <main class="docs-content">
-            <div class="content-container">
-                <h1>Introduction to PIGMENT</h1>
-                <p class="lead">PIGMENT is an open-source API that uses genetic algorithms to evolve artwork. Each artwork is represented as a genome — a collection of colored polygons that mutate over generations.</p>
+  <!-- Docs layout -->
+  <div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar" aria-label="Documentation navigation">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Getting Started</div>
+        <ul class="sidebar-nav">
+          <li><a href="index.html" class="active">Introduction</a></li>
+          <li><a href="getting-started.html">Quick Start</a></li>
+          <li><a href="authentication.html">Authentication</a></li>
+          <li><a href="catalog.html">Genome Catalog</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">API Endpoints</div>
+        <ul class="sidebar-nav">
+          <li><a href="endpoints/works.html">/v1/works</a></li>
+          <li><a href="endpoints/evolve.html">/v1/evolve</a></li>
+          <li><a href="endpoints/kinship.html">/v1/kinship</a></li>
+          <li><a href="endpoints/prompt.html">/v1/prompt</a></li>
+          <li><a href="endpoints/gallery.html">/v1/gallery</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Reference</div>
+        <ul class="sidebar-nav">
+          <li><a href="rate-limits.html">Rate Limits</a></li>
+          <li><a href="errors.html">Error Codes</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Examples</div>
+        <ul class="sidebar-nav">
+          <li><a href="example/curl.html">cURL</a></li>
+          <li><a href="example/javascript.html">JavaScript</a></li>
+          <li><a href="example/python.html">Python</a></li>
+        </ul>
+      </div>
+    </aside>
 
-                <div class="auth-note">
-                    <strong>✨ New in v6:</strong> AI-powered evolution prompts, kinship tracking with 16D feature vectors, real-time WebSocket support, and a 19-strategy adaptive engine.
-                </div>
+    <!-- Main content -->
+    <main class="docs-content">
+      <div class="docs-content-inner">
+        <h1>Introduction</h1>
+        <p>PIGMENT is a REST API for evolutionary art generation. Drop any image and watch it evolve through generations of mutations — driven by genetic algorithms, edge-aware fitness scoring, and an optional AI prompt layer powered by Claude.</p>
 
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">🧬</div>
-                        <h3>Evolution</h3>
-                        <p>Start with random polygons and evolve toward your target image. 7 mutation operators with adaptive probabilities.</p>
-                        <a href="getting-started.html" class="feature-link">Learn more →</a>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🔗</div>
-                        <h3>Kinship</h3>
-                        <p>Track relationships between artworks. Find parents, children, siblings, and cousins using 16D feature vectors.</p>
-                        <a href="endpoints/kinship.html" class="feature-link">Learn more →</a>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🤖</div>
-                        <h3>AI Prompts</h3>
-                        <p>Guide evolution with natural language. "Make it glitchy" — Claude API (or fallback) translates to mutations.</p>
-                        <a href="endpoints/prompt.html" class="feature-link">Learn more →</a>
-                    </div>
-                </div>
+        <div class="base-url-box">
+          <span class="base-url-label">Base URL</span>
+          <code class="base-url-val">https://pigment-api.onrender.com</code>
+        </div>
 
-                <div class="api-box">
-                    <h2>API Overview</h2>
-                    
-                    <div class="base-url">
-                        <strong>Base URL:</strong> <code>https://pigment-api.onrender.com</code>
-                    </div>
+        <div class="info-box note">
+          <strong>Note</strong>
+          The API is hosted on Render's free tier and may take 30–60 seconds to respond on the first request after a period of inactivity (cold start). Subsequent requests are fast.
+        </div>
 
-                    <p>All requests require authentication via <code>X-API-Key</code> header:</p>
-                    <div class="base-url" style="font-size: 1rem;">
-                        <code>X-API-Key: your-api-key-here</code>
-                    </div>
+        <h2>Navigate the Docs</h2>
+        <div class="section-grid">
+          <a href="getting-started.html" class="nav-card">
+            <span class="nav-card-icon">🚀</span>
+            <div class="nav-card-title">Quick Start</div>
+            <p class="nav-card-desc">Get an API key and make your first call in under 5 minutes.</p>
+          </a>
+          <a href="authentication.html" class="nav-card">
+            <span class="nav-card-icon">🔑</span>
+            <div class="nav-card-title">Authentication</div>
+            <p class="nav-card-desc">API key creation, rotation, and request signing.</p>
+          </a>
+          <a href="endpoints/evolve.html" class="nav-card">
+            <span class="nav-card-icon">🧬</span>
+            <div class="nav-card-title">Evolve Endpoint</div>
+            <p class="nav-card-desc">Start evolution jobs, control mutation operators and generations.</p>
+          </a>
+          <a href="endpoints/kinship.html" class="nav-card">
+            <span class="nav-card-icon">🔗</span>
+            <div class="nav-card-title">Kinship System</div>
+            <p class="nav-card-desc">Find related artworks using 16-dimensional feature vectors.</p>
+          </a>
+          <a href="endpoints/prompt.html" class="nav-card">
+            <span class="nav-card-icon">🤖</span>
+            <div class="nav-card-title">AI Prompts</div>
+            <p class="nav-card-desc">Natural language control — translate text into mutation plans.</p>
+          </a>
+          <a href="errors.html" class="nav-card">
+            <span class="nav-card-icon">⚠️</span>
+            <div class="nav-card-title">Error Reference</div>
+            <p class="nav-card-desc">Complete error code list with causes and fixes.</p>
+          </a>
+        </div>
 
-                    <p>Get your API key instantly:</p>
-                    <div class="base-url" style="font-size: 0.9rem;">
-                        <pre style="margin: 0;"><code>curl -X POST https://pigment-api.onrender.com/v1/users \
-  -H "Content-Type: application/json" \
-  -d '{"email": "your@email.com"}'</code></pre>
-                    </div>
+        <h2>API Overview</h2>
+        <p>All endpoints accept and return JSON. Authentication is via an <code>X-API-Key</code> header. The API follows standard REST conventions.</p>
 
-                    <p>Response includes your key:</p>
-                    <div class="base-url" style="font-size: 0.9rem;">
-                        <pre style="margin: 0;"><code>{
-  "id": "user_2a7f8c3e",
-  "email": "your@email.com",
-  "api_key": "pigment_a1b2c3d4e5f6g7h8i9j0",
-  "plan": "free"
-}</code></pre>
-                    </div>
-                </div>
+        <h3>All Endpoints</h3>
+        <ul class="endpoint-list">
+          <li><span class="method-badge method-post">POST</span><a href="endpoints/works.html">/v1/works — Create a new artwork</a></li>
+          <li><span class="method-badge method-get">GET</span><a href="endpoints/works.html">/v1/works/:id — Get artwork metadata</a></li>
+          <li><span class="method-badge method-post">POST</span><a href="endpoints/evolve.html">/v1/evolve — Start an evolution job</a></li>
+          <li><span class="method-badge method-get">GET</span><a href="endpoints/evolve.html">/v1/evolve/:job_id — Get job status</a></li>
+          <li><span class="method-badge method-get">GET</span><a href="endpoints/kinship.html">/v1/kinship/:id — Get artwork relatives</a></li>
+          <li><span class="method-badge method-post">POST</span><a href="endpoints/prompt.html">/v1/prompt — Translate AI prompt to mutations</a></li>
+          <li><span class="method-badge method-get">GET</span><a href="endpoints/gallery.html">/v1/gallery — Browse public artworks</a></li>
+          <li><span class="method-badge method-post">POST</span><a href="#">/v1/users — Create account &amp; get API key</a></li>
+        </ul>
 
-                <h2>Core Concepts</h2>
+        <h2>Genome Format (.pg)</h2>
+        <p>PIGMENT uses a custom genome format called <strong>.pg</strong> (Pigment Genome) to represent artwork as editable text. A genome describes a canvas, palette, and one or more polygon layers.</p>
+        <pre><code>-- PIGMENT Genome v6.0.0
+-- @fitness 0.94
+-- @generations 1500
 
-                <h3>1. Genomes (.pg files)</h3>
-                <p>Every artwork is stored as a <code>.pg</code> (PIGMENT Genome) file:</p>
-                <div class="base-url" style="font-size: 0.9rem;">
-                    <pre><code>-- PIGMENT Genome v6.0.0
--- @fitness 78.5
--- @generation 1542
-
-canvas { width: 400 height: 400 }
+canvas { width: 400 height: 400 background: #0a0a0a }
 
 palette {
-  c0: #ff3366
-  c1: #33ff99
+  color_0: #c8ff00
+  color_1: #ff3b2f
 }
 
-layer evolved {
+layer base {
   zone poly_0 {
-    color: palette.c0
-    opacity: 0.8
+    color: palette.color_0
+    opacity: 0.85
     points: 120,140 180,120 160,200
   }
+  zone poly_1 {
+    color: palette.color_1
+    opacity: 0.6
+    points: 200,100 260,140 240,220 180,200
+  }
 }</code></pre>
-                </div>
 
-                <h3>2. Feature Vectors</h3>
-                <p>Each work has a 16-dimensional perceptual fingerprint used for kinship:</p>
-                <div class="base-url" style="font-size: 0.9rem;">
-                    <code>[r_mean, g_mean, b_mean, r_std, g_std, b_std, lum_contrast, color_entropy, poly_count, avg_opacity, avg_points, hue_spread, glitch_factor, organic_factor, void_factor, fitness_proxy]</code>
-                </div>
+        <h2>Fitness Scoring</h2>
+        <p>PIGMENT measures how closely an evolved image matches the target using a weighted combination of edge similarity and color similarity:</p>
+        <div class="info-box tip">
+          <strong>Formula</strong>
+          fitness = (edge_similarity × 0.70) + (color_similarity × 0.30)
+        </div>
+        <p>Edge similarity is computed using Sobel operators on both images. Color similarity compares RGB histograms. A fitness of 1.0 is a perfect match; most high-quality evolutions achieve 0.85–0.98 after thousands of generations.</p>
 
-                <h3>3. Evolution Strategies</h3>
-                <p>19 different strategies adapt based on fitness and context:</p>
-                <ul>
-                    <li><strong>Explore:</strong> Large mutations, coarse seeding (0-30% fitness)</li>
-                    <li><strong>Refine:</strong> Moderate adjustments (30-60% fitness)</li>
-                    <li><strong>Polish:</strong> Micro-mutations for precision (60-100% fitness)</li>
-                    <li><strong>Stagnation breakers:</strong> Escape local minima</li>
-                    <li><strong>Sprint:</strong> Exploit consecutive successes</li>
-                </ul>
+        <h2>Support</h2>
+        <p>For bugs and feature requests, open an issue on <a href="https://github.com/pigment-org" target="_blank" rel="noopener">GitHub</a>. For usage questions, check the <a href="faq.html">FAQ</a>.</p>
+      </div>
+    </main>
+  </div>
 
-                <h2>Quick Start</h2>
-                <p>Get your API key and make your first request in 30 seconds:</p>
-
-                <div class="base-url" style="font-size: 0.9rem;">
-                    <pre><code># 1. Get API key
-curl -X POST https://pigment-api.onrender.com/v1/users \
-  -H "Content-Type: application/json" \
-  -d '{"email": "me@example.com"}'
-
-# 2. Create a work
-curl -X POST https://pigment-api.onrender.com/v1/works \
-  -H "X-API-Key: your-key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "My First Art",
-    "content": "-- PIGMENT Genome...",
-    "tags": ["demo"]
-  }'
-
-# 3. Evolve it
-curl -X POST https://pigment-api.onrender.com/v1/evolve \
-  -H "X-API-Key: your-key" \
-  -H "Content-Type: application/json" \
-  -d '{"work_id": "work_abc123", "steps": 500}'</code></pre>
-                </div>
-
-                <h2>Deployment Options</h2>
-                <ul>
-                    <li><strong>Layer 2:</strong> Pure Python stdlib — run <code>python3 server.py</code> anywhere</li>
-                    <li><strong>Layer 3/4:</strong> FastAPI + PostgreSQL + Redis — Docker Compose included</li>
-                    <li><strong>Frontend:</strong> GitHub Pages — <a href="https://pigment-org.github.io">pigment-org.github.io</a></li>
-                </ul>
-
-                <div class="pagination">
-                    <a href="#" class="prev disabled">← Previous</a>
-                    <a href="getting-started.html" class="next">Getting Started →</a>
-                </div>
-            </div>
-        </main>
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>PIGMENT</h4>
+        <ul>
+          <li><a href="index.html">Documentation</a></li>
+          <li><a href="../blog/index.html">Blog</a></li>
+          <li><a href="../showcase/index.html">Showcase</a></li>
+          <li><a href="../pigment-engine.html">Live Demo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>API Reference</h4>
+        <ul>
+          <li><a href="getting-started.html">Quick Start</a></li>
+          <li><a href="authentication.html">Authentication</a></li>
+          <li><a href="endpoints/evolve.html">/v1/evolve</a></li>
+          <li><a href="rate-limits.html">Rate Limits</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+          <li><a href="../blog/kinship-explained.html">Kinship System</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="errors.html">Error Codes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Links</h4>
+        <ul>
+          <li><a href="https://github.com/pigment-org" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="../LICENSE">MIT License</a></li>
+        </ul>
+      </div>
     </div>
+    <div class="footer-bottom">
+      <p>© 2026 PIGMENT. Open source under the <a href="../LICENSE">MIT License</a>.</p>
+    </div>
+  </footer>
 
-    <footer class="docs-footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h4>PIGMENT</h4>
-                <ul>
-                    <li><a href="../index.html">Home</a></li>
-                    <li><a href="index.html">Documentation</a></li>
-                    <li><a href="../blog/index.html">Blog</a></li>
-                    <li><a href="../showcase/index.html">Showcase</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>API</h4>
-                <ul>
-                    <li><a href="getting-started.html">Quick Start</a></li>
-                    <li><a href="authentication.html">Authentication</a></li>
-                    <li><a href="rate-limits.html">Rate Limits</a></li>
-                    <li><a href="endpoints/works.html">Endpoints</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Resources</h4>
-                <ul>
-                    <li><a href="../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
-                    <li><a href="../blog/kinship-explained.html">Kinship System</a></li>
-                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 PIGMENT. All rights reserved. · <strong>Free & Open Source</strong> · v6.0.0</p>
-        </div>
-    </footer>
-
-    <script src="../js/docs.js"></script>
+  <script src="../js/ui.js"></script>
 </body>
 </html>
