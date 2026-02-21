@@ -3,7 +3,7 @@
 <div align="center">
   <img src="assets/images/pigment-banner.png" alt="PIGMENT Banner" width="600">
   <br>
-  <strong>Evolutionary Art API · Genetic Algorithms · AI-Powered</strong>
+  <strong>Evolutionary Art API · Genetic Algorithms · AI-Powered · Self-Learning</strong>
 </div>
 
 <br>
@@ -26,50 +26,64 @@
 
 ## ✨ Overview
 
-PIGMENT is a **production-ready AI art evolution platform** that transforms images through genetic algorithms. Drop any image and watch it evolve through generations of mutations in real-time.
+PIGMENT is a **production-ready AI art evolution platform** that transforms images through genetic algorithms. Drop any image and watch it evolve through generations of mutations in real-time. The system **learns from every mutation**, continuously improving its strategies based on 171k+ training samples.
 
-Built with **pure HTML/CSS/JavaScript** (no frameworks) and powered by a [FastAPI backend](https://github.com/PIGMENT-ORG/PIGMENT-V6), PIGMENT demonstrates how evolutionary computing can create stunning visual art.
+Built with **pure HTML/CSS/JavaScript** (no frameworks) and powered by a [Python backend](https://github.com/PIGMENT-ORG/PIGMENT-V6), PIGMENT demonstrates how evolutionary computing can create stunning visual art while **learning and adapting** over time.
 
 ---
 
 ## 🎯 Key Features
 
-### 🧬 **Genetic Evolution Engine**
-- **6 mutation operators**: scale, rotate, color shift, translate, opacity, intelligent
-- Adaptive operator probabilities based on success rates
-- Real-time fitness calculation against target image
-- Resolution scaling for performance optimization
+### 🧠 **Self-Learning AI**
+- **8.1% proven improvement** from just 510 training samples
+- **171k+ training samples** collected and growing
+- Operator success rates tracked in real-time
+- ML-optimized weights automatically adjust strategy
+- `/v1/learning/weights` endpoint for dynamic optimization
+
+### 🧬 **Advanced Evolution Engine**
+- **9 mutation operators**: scale, rotate, color, opacity, translate, reshape, spawn, merge, intelligent
+- **Edge-aware fitness** (70% edge similarity, 30% color similarity) using Sobel operators
+- **Diff-aware mutation** targeting highest-error areas
+- **Self-healing** polygon culling and hotspot spawning
+- Adaptive operator probabilities based on real success rates
 
 ### 🔗 **Kinship System**
-- Track parent/child/sibling relationships between artworks
+- Track parent/child/sibling/cousin relationships
 - 16-dimensional feature vector extraction
-- Cosine similarity matching
+- Cosine similarity matching with weighted scoring
 - Visual family tree generation
+- Full ancestry tracking with fitness history
 
 ### 🤖 **AI Integration**
 - Natural language prompts via Claude API
 - "make it glitchy" → structured mutation plan
-- 14 high-level mutation operations
+- 16 high-level mutation operations
 - Local keyword fallback when offline
+- Double-tap on canvas for quick prompts (mobile)
 
 ### 📡 **Real-time Updates**
 - WebSocket streaming of evolution progress
 - Live fitness milestone notifications
 - Job queue status with progress bars
 - Kinship updates pushed to clients
+- Fitness sparkline and error heatmap
 
 ### 🎮 **Interactive UI**
 - **Side-by-side canvas**: Target vs Evolved
 - **Diff mode**: Visualize pixel differences
 - **Snapshot history**: Save/restore generations
 - **Genome editor**: View/edit .pg files
-- **Keyboard shortcuts**: Space, R, D, S, E, G
+- **Live HUD**: Real-time stats overlay
+- **Zoom on click**: Inspect details
+- **Double-tap prompt**: Quick AI access on mobile
 
 ### 📱 **Mobile Optimized**
 - Touch-friendly controls
-- Swipeable sidebar
+- Swipeable drawer interface
 - Responsive canvas scaling
-- Gesture support (drag to close)
+- Double-tap gestures
+- Heatmap for error visualization
 
 ---
 
@@ -101,7 +115,8 @@ Click the ↗ button in API CONNECT panel
 # • Save artworks to database
 # • Server-side evolution (faster)
 # • Kinship tracking
-# • Training data collection
+# • Training data collection (171k+ samples)
+# • ML-optimized weights
 ```
 
 ---
@@ -112,6 +127,7 @@ Key Action Description
 Space Play/Pause Start/stop evolution
 R Reset Reset to initial random polygons
 D Toggle Diff Show/hide difference overlay
+H Toggle HUD Show/hide heads-up display
 S Snapshot Save current generation
 E Export Download evolved image as PNG
 G Viewer Open genome viewer modal
@@ -144,35 +160,56 @@ layer evolved {
 }
 ```
 
-2. Feature Extraction
-
-16 perceptual features per artwork:
-
-· RGB means & standard deviations (6)
-· Luminance contrast (1)
-· Color entropy (1)
-· Polygon count (1)
-· Average opacity (1)
-· Average points per polygon (1)
-· Hue spread (1)
-· Glitch factor (1)
-· Organic factor (1)
-· Void factor (1)
-· Fitness proxy (1)
-
-3. Evolution Process
+2. Edge-Aware Fitness Calculation
 
 ```javascript
-// Every frame, 50-300 mutations happen
-1. Select operator (weighted by success rate)
-2. Choose random polygon
-3. Apply mutation
-4. Calculate new fitness
-5. Keep if improved, revert if worse
-6. Update operator statistics
+// 70% edge similarity, 30% color similarity
+fitness = colorScore * 0.3 + edgeScore * 0.7;
+
+// Edge detection uses Sobel operators
+const evolvedEdges = detectEdges(evolved);
+const targetEdges = detectEdges(target);
 ```
 
-4. Kinship Calculation
+3. Self-Learning Evolution Process
+
+```javascript
+// Every frame, mutations happen where they're needed most
+1. Generate error heatmap (diff between target and evolved)
+2. Select operator using ML-optimized weights
+3. Find worst-performing polygons in high-error zones
+4. Apply targeted mutation
+5. Calculate new fitness (edge-aware)
+6. Update operator statistics (success/failure)
+7. Adjust weights based on real data
+8. Cull weakest polygons every 1000 generations
+9. Spawn new polygons in error hotspots
+```
+
+4. Operator Success Rates (From 510 Samples)
+
+Operator Success Rate Role
+intelligent 59% Learned selection
+color 54% Fine-tuning
+scale 51% Shape adjustment
+opacity 46% Transparency
+rotate 41% Rotation
+translate 30% Movement
+
+5. ML-Optimized Weights (Now Active)
+
+```javascript
+IMPROVED_WEIGHTS = {
+  explore: { scale: 0.25, translate: 0.15, color: 0.20, 
+             opacity: 0.12, rotate: 0.10, intelligent: 0.18 },
+  refine:  { scale: 0.20, translate: 0.10, color: 0.25, 
+             opacity: 0.18, rotate: 0.10, intelligent: 0.17 },
+  polish:  { scale: 0.15, translate: 0.05, color: 0.25, 
+             opacity: 0.20, rotate: 0.08, intelligent: 0.12 }
+}
+```
+
+6. Kinship Calculation
 
 ```
 visual_similarity (40%) + generational_distance (30%) + structural_similarity (30%)
@@ -206,6 +243,9 @@ POST /v1/search/similar Find similar works
 GET /v1/ancestry/{id} Get full ancestry
 POST /v1/prompt Apply AI prompt
 POST /v1/training Ingest training data
+GET /v1/training/stats Get training statistics
+GET /v1/export/training Export training data as CSV
+GET /v1/learning/weights Get ML-optimized weights
 GET /v1/gallery Public gallery
 WebSocket /ws/{user_id} Real-time updates
 
@@ -220,6 +260,41 @@ await client.createUser('me@example.com');
 const work = await client.createWork('My Art', genomeContent);
 const evolved = await client.evolve(work.id, 1000);
 const kinship = await client.getKinship(work.id);
+
+// Get ML-optimized weights
+const weights = await client.getLearningWeights();
+console.log('Best operator:', weights.weights[0].operator);
+```
+
+---
+
+📊 Training & Analytics
+
+Real-Time Operator Stats
+
+The system tracks every mutation and displays:
+
+· Success rates per operator
+· Attempts per operator
+· Fitness distribution
+· Daily learning curves
+· Error heatmaps
+
+ML Optimization
+
+The /v1/learning/weights endpoint returns:
+
+· Success rates from last 7 days
+· Recommended normalized weights
+· Sample counts per operator
+· Period-over-period improvements
+
+Export Training Data
+
+```bash
+curl -H "X-API-Key: your-key" \
+     https://pigment-api.onrender.com/v1/export/training \
+     --output pigment_training_data.csv
 ```
 
 ---
@@ -228,8 +303,7 @@ const kinship = await client.getKinship(work.id);
 
 ```
 pigment-org.github.io/
-├── index.html                    # Marketing homepage
-├── pigment-engine.html           # Main app
+├── index.html                    # Main app (edge-aware evolution)
 ├── docs/                         # Documentation
 │   ├── index.html                # Docs hub
 │   ├── getting-started.html      # Quick start
@@ -238,7 +312,8 @@ pigment-org.github.io/
 ├── blog/                          # Educational content
 │   ├── index.html                # Blog hub
 │   ├── genetic-algorithms.html   # GA deep dive
-│   └── kinship-explained.html    # Kinship system
+│   ├── kinship-explained.html    # Kinship system
+│   └── ai-prompts.html           # AI prompts
 ├── showcase/                      # Gallery
 │   └── index.html                # Art showcase
 ├── css/                           # Styles
@@ -311,10 +386,22 @@ Browser Compatibility
 Responsive Breakpoints
 
 Device Width Behavior
-Desktop 1024px Side-by-side layout
-Tablet 768-1024px Stacked layout
-Mobile <768px Collapsible sidebar
-Small Mobile <480px Single column
+Desktop 1024px Side-by-side canvas, full HUD
+Tablet 768-1024px Stacked layout, compact HUD
+Mobile <768px Drawer interface, touch gestures
+Small Mobile <480px Single column, simplified stats
+
+---
+
+📊 Stats
+
+Metric Value
+Training Samples 171,381+
+Proven Improvement 8.1% (from 510 samples)
+Mutation Operators 9
+API Endpoints 20+
+File Size < 500KB (gzipped)
+Lighthouse Score 95+
 
 ---
 
@@ -343,18 +430,7 @@ Guidelines
 · Test on multiple screen sizes
 · Follow existing style patterns
 · Add comments for complex logic
-
----
-
-📊 Stats
-
-Metric Value
-Training Samples 171,381+
-Q-States 14
-API Endpoints 15+
-Mutation Operators 6
-File Size < 500KB (gzipped)
-Lighthouse Score 95+
+· Include training data for new features
 
 ---
 
@@ -378,6 +454,7 @@ of this software and associated documentation files...
 · Claude API - Natural language understanding
 · Render - Free tier hosting
 · GitHub Pages - Frontend hosting
+· Sobel Operators - Edge detection magic
 · All contributors - You rock!
 
 ---
@@ -387,7 +464,6 @@ of this software and associated documentation files...
 · Website: pigment-org.github.io
 · GitHub: @PIGMENT-ORG
 · Twitter: @pigment_ai
-· Email: pigment@pigment.dev
 
 ---
 
@@ -395,7 +471,6 @@ of this software and associated documentation files...
   <sub>Built with ❤️ by the PIGMENT Team</sub>
   <br>
   <sub>⭐ Star us on GitHub — it motivates us a lot!</sub>
+  <br>
+  <sub>🧠 Self-learning · Edge-aware · Production-ready</sub>
 </div>
-
-
----
