@@ -1,561 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PIGMENT - Evolutionary Art API</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --ink: #0a0a0a;
-            --paper: #f0ede6;
-            --dim: #b8b4ac;
-            --accent: #c8ff00;
-            --mono: 'DM Mono', monospace;
-            --display: 'Unbounded', sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="PIGMENT Showcase — Community artwork created using the PIGMENT evolutionary art API.">
+  <title>Showcase — PIGMENT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .showcase-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .showcase-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+      flex: 1;
+    }
+    .showcase-header { margin-bottom: 2rem; }
+    .showcase-header h1 { margin-bottom: 0.5rem; }
 
-        body {
-            background: var(--ink);
-            color: var(--paper);
-            font-family: var(--mono);
-            line-height: 1.6;
-        }
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0 2rem;
+    }
+    .filter-btn {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: var(--dim);
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .filter-btn.active {
+      background: var(--accent);
+      color: var(--ink);
+      border-color: var(--accent);
+    }
 
-        /* Navigation */
-        .nav {
-            position: sticky;
-            top: 0;
-            background: rgba(10,10,10,0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #1a1a1a;
-            z-index: 100;
-        }
+    /* Grid */
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.25rem;
+    }
+    .showcase-card {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+    .showcase-card:hover {
+      transform: scale(1.025);
+      border-color: rgba(200,255,0,0.4);
+    }
+    .showcase-preview {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      transition: transform 0.3s;
+    }
+    .showcase-card:hover .showcase-preview { transform: scale(1.05); }
+    .showcase-info {
+      padding: 0.875rem 1rem;
+      border-top: 1px solid #1a1a1a;
+    }
+    .showcase-title {
+      font-family: var(--display);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+    .showcase-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #555;
+    }
+    .showcase-fitness {
+      color: var(--accent);
+      font-weight: 600;
+    }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    /* Sort & count bar */
+    .list-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .result-count {
+      color: var(--dim);
+      font-size: 0.8125rem;
+    }
+    .sort-select {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: var(--paper);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      cursor: pointer;
+    }
 
-        .logo {
-            font-family: var(--display);
-            font-weight: 900;
-            font-size: 1.5rem;
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--dim);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: 1px solid #333;
-            color: var(--paper);
-            font-size: 1.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        /* Hero */
-        .hero {
-            padding: 4rem 1rem;
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-family: var(--display);
-            font-size: clamp(2rem, 8vw, 4rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero .accent {
-            color: var(--accent);
-        }
-
-        .hero p {
-            font-size: clamp(1rem, 4vw, 1.25rem);
-            color: var(--dim);
-            margin-bottom: 2rem;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 0.75rem 2rem;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
-            font-size: 1rem;
-            min-width: 160px;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: var(--ink);
-            border: 1px solid var(--accent);
-        }
-
-        .btn-primary:hover {
-            background: #d4ff26;
-            transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--paper);
-            border: 1px solid #333;
-        }
-
-        .btn-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        /* Features */
-        .features {
-            max-width: 1200px;
-            margin: 4rem auto;
-            padding: 0 1rem;
-        }
-
-        .features h2 {
-            font-family: var(--display);
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 8px;
-            padding: 2rem 1.5rem;
-            transition: transform 0.2s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-            font-family: var(--display);
-            margin-bottom: 0.5rem;
-            font-size: 1.25rem;
-        }
-
-        .feature-card p {
-            color: var(--dim);
-            font-size: 0.9rem;
-        }
-
-        /* Stats */
-        .stats {
-            background: #0d0d0d;
-            border-top: 1px solid #1a1a1a;
-            border-bottom: 1px solid #1a1a1a;
-            padding: 3rem 1rem;
-        }
-
-        .stats-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-family: var(--display);
-            font-size: clamp(2rem, 6vw, 3rem);
-            font-weight: 900;
-            color: var(--accent);
-            display: block;
-        }
-
-        .stat-label {
-            color: var(--dim);
-            font-size: 0.9rem;
-        }
-
-        /* Showcase */
-        .showcase {
-            max-width: 1200px;
-            margin: 4rem auto;
-            padding: 0 1rem;
-        }
-
-        .showcase h2 {
-            font-family: var(--display);
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .showcase-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .showcase-item {
-            aspect-ratio: 1;
-            background: #1a1a1a;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .showcase-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .showcase-item:hover img {
-            transform: scale(1.05);
-        }
-
-        /* CTA Section */
-        .cta-section {
-            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
-            padding: 4rem 1rem;
-            text-align: center;
-            border-top: 1px solid #1a1a1a;
-        }
-
-        .cta-section h2 {
-            font-family: var(--display);
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            margin-bottom: 1rem;
-        }
-
-        .cta-section p {
-            color: var(--dim);
-            margin-bottom: 2rem;
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
-        }
-
-        /* Footer */
-        .footer {
-            background: #0a0a0a;
-            padding: 3rem 1rem 1rem;
-            border-top: 1px solid #1a1a1a;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-        }
-
-        .footer-section h4 {
-            font-family: var(--display);
-            color: var(--paper);
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a {
-            color: var(--dim);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        .footer-section a:hover {
-            color: var(--accent);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 3rem;
-            padding-top: 1rem;
-            border-top: 1px solid #1a1a1a;
-            color: #333;
-            font-size: 0.8rem;
-        }
-
-        /* Mobile Styles */
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: #0a0a0a;
-                flex-direction: column;
-                padding: 1rem;
-                border-bottom: 1px solid #1a1a1a;
-                gap: 1rem;
-            }
-
-            .nav-links.show {
-                display: flex;
-            }
-
-            .nav-links a {
-                width: 100%;
-                text-align: center;
-                padding: 0.75rem;
-            }
-
-            .nav-links .btn {
-                width: 100%;
-                margin: 0;
-            }
-
-            .hero {
-                padding: 2rem 1rem;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .btn {
-                width: 100%;
-            }
-
-            .feature-grid {
-                gap: 1rem;
-            }
-
-            .stats-container {
-                gap: 1.5rem;
-            }
-
-            .showcase-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .showcase-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .footer-container {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .feature-card {
-                padding: 1.5rem 1rem;
-            }
-        }
-
-        /* Touch-friendly */
-        @media (hover: none) {
-            .btn, 
-            .feature-card,
-            .nav-links a {
-                -webkit-tap-highlight-color: transparent;
-            }
-
-            .btn:active {
-                transform: scale(0.98);
-            }
-        }
-    </style>
+    @media (max-width: 600px) {
+      .showcase-main { padding: 1.5rem 1rem; }
+      .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    }
+    @media (max-width: 380px) {
+      .showcase-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-<body>
-    <nav class="nav">
-        <div class="nav-container">
-            <a href="/" class="logo">PIGMENT</a>
-            <button class="mobile-menu-btn" id="menuBtn">☰</button>
-            <div class="nav-links" id="navLinks">
-                <a href="docs/">Docs</a>
-                <a href="blog/">Blog</a>
-                <a href="showcase/">Showcase</a>
-                <a href="https://github.com/pigment-org">GitHub</a>
-                <a href="docs/getting-started.html" class="btn btn-primary">Get Started</a>
+<body class="showcase-page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="site-logo">PIGMENT <span>showcase</span></a>
+      <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <nav class="header-nav" role="navigation" aria-label="Main navigation">
+        <a href="../index.html">Home</a>
+        <a href="../docs/index.html">Docs</a>
+        <a href="../blog/index.html">Blog</a>
+        <a href="index.html" class="active">Showcase</a>
+      </nav>
+      <div class="header-actions">
+        <a href="../pigment-engine.html" class="btn btn-outline">Try Demo</a>
+        <a href="../docs/getting-started.html" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="showcase-main">
+    <div class="showcase-header">
+      <h1>Community Showcase</h1>
+      <p class="lead">Artwork evolved using PIGMENT's genetic algorithms and AI prompts.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters" role="group" aria-label="Filter artworks by style">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="glitch">Glitch</button>
+      <button class="filter-btn" data-filter="organic">Organic</button>
+      <button class="filter-btn" data-filter="void">Void</button>
+      <button class="filter-btn" data-filter="abstract">Abstract</button>
+      <button class="filter-btn" data-filter="portrait">Portrait</button>
+    </div>
+
+    <div class="list-controls">
+      <span class="result-count" id="result-count">Showing 12 artworks</span>
+      <select class="sort-select" id="sort-select" aria-label="Sort artworks">
+        <option value="fitness">Sort by Fitness</option>
+        <option value="generations">Sort by Generations</option>
+        <option value="newest">Newest First</option>
+      </select>
+    </div>
+
+    <div class="showcase-grid" id="showcase-grid" role="list" aria-live="polite"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>PIGMENT</h4>
+        <ul>
+          <li><a href="../docs/index.html">Documentation</a></li>
+          <li><a href="../blog/index.html">Blog</a></li>
+          <li><a href="index.html">Showcase</a></li>
+          <li><a href="../pigment-engine.html">Live Demo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>API Reference</h4>
+        <ul>
+          <li><a href="../docs/getting-started.html">Quick Start</a></li>
+          <li><a href="../docs/authentication.html">Authentication</a></li>
+          <li><a href="../docs/endpoints/works.html">/v1/works</a></li>
+          <li><a href="../docs/endpoints/gallery.html">/v1/gallery</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="../blog/genetic-algorithms.html">Genetic Algorithms</a></li>
+          <li><a href="../blog/kinship-explained.html">Kinship System</a></li>
+          <li><a href="../docs/faq.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Links</h4>
+        <ul>
+          <li><a href="https://github.com/pigment-org" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="../LICENSE">MIT License</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 PIGMENT. Open source under the <a href="../LICENSE">MIT License</a>.</p>
+    </div>
+  </footer>
+
+  <script src="../js/ui.js"></script>
+  <script>
+    const artworks = [
+      { id: 1,  title: "Neon Genesis",      style: "glitch",    fitness: 98.5, generations: 1542, emoji: "🌀", bg: "radial-gradient(circle, #c8ff00 0%, #0a0a0a 75%)" },
+      { id: 2,  title: "Forest Dreams",     style: "organic",   fitness: 97.2, generations: 2310, emoji: "🌿", bg: "radial-gradient(circle, #003300 0%, #0a0a0a 75%)" },
+      { id: 3,  title: "Dark Void",         style: "void",      fitness: 94.8, generations: 876,  emoji: "⚫", bg: "radial-gradient(circle, #0051ff 0%, #0a0a0a 75%)" },
+      { id: 4,  title: "Abstract Forms",    style: "abstract",  fitness: 92.3, generations: 654,  emoji: "🔷", bg: "radial-gradient(circle, #8a6ae0 0%, #0a0a0a 75%)" },
+      { id: 5,  title: "Glitch Portrait",   style: "portrait",  fitness: 91.7, generations: 1203, emoji: "👤", bg: "radial-gradient(circle, #ff3b2f 0%, #0a0a0a 75%)" },
+      { id: 6,  title: "Organic Growth",    style: "organic",   fitness: 90.2, generations: 892,  emoji: "🌱", bg: "radial-gradient(circle, #004400 0%, #0a0a0a 75%)" },
+      { id: 7,  title: "Void Echo",         style: "void",      fitness: 88.9, generations: 543,  emoji: "🌑", bg: "radial-gradient(circle, #111 0%, #0a0a0a 75%)" },
+      { id: 8,  title: "Geometric Study",   style: "abstract",  fitness: 87.5, generations: 765,  emoji: "🔺", bg: "radial-gradient(circle, #6a00ee 0%, #0a0a0a 75%)" },
+      { id: 9,  title: "Signal Noise",      style: "glitch",    fitness: 86.1, generations: 980,  emoji: "📡", bg: "radial-gradient(circle, #c8ff00 0%, #111 75%)" },
+      { id: 10, title: "Deep Roots",        style: "organic",   fitness: 84.3, generations: 1450, emoji: "🌳", bg: "radial-gradient(circle, #1a4a00 0%, #0a0a0a 75%)" },
+      { id: 11, title: "Unknown Horizon",   style: "portrait",  fitness: 82.7, generations: 607,  emoji: "🌅", bg: "radial-gradient(circle, #ff6600 0%, #0a0a0a 75%)" },
+      { id: 12, title: "Static Dreams",     style: "glitch",    fitness: 81.0, generations: 334,  emoji: "📺", bg: "radial-gradient(circle, #aaffcc 0%, #0a0a0a 75%)" },
+    ];
+
+    const grid = document.getElementById('showcase-grid');
+    const countEl = document.getElementById('result-count');
+    const sortSelect = document.getElementById('sort-select');
+    let activeFilter = 'all';
+
+    function sorted(list) {
+      const s = sortSelect.value;
+      return [...list].sort((a, b) =>
+        s === 'generations' ? b.generations - a.generations :
+        s === 'newest'      ? b.id - a.id :
+                              b.fitness - a.fitness
+      );
+    }
+
+    function render() {
+      const filtered = activeFilter === 'all'
+        ? artworks
+        : artworks.filter(a => a.style === activeFilter);
+      const list = sorted(filtered);
+
+      countEl.textContent = `Showing ${list.length} artwork${list.length !== 1 ? 's' : ''}`;
+
+      grid.innerHTML = list.map(art => `
+        <div class="showcase-card" role="listitem" tabindex="0"
+             aria-label="${art.title}, ${art.style} style, fitness ${art.fitness}%">
+          <div class="showcase-preview" style="background:${art.bg}">${art.emoji}</div>
+          <div class="showcase-info">
+            <div class="showcase-title">${art.title}</div>
+            <div class="showcase-meta">
+              <span>${art.style} · ${art.generations.toLocaleString()} gen</span>
+              <span class="showcase-fitness">${art.fitness}%</span>
             </div>
+          </div>
         </div>
-    </nav>
+      `).join('');
+    }
 
-    <section class="hero">
-        <h1>Evolutionary Art <span class="accent">API</span></h1>
-        <p>Generate unique artwork using genetic algorithms. Watch images evolve in real-time.</p>
-        <div class="cta-buttons">
-            <a href="docs/getting-started.html" class="btn btn-primary">Start Building</a>
-            <a href="pigment-engine.html" class="btn btn-outline">Try Demo</a>
-        </div>
-    </section>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        render();
+      });
+    });
 
-    <section class="features">
-        <h2>Why PIGMENT?</h2>
-        <div class="feature-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🧬</div>
-                <h3>Genetic Evolution</h3>
-                <p>Watch your images evolve through generations of mutation and selection.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔗</div>
-                <h3>Kinship System</h3>
-                <p>Track family trees of artwork and measure artistic influence.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3>AI-Powered</h3>
-                <p>Integrated with Claude for intelligent prompt-based evolution.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Real-time</h3>
-                <p>WebSocket support for live evolution progress.</p>
-            </div>
-        </div>
-    </section>
+    sortSelect.addEventListener('change', render);
 
-    <section class="stats">
-        <div class="stats-container">
-            <div class="stat-item">
-                <span class="stat-number">171K</span>
-                <span class="stat-label">Training Samples</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">14</span>
-                <span class="stat-label">Q-States</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">12</span>
-                <span class="stat-label">Strategies</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">99%</span>
-                <span class="stat-label">Uptime</span>
-            </div>
-        </div>
-    </section>
-
-    <section class="showcase">
-        <h2>Generated with PIGMENT</h2>
-        <div class="showcase-grid">
-            <div class="showcase-item"><img src="https://via.placeholder.com/300/c8ff00/000000?text=Art+1" alt="Artwork 1"></div>
-            <div class="showcase-item"><img src="https://via.placeholder.com/300/0051ff/ffffff?text=Art+2" alt="Artwork 2"></div>
-            <div class="showcase-item"><img src="https://via.placeholder.com/300/ff3b2f/ffffff?text=Art+3" alt="Artwork 3"></div>
-            <div class="showcase-item"><img src="https://via.placeholder.com/300/bf5af2/ffffff?text=Art+4" alt="Artwork 4"></div>
-        </div>
-    </section>
-
-    <section class="cta-section">
-        <h2>Ready to create?</h2>
-        <p>Get your API key and start generating in minutes.</p>
-        <a href="docs/getting-started.html" class="btn btn-primary">Get Started Now</a>
-    </section>
-
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h4>PIGMENT</h4>
-                <ul>
-                    <li><a href="docs/">Documentation</a></li>
-                    <li><a href="blog/">Blog</a></li>
-                    <li><a href="showcase/">Showcase</a></li>
-                    <li><a href="pigment-engine.html">Live Demo</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>API</h4>
-                <ul>
-                    <li><a href="docs/getting-started.html">Quick Start</a></li>
-                    <li><a href="docs/authentication.html">Authentication</a></li>
-                    <li><a href="docs/endpoints/evolve.html">Evolve Endpoint</a></li>
-                    <li><a href="docs/rate-limits.html">Rate Limits</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Resources</h4>
-                <ul>
-                    <li><a href="blog/genetic-algorithms.html">Genetic Algorithms</a></li>
-                    <li><a href="blog/kinship-explained.html">Kinship System</a></li>
-                    <li><a href="blog/ai-prompts.html">AI Prompts</a></li>
-                    <li><a href="https://github.com/pigment-org">GitHub</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 PIGMENT. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        // Mobile menu toggle
-        document.getElementById('menuBtn').addEventListener('click', () => {
-            document.getElementById('navLinks').classList.toggle('show');
-        });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.nav')) {
-                document.getElementById('navLinks').classList.remove('show');
-            }
-        });
-    </script>
+    render();
+  </script>
 </body>
 </html>
