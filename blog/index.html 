@@ -1,136 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>PIGMENT Blog - AI Art Evolution</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/main.css">
-    <style>
-        .blog-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-        .blog-card {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-        .blog-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-        }
-        .blog-card-image {
-            width: 100%;
-            height: 180px;
-            background: #1a1a1a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-        }
-        .blog-card-content {
-            padding: 1.5rem;
-        }
-        .blog-card-date {
-            color: #666;
-            font-size: 0.8rem;
-            margin-bottom: 0.5rem;
-        }
-        .blog-card-title {
-            font-family: var(--display);
-            font-size: 1.3rem;
-            margin-bottom: 0.75rem;
-        }
-        .blog-card-excerpt {
-            color: #999;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-        .blog-card-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .featured-post {
-            background: #0d0d0d;
-            border: 1px solid #1a1a1a;
-            border-radius: 16px;
-            padding: 2rem;
-            margin: 2rem 0;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-        @media (max-width: 768px) {
-            .featured-post {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="PIGMENT Blog — Deep dives into genetic algorithms, kinship systems, and AI-powered art evolution.">
+  <title>Blog — PIGMENT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Unbounded:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/blog.css">
 </head>
-<body>
-    <header class="docs-header">
-        <div class="header-container">
-            <div class="logo"><a href="../index.html">PIGMENT <span>blog</span></a></div>
-            <nav class="header-nav">
-                <a href="../index.html">Home</a>
-                <a href="../docs/index.html">Docs</a>
-                <a href="index.html" class="active">Blog</a>
-                <a href="../showcase/index.html">Showcase</a>
-            </nav>
+<body class="blog-page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="../index.html" class="site-logo">PIGMENT <span>blog</span></a>
+      <button class="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <nav class="header-nav" role="navigation" aria-label="Main navigation">
+        <a href="../index.html">Home</a>
+        <a href="../docs/index.html">Docs</a>
+        <a href="index.html" class="active">Blog</a>
+        <a href="../showcase/index.html">Showcase</a>
+      </nav>
+      <div class="header-actions">
+        <a href="../docs/getting-started.html" class="btn btn-primary">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Blog hero -->
+  <div class="blog-hero">
+    <h1>PIGMENT Blog</h1>
+    <p class="lead">Deep dives into genetic algorithms, kinship systems, and AI-powered art evolution.</p>
+
+    <!-- Featured post -->
+    <a href="genetic-algorithms.html" class="featured-post" style="text-decoration:none; color:inherit;">
+      <div class="featured-image" style="background: linear-gradient(135deg, #0f1a00 0%, #1a2a00 100%);">🧬</div>
+      <div class="featured-content">
+        <div class="featured-label">Featured Article</div>
+        <h2>How Genetic Algorithms Create Art</h2>
+        <p>An in-depth exploration of how evolution through mutation and selection can generate stunning visual artwork — and how PIGMENT's fitness function drives convergence.</p>
+        <div class="featured-meta">March 20, 2026 · 12 min read</div>
+        <span class="btn btn-primary">Read Article →</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Post grid -->
+  <p class="blog-section-title">All Articles</p>
+  <div class="blog-grid">
+
+    <article class="blog-card">
+      <div class="blog-card-thumb" style="background: linear-gradient(135deg, #000d1a 0%, #001a33 100%);">🔗</div>
+      <div class="blog-card-body">
+        <div class="blog-card-date">March 15, 2026</div>
+        <h2 class="blog-card-title"><a href="kinship-explained.html">Kinship Explained: Art Family Trees</a></h2>
+        <p class="blog-card-excerpt">How FAISS vector search finds parents, siblings, and cousins in your art collection using 16-dimensional feature vectors and cosine similarity.</p>
+        <div class="blog-card-footer">
+          <span>8 min read</span>
+          <a href="kinship-explained.html" class="read-more">Read more →</a>
         </div>
-    </header>
+      </div>
+    </article>
 
-    <main class="docs-content" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
-        <h1>PIGMENT Blog</h1>
-        <p class="lead">Deep dives into genetic algorithms, kinship systems, and AI-powered art evolution.</p>
-
-        <div class="featured-post">
-            <div class="featured-image" style="background: #1a1a1a; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 5rem;">🧬</div>
-            <div>
-                <h2>How Genetic Algorithms Create Art</h2>
-                <p style="color: #999;">An in-depth exploration of how evolution through mutation and selection can generate stunning visual artwork.</p>
-                <p><strong>Reading time:</strong> 12 minutes</p>
-                <a href="genetic-algorithms.html" class="btn btn-primary">Read More →</a>
-            </div>
+    <article class="blog-card">
+      <div class="blog-card-thumb" style="background: linear-gradient(135deg, #0a001a 0%, #1a0033 100%);">🤖</div>
+      <div class="blog-card-body">
+        <div class="blog-card-date">March 10, 2026</div>
+        <h2 class="blog-card-title"><a href="ai-prompts.html">AI Prompts Meet Genetic Algorithms</a></h2>
+        <p class="blog-card-excerpt">How Claude API translates natural language like "make it glitchy" into structured mutation plans with weighted operator selection.</p>
+        <div class="blog-card-footer">
+          <span>6 min read</span>
+          <a href="ai-prompts.html" class="read-more">Read more →</a>
         </div>
+      </div>
+    </article>
 
-        <div class="blog-grid">
-            <div class="blog-card">
-                <div class="blog-card-image">🔗</div>
-                <div class="blog-card-content">
-                    <div class="blog-card-date">March 15, 2026</div>
-                    <div class="blog-card-title">Kinship Explained: Art Family Trees</div>
-                    <div class="blog-card-excerpt">How FAISS vector search finds parents, siblings, and cousins in your art collection using 16-dimensional features.</div>
-                    <a href="kinship-explained.html" class="blog-card-link">Read more →</a>
-                </div>
-            </div>
-            <div class="blog-card">
-                <div class="blog-card-image">🤖</div>
-                <div class="blog-card-content">
-                    <div class="blog-card-date">March 10, 2026</div>
-                    <div class="blog-card-title">AI Prompts Meet Genetic Algorithms</div>
-                    <div class="blog-card-excerpt">How Claude API translates "make it glitchy" into structured mutation plans for evolving artwork.</div>
-                    <a href="ai-prompts.html" class="blog-card-link">Read more →</a>
-                </div>
-            </div>
-            <div class="blog-card">
-                <div class="blog-card-image">📊</div>
-                <div class="blog-card-content">
-                    <div class="blog-card-date">March 5, 2026</div>
-                    <div class="blog-card-title">16 Dimensions of Art</div>
-                    <div class="blog-card-excerpt">Breaking down the perceptual features: RGB means, entropy, hue spread, glitch factor, and more.</div>
-                    <a href="feature-vectors.html" class="blog-card-link">Read more →</a>
-                </div>
-            </div>
+    <article class="blog-card">
+      <div class="blog-card-thumb" style="background: linear-gradient(135deg, #1a0a00 0%, #330d00 100%);">📊</div>
+      <div class="blog-card-body">
+        <div class="blog-card-date">March 5, 2026</div>
+        <h2 class="blog-card-title"><a href="#">16 Dimensions of Art</a></h2>
+        <p class="blog-card-excerpt">Breaking down the perceptual feature vector: RGB channel means, entropy, hue spread, saturation variance, glitch factor, edge density, and more.</p>
+        <div class="blog-card-footer">
+          <span>9 min read</span>
+          <a href="#" class="read-more">Coming soon</a>
         </div>
-    </main>
+      </div>
+    </article>
 
-    <footer class="docs-footer">[footer]</footer>
+    <article class="blog-card">
+      <div class="blog-card-thumb" style="background: linear-gradient(135deg, #001a1a 0%, #003333 100%);">🎯</div>
+      <div class="blog-card-body">
+        <div class="blog-card-date">Feb 28, 2026</div>
+        <h2 class="blog-card-title"><a href="#">The Fitness Function</a></h2>
+        <p class="blog-card-excerpt">Why 70% edge similarity and 30% color similarity outperforms pixel-level MSE — a deep dive into Sobel operators and perceptual fitness scoring.</p>
+        <div class="blog-card-footer">
+          <span>7 min read</span>
+          <a href="#" class="read-more">Coming soon</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="blog-card">
+      <div class="blog-card-thumb" style="background: linear-gradient(135deg, #1a1a00 0%, #2a2a00 100%);">⚡</div>
+      <div class="blog-card-body">
+        <div class="blog-card-date">Feb 22, 2026</div>
+        <h2 class="blog-card-title"><a href="#">WebSocket Streaming for Live Art</a></h2>
+        <p class="blog-card-excerpt">Building real-time evolution pipelines: job queues, fitness milestones, kinship push events, and error heatmap streaming.</p>
+        <div class="blog-card-footer">
+          <span>5 min read</span>
+          <a href="#" class="read-more">Coming soon</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="blog-card">
+      <div class="blog-card-thumb" style="background: linear-gradient(135deg, #0a001a 0%, #130033 100%);">🧪</div>
+      <div class="blog-card-body">
+        <div class="blog-card-date">Feb 15, 2026</div>
+        <h2 class="blog-card-title"><a href="#">From 510 to 171k: How We Trained PIGMENT</a></h2>
+        <p class="blog-card-excerpt">The journey from 510 seed samples to 171k+ training examples — and how that 8.1% improvement in operator selection changed everything.</p>
+        <div class="blog-card-footer">
+          <span>11 min read</span>
+          <a href="#" class="read-more">Coming soon</a>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>PIGMENT</h4>
+        <ul>
+          <li><a href="../docs/index.html">Documentation</a></li>
+          <li><a href="index.html">Blog</a></li>
+          <li><a href="../showcase/index.html">Showcase</a></li>
+          <li><a href="../pigment-engine.html">Live Demo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>API Reference</h4>
+        <ul>
+          <li><a href="../docs/getting-started.html">Quick Start</a></li>
+          <li><a href="../docs/authentication.html">Authentication</a></li>
+          <li><a href="../docs/endpoints/evolve.html">/v1/evolve</a></li>
+          <li><a href="../docs/rate-limits.html">Rate Limits</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Articles</h4>
+        <ul>
+          <li><a href="genetic-algorithms.html">Genetic Algorithms</a></li>
+          <li><a href="kinship-explained.html">Kinship System</a></li>
+          <li><a href="ai-prompts.html">AI Prompts</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Links</h4>
+        <ul>
+          <li><a href="https://github.com/pigment-org" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="../docs/faq.html">FAQ</a></li>
+          <li><a href="../LICENSE">MIT License</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 PIGMENT. Open source under the <a href="../LICENSE">MIT License</a>.</p>
+    </div>
+  </footer>
+
+  <script src="../js/ui.js"></script>
 </body>
 </html>
